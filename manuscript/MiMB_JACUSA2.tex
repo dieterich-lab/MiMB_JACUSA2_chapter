@@ -56,7 +56,13 @@ Several approaches have been presented to map RNA modifications on RNA. Herein, 
 \section*{MATERIALS}
 
 \subsection*{ONT direct RNA sequencing}
-ScNapBar offers two run modes. The first one uses cell barcode and UMI information without any additional modeling aspect. The second one introduces a probabilistic model, which performs very well in cases of low sequencing saturation (i.e. UMI coverage in Illumina data).
+\todo{Isabel}
+
+\subsection*{Hardware requirements}
+All analyses have been performed/tested on two alternative hardware systems:
+a standard Linux desktop computer or an Apple iMac (Retina 5K, ultimo 2014).
+The workflow requires a multi-core processor system with minimal main memory of 16GB RAM
+and several GBs of free disk space (depending on data set size).
 
 \subsection*{Software dependencies and installation}
 The UMI approach requires a matching cell barcode and UMI tag and was first developed in Sicelore . Any cell barcode predictions that are supported by the presence of both, barcode and UMI alignment, are very reliable. We performed an \emph{in silico} benchmark of cell barcode assignment when both, cell barcode and UMI,  are found in the Nanopore read. We observed an average specificity of 99.9\% (ScNapBar) and 99.8\% (Sicelore) over 100 averaged simulation runs (Fig. \ref{fig:umimetrics}a). As expected, sensitivity heavily depends on Illumina sequencing saturation (Fig. \ref{fig:umimetrics}a). As the UMI approach relies on consistent genomic mappings for the Illumina and Nanopore reads, other challenges include: insufficient or inaccurate genome annotations causing wrong gene assignment; chimeric or super-long Nanopore reads assigned to multiple genes increase the risk of assigning a false UMI. %(Suppl. Fig. \ref{fig:simx}).
@@ -163,6 +169,19 @@ We used 10X Genomics Cell Ranger 3.1 (\url{https://github.com/10XGenomics/cellra
 
 \section*{TABLE CAPTIONS}
 \section*{TABLES}
+
+\begin{table}[]
+\begin{tabular}{|l|c|r|}
+\hline 
+            Software & Version & Description \\ 
+            \hline \hline
+            \texttt{Minimap2} & \url{https://github.com/lh3/minimap2} v2.22 or later & \url{https://lh3.github.io/minimap2/} \\ \hline
+            \texttt{samtools} & v1.12 or later & \\ \hline
+	   \texttt{JAVA} & openjdk 11.0.12 2021-07-20 (JAVA 11 or later)& OpenJDK Runtime Environment\\ \hline
+\end{tabular}
+\caption{\textbf{Prediction metrics for the benchmark in the SIRV and ONT RNA-seq datasets.}\label{tab:benchmark} See the complete report at the Supplementary Section \ref{s:sirv_cmreport} (SIRV) and \ref{s:ont_cmreport} (ONT RNA-seq). Spec: Specificity.}
+\end{table}
+
 
 
 \end{document}

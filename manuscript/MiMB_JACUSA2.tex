@@ -171,15 +171,31 @@ We used 10X Genomics Cell Ranger 3.1 (\url{https://github.com/10XGenomics/cellra
 \section*{TABLES}
 
 \begin{table}[]
-\begin{tabular}{|p{2cm}|p{7cm}|p{7cm}|}
+\begin{tabular}{|p{1.5cm}|p{7cm}|p{6.5cm}|}
 \hline 
             Software & Version & Description \\ 
             \hline \hline
             \texttt{Minimap2} & \url{https://github.com/lh3/minimap2} v2.22 or later & \url{https://lh3.github.io/minimap2/} \\ \hline
             \texttt{samtools} & \url{https://github.com/samtools/samtools} v1.12 or later & \url{http://samtools.github.io/} \\ \hline
-	   \texttt{JAVA} & openjdk 11.0.12 2021-07-20 (JAVA 11 or later)& OpenJDK Runtime Environment\\ \hline
+	   \texttt{JAVA} & openjdk 11.0.12 2021-07-20 - JAVA 11 or later & OpenJDK Runtime Environment\\ \hline
+	   \texttt{R} &  \url{https://www.r-project.org/} version 3.5.1 or later & The R Project for Statistical Computing \\ \hline
+	   \texttt{PERL} &  \url{https://www.perl.org/} version 5.28.1 or later & Perl is a highly capable, feature-rich programming language \\ \hline
+	   \texttt{BASH} &  \url{https://www.perl.org/} version 5.28.1 or later & Perl is a highly capable, feature-rich programming language \\ \hline
+	   \texttt{sed, awk} &  \url{https://www.perl.org/} version 5.28.1 or later & Perl is a highly capable, feature-rich programming language \\ \hline	   
+	   \texttt{bedtools} &  \url{https://www.perl.org/} version 5.28.1 or later & Perl is a highly capable, feature-rich programming language \\ \hline	   
 \end{tabular}
-\caption{\textbf{Prediction metrics for the benchmark in the SIRV and ONT RNA-seq datasets.}\label{tab:benchmark} See the complete report at the Supplementary Section \ref{s:sirv_cmreport} (SIRV) and \ref{s:ont_cmreport} (ONT RNA-seq). Spec: Specificity.}
+\caption{\textbf{Software dependencies}\label{tab:software} blubba}
+\end{table}
+
+\begin{table}[]
+\begin{tabular}{|p{1.5cm}|p{7cm}|p{6.5cm}|}
+\hline 
+            R Packages & Version & Description \\ 
+            \hline \hline
+            \texttt{ggplot2} & \url{https://cran.r-project.org/web/packages/ggplot2/index.html} - ggplot2\_3.3.0 or later &  ggplot2 is a system for declaratively creating graphics, based on The Grammar of Graphics. \\ \hline
+            \texttt{NMF} & \url{https://cran.r-project.org/web/packages/NMF/index.html} - NMF\_0.22.0 or later &  Provides a framework to perform Non-negative Matrix Factorization (NMF). \\ \hline
+\end{tabular}
+\caption{\textbf{R Package dependencies}\label{tab:software} blubba}
 \end{table}
 
 

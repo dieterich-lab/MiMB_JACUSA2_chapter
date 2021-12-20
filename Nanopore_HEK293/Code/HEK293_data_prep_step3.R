@@ -29,7 +29,9 @@ dev.off()
 
 
 wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
-table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))}))
+print("Table of number of best hits for each pattern")  
+print(table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})))
+
 tt=apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})
 
                                         #BigTable[names(which(tt==k)),"Motif"]

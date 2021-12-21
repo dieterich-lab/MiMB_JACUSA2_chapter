@@ -65,25 +65,19 @@ The workflow requires a multi-core processor system with minimal main memory of 
 and several GBs of free disk space (depending on data set size).
 
 \subsection*{Software dependencies and installation}
-The UMI approach requires a matching cell barcode and UMI tag and was first developed in Sicelore . Any cell barcode predictions that are supported by the presence of both, barcode and UMI alignment, are very reliable. We performed an \emph{in silico} benchmark of cell barcode assignment when both, cell barcode and UMI,  are found in the Nanopore read. We observed an average specificity of 99.9\% (ScNapBar) and 99.8\% (Sicelore) over 100 averaged simulation runs (Fig. \ref{fig:umimetrics}a). As expected, sensitivity heavily depends on Illumina sequencing saturation (Fig. \ref{fig:umimetrics}a). As the UMI approach relies on consistent genomic mappings for the Illumina and Nanopore reads, other challenges include: insufficient or inaccurate genome annotations causing wrong gene assignment; chimeric or super-long Nanopore reads assigned to multiple genes increase the risk of assigning a false UMI. %(Suppl. Fig. \ref{fig:simx}).
+Our analysis workflow has few requirements, which are detailed in Table \ref{tab:software}. Specifically, to execute our workflow, the following prerequisites are necessary: a BASH shell, a JAVA runtime environment, a working PERL and R installation. Additional i.e. non-standard software to process and map Nanopore reads (bedtools, samtools and Minimap2) are obligatory, while the installation of a Nanopore read simulator (NanoSim) is optional and depends on your use case. Table \ref{tab:packages} lists some additional R packages, which are required to run the R code. Detailed instructions on how to setup are found under \url{https://github.com/dieterich-lab/MiMB_JACUSA2_chapter} 
 
 \section*{METHODS}
-The current ecosystem of single-cell RNA-seq platforms is rapidly expanding, but robust solutions for single-cell and single-molecule full-length RNA sequencing are virtually absent. In our manuscript, we combined Oxford Nanopore single-molecule sequencing of 10x Genomics cDNA libraries and developed a novel software tool to arrive at single-cell, single-molecule, full cDNA length resolution. In contrast to , our Bayesian method for cell barcode assignment performs superior in situations of low sequencing saturation.
-%This is related to issue 1
-Even in the light of expected improvements of ONT sequencing error rates, ScNapBar offers improved performance the aforementioned use case (see Suppl. Fig. \ref{fig:lowerrormetrics}).  In summary, we could track in a well-controlled setting, i.e. by using GFP labeled cells and strong transcriptome pertubations, full-length transcript information at a single-cell level. We have identified differential RNA splicing linked to NMD pathway activity across our cell population. Our high-throughput full-length RNA sequencing solution is a necessary step forward towards studying the complex life of mRNA on single-cell level. This opens up unprecedented opportunities in low saturation settings such as multiplexed CRISPR-based screens.
+Overview Figure 1
+\subsection*{Nanopore direct RNA sequencing}
+\subsection*{Nanopore read processing}
+\subsection*{Use Case 1: Comparison of wildtype and knock-out samples}
+\subsection*{Use Case 2: Comparison of wildtype and IVT samples}
+\subsection*{Use Case 3: Comparison of wildtype to simulated IVT sample}
+
 
 \section*{NOTES}
-\subsection*{Single cell samples preparation and experiment}
-
-We performed an experiment using two different Flp-In-T-REx-293 cell lines: the wild type cell line with stably integrated FLAG-emGFP and a \textit{SMG7} knockout (KO) cell line (generated and established in ). Wild type cells (GFP+) were transfected with siRNA against Luciferase and the \textit{SMG7} KO cells (GFP-) were transfected with an siRNA against \textit{SMG6}. Two days after siRNA transfection, we mixed both cell types at a 1:1 ratio with a target of 2,000 cells in total.
-cDNA was prepared according to the 10x Genomics Chromium Single Cell 3' Reagent Kit User Guide (v3  Chemistry) from the pool of $\approx$2.000 cells with a yield of 1.68 $\mu$g cDNA ( 42ng/$\mu$l concentration , 40$\mu$L volume) and a fragment size of 1.5kbp. At this point, all cDNA fragments carry the 16nt cellular barcode and 12nt UMI at the Poly (dT) end. 25\% (10 $\mu$L) of this cDNA solution continued with the original 10x Genomics protocol to create an Illumina 3' mRNA library with P5 and P7 Illumina adapters, and paired-end reads of this library will present cellular barcode and UMI with the first read and a 90nt second read containing 3' mRNA sequence. Further on, we produced two ONT libraries with 200ng each of the same cDNA  (0.2 pmoles) with the ONT Direct cDNA Sequencing Kit SQK-DCS109 protocol according to the manufactures' standard procedures. We sequenced each library on one GridIon flowcell (FLO-MIN106D R9 Version / R9.4.1) creating reads of full cDNA length that contained the same compositions of $\approx$2000 cellular barcodes as the Illumina data (based on the same cells) but a different composion of UMIs (different transcripts).
-
-%A cDNA library was prepared according to the 10x Genomics Chromium Single Cell 3' Reagent Kit User Guide (v3 Chemistry) from the pool of cells. The final libraries contain the P5 and P7 primers. The P5 read contains 21-nt adaptor sequence, 16-nt cellular barcode, 12-nt UMI, and polyA-tail, followed by cDNA sequences.
-
-\subsection*{Illumina reads processing and identification of cellular barcodes}
-We used 10X Genomics Cell Ranger 3.1 (\url{https://github.com/10XGenomics/cellranger}) %\citep{10XGenomics2020}
- to map the Illumina reads onto the reference genome. In our NMD dataset, the DNA sequences of luciferase were appended to the reference genome, and therefore the GFP+ cells can be called from Cell Ranger. Cell Ranger also corrects the sequencing errors in the barcode and unique molecular identifier (UMI) sequences. Cell Ranger estimates the number of cells using a Good-Turing frequency estimation model (\url{https://support.10xgenomics.com}), %\citep{10XGenomics2020a}
- and characterized the identified barcodes into the cell-associated and background-associated barcodes. We used the cell-associated barcode sequences as the cellular barcode whitelist in the following analyses. Our CellRanger analysis estimated 2,052 sequenced cells (Suppl. Table \ref{tab:crs}). The read counts per cell of the estimated cell barcodes are shown in Suppl. Fig. \ref{fig:seqstats}. 
+\subsection*{Tips and Tricks}
 
 \section*{ACKNOWLEDGMENTS}
   The authors would like to thank Etienne Boileau, Thiago Britto Borges, Tobias Jakobi for proof-reading and comments.
@@ -111,66 +105,25 @@ We used 10X Genomics Cell Ranger 3.1 (\url{https://github.com/10XGenomics/cellra
 
 \section*{FIGURE CAPTIONS}
 
-  \begin{figure}[h!]
-    %\includegraphics[width = 1\textwidth]{figs/graphicsummary.pdf}
-  \caption{\textbf{Combined Single-cell Illumina and Nanopore sequencing strategy.} GFP+/- cells are pooled and sequenced on the Illumina and Nanopore platform. The Nanopore platform generates long cDNA sequencing read that are used in barcode calling and estimating read error parameters. The Illumina data are used to estimate the total number of cells in sequencing and the represented cell barcodes. The simulated data are then used to parameterize a Bayesian model of barcode alignment features to discriminate correct vs. false barcode assignments. This model is then used on the real data to assign cell barcodes to Nanopore reads. The GFP label and known NMD transcripts can be used to validate this assignment. }
+\begin{figure}[h!]
+    \includegraphics[width = 1\textwidth]{Figure1.pdf}
+  \caption{\textbf{General outline of RNA modification detection by JACUSA2.} A key feature of our approach is that multiple replicates can be compared as shown on the left. Samples of interests where all modifications are present could be compared with either KO samples where the modification of interest is missing or IVT/simulated samples where all modifications are absent. Read mapping are compared head-to-head as shown on the right. }
   \label{fig:graphicsummary}
       \end{figure}
 
 \begin{figure}[h!]
-     \centering
-     \begin{subfigure}[t]{0.65\textwidth}
-        % \caption{}
-         \centering
-         %\includegraphics[height=5cm]{figs/umi-t.pdf}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[t]{0.3\textwidth}
-        % \caption{}
-         \centering
-         %\includegraphics[height=4.9cm]{figs/fc12-roc.pdf}
-     %   \label{fig:score_metrics}
-      \end{subfigure}
-        \caption{\textbf{Sensitivity and specificity of ScNapBar and Sicelore on 100 Illumina libraries with different levels of saturation.} (a) Barcode assignment with UMI matches. (b) Barcode assignment without UMI matches (ScNapBar score \textgreater 50). (c) Benchmark of the specificity and sensitivity of the Illumina library with 100\% saturation. We compared the barcode assignments with ScNapBar score \textgreater 1-99, and the assignments from Sicelore with UMI support are roughly equivalent to the ScNapBar score \textgreater 90. }
-         \label{fig:umimetrics}
-\end{figure}
-    
-\begin{figure}[h!]
-     \centering
-     \begin{subfigure}[t]{0.35\textwidth}
-         \caption{}
-         \label{fig:cpu-rt}
-         \centering
-         %\includegraphics[width=\textwidth]{figs/cpu-rt.pdf}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[t]{0.55\textwidth}
-         \caption{}
-         \label{fig:ctime-sis}
-         \centering
-         %\includegraphics[width=\textwidth]{figs/cpu-sis.pdf}
-     \end{subfigure}
-        \caption{\textbf{Sicelore and ScNapBar CPU time comparison.} (a) ScNapBar CPU time depends on the number of whitelist barcodes (allowing an edit distance of  \textgreater 2 and and offset of up to 4bp between adapter and barcode). Gray area represents the standard deviation for 10 runs. (b) Comparison of ScNapBar and Sicelore CPU times. Benchmark was measured using one million barcode sequences and 2,052 barcodes in the whitelist. }
-        \label{fig:runtime}
-\end{figure}
+    \includegraphics[width = 1\textwidth]{Figure2.pdf}
+  \caption{\textbf{Motivation of 5mer context for RNA modification mapping} to be defined }
+  \label{fig:5mer}
+      \end{figure}
 
-\begin{figure}[h!]
-     %\centering
-     %\begin{subfigure}[b]{0.45\textwidth}
-      %   \caption{}
-         \centering
-         %\includegraphics[width=\textwidth]{revision/figs/fc12-realsteps.pdf}
-         \label{fig:fc1realsteps}
-     %\end{subfigure}
-     %\hfill
-        \caption{\textbf{Number of the Nanopore reads identified by ScNapBar and Sicelore at each processing step.}  We inspected each processing step on real data (low lllumina saturation of 11.3\%). The first two steps are identical for both workflows. Total Reads: Number of input reads, Aligned to genome: Number of reads aligned to genome. The next three steps are workflow-specific: Aligned to adapter: Number of reads with identified adapter sequence, Aligned to barcode: Number of reads with aligned barcode sequence, Assigned to barcode: Number of predictions by each workflow. The last step is a validation of the previous assignment step after additional Illumina sequencing, which increases the Illumina saturation to 52\%, and using UMI matches, see main text.}
-        \label{fig:realsteps}
-\end{figure}
+\newpage
 
 \section*{TABLE CAPTIONS}
 \section*{TABLES}
 
 \begin{table}[]
+\label{tab:software}
 \begin{tabular}{|p{1.5cm}|p{7cm}|p{6.5cm}|}
 \hline 
             Software & Version & Description \\ 
@@ -188,6 +141,7 @@ We used 10X Genomics Cell Ranger 3.1 (\url{https://github.com/10XGenomics/cellra
 \end{table}
 
 \begin{table}[]
+\label{tab:packages}
 \begin{tabular}{|p{1.5cm}|p{7cm}|p{6.5cm}|}
 \hline 
             R Packages & Version & Description \\ 

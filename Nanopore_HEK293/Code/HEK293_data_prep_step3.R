@@ -27,16 +27,17 @@ barplot(rep1,legend=F, main="Experiment 1",col=cbbPalette,,cex.names=2,cex.axis=
 dev.off()
 }
 
+                                        #Choice of best pattern for subsequent analysis
 
 wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
-print("Table of number of best hits for each pattern")  
-print(table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})))
-
+print("Table of number of best hits for each pattern")
+TabPatternInstances=table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))}))
+print(TabPatternInstances)
+chosenPattern=which(TabPatternInstances==max(TabPatternInstances))
+print(paste0("We suggest to use pattern:",chosenPattern))
 tt=apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})
 
-                                        #BigTable[names(which(tt==k)),"Motif"]
-                                        #BigTable[names(which(tt!=k)),"Motif"]
-
+#Compute CountMatrix                                  
 CountMatrix<-function(inp,pseudo=0.01){
 factor3=t(as.matrix((sapply(sapply(inp,strsplit,""),unlist))))
 factor3=apply(factor3,2,table)
@@ -55,7 +56,7 @@ for(k in 1:5)
 return(factor3Mat)
 }
 
-                                        #motif search TODO
+                                        #motif search optional
 library(Logolas)
 for(k in 1:nrow(h))
     {

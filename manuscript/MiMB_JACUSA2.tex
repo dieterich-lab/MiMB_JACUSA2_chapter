@@ -56,7 +56,7 @@ Several approaches have been presented to map RNA modifications on RNA. Herein, 
 \section*{MATERIALS}
 
 \subsection*{ONT direct RNA sequencing}
-\todo{Isabel}
+\todo[inline]{Isabel}
 
 \subsection*{Hardware requirements}
 All analyses have been performed/tested on two alternative hardware systems:
@@ -70,11 +70,19 @@ Our analysis workflow has few requirements, which are detailed in Table \ref{tab
 \section*{METHODS}
 Overview Figure 1
 \subsection*{Nanopore direct RNA sequencing}
+\todo[inline]{Isabel}
+\subsection*{Preparation of an \emph{in vitro} transcriptome sample}
+\todo[inline]{Isabel}
 \subsection*{Nanopore read processing}
+Minimap2 and samtools
+\todo[inline]{Christoph}
 \subsection*{Use Case 1: Comparison of wildtype and knock-out samples}
+Xpore data
+\todo[inline]{Christoph}
 \subsection*{Use Case 2: Comparison of wildtype and IVT samples}
+\todo[inline]{Christoph}
 \subsection*{Use Case 3: Comparison of wildtype to simulated IVT sample}
-
+\todo[inline]{Christoph}
 
 \section*{NOTES}
 \subsection*{Tips and Tricks}
@@ -107,17 +115,26 @@ Overview Figure 1
 
 \begin{figure}[h!]
     \includegraphics[width = 1\textwidth]{Figure1.pdf}
-  \caption{\textbf{General outline of RNA modification detection by JACUSA2.} A key feature of our approach is that multiple replicates can be compared as shown on the left. Samples of interests where all modifications are present could be compared with either KO samples where the modification of interest is missing or IVT/simulated samples where all modifications are absent. Read mapping are compared head-to-head as shown on the right. }
+  \caption{\textbf{General outline of RNA modification detection by JACUSA2.} A key feature of our approach is that multiple replicates can be compared as shown on the left. Samples of interests where all modifications are present could be compared with either KO samples where the modification of interest is missing or IVT/simulated samples where all modifications are absent. Read stacks (in blue) are compared head-to-head as shown on the right. }
   \label{fig:graphicsummary}
       \end{figure}
+\newpage
 
 \begin{figure}[h!]
     \includegraphics[width = 1\textwidth]{Figure2.pdf}
-  \caption{\textbf{Motivation of 5mer context for RNA modification mapping} to be defined }
+  \caption{\textbf{Motivation of 5mer context for RNA modification mapping}. The nanopore covers 5 consecutive RNA residues. That is why we consider a 5mer context and derive 3 principal features for every position within a given 5 mer (15 features in total, with a central A residue in this example). We evaluate each feature set by previously learned patterns and compute a final score for modification site detection.}
   \label{fig:5mer}
       \end{figure}
-
 \newpage
+
+\begin{figure}[h!]
+    \includegraphics[width = 1\textwidth]{Figure3.pdf}
+  \caption{\textbf{Experimental and computational workflow}. tbd}
+  \label{fig:workflow}
+      \end{figure}
+\newpage
+
+
 
 \section*{TABLE CAPTIONS}
 \section*{TABLES}

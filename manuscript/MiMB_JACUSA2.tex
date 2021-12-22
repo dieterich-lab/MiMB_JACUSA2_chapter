@@ -56,6 +56,41 @@ Several approaches have been presented to map RNA modifications on RNA. Herein, 
 \section*{MATERIALS}
 
 \subsection*{ONT direct RNA sequencing}
+\begin{enumerate}
+\item 500 ng polyA\textsuperscript{+} RNA isolated from total RNA e.g. with Oligotex mRNA kit (Qiagen) or Dynabeads oligo dT\textsubscript{25} beads (Thermo Fisher Scientific). Store RNA at -80 $^{\circ}$C and the mRNA purification kit as recommended by the manufacturer.
+
+\item Nuclease-free water. Store at room temperature.
+
+\item Direct RNA-sequencing kit (SQK-RNA002, Oxford Nanopore Technologies). Store at -20 $^{\circ}$C.
+
+\item NEBNext Quick Ligation Reaction Buffer (New England Biolabs). Store at -20 $^{\circ}$C.
+
+\item T4 DNA Ligase (New England Biolabs). Store at -20 $^{\circ}$C.
+
+\item dNTP Mix (10 mM each). Store at -20 $^{\circ}$C.
+
+\item SuperScript IV Reverse Transcriptase (Thermo Fisher Scientific). Store at -20 $^{\circ}$C.
+
+\item Agencourt RNAClean XP beads (Beckman Coulter). Store at 4 $^{\circ}$C.
+
+\item 70 \% ethanol, freshly prepared. 
+
+\item Qubit dsDNA HS assay kit and Qubit Fluorometer (Thermo Fisher Scientific).
+
+\item Flow cell priming kit (EXP-FLP002, Oxford Nanopore Technologies). Store at -20 $^{\circ}$C.
+
+\item Thermo cycler.
+
+\item Gentle rotator mixer.
+
+\item Magnetic stand for 1.5 ml tubes.
+
+\item 1.5 ml DNA LoBind tubes (Eppendorf), 0.2  ml PCR tubes.
+
+\item MinION or GridION sequencing device and MinION R9.4.1 Flow cells (FLO-MIN106D, Oxford Nanopore Technologies). Store Flow cells at 4 $^{\circ}$C.
+\end{enumerate}
+
+\subsection*{Preparation of an \emph{in vitro} transcriptome sample}
 \todo[inline]{Isabel}
 
 \subsection*{Hardware requirements}
@@ -71,6 +106,39 @@ Our analysis workflow has few requirements, which are detailed in Table \ref{tab
 Overview Figure 1
 \subsection*{Nanopore direct RNA sequencing}
 \todo[inline]{Isabel}
+\begin{enumerate}
+\item Adjust 500 ng polyA\textsuperscript{+} RNA to a total volume of 9 $\mu$l with nuclease-free water. Complete RT adapter ligation reaction (in 0.2 ml PCR tube) with 3 $\mu$l NEBNext Quick Ligation Reaction Buffer, 0.5 $\mu$l RNA CS (RCS, from SQK-RNA002), 1 $\mu$l RT-Adapter (RTA, from SQK-RNA002) and 1.5 $\mu$l T4 DNA Ligase. Incubate 10 min at room temperature.
+
+\item Prepare reverse transcription master mix during ligation: 9 $\mu$l nuclease-free water, 2 $\mu$l 10 mM dNTPs, 8 $\mu$l 5x SuperScript IV first strand buffer, 4 $\mu$l 0.1 mM DTT.
+
+\item Add the reverse transcription master mix to the ligation reaction and mix by pipetting. Add 2 $\mu$l SuperScript IV reverse transcriptase and mix by pipetting. Incubate in a thermocycler with the following protocol: 50 min at 50 $^{\circ}$C, 10 min at 70 $^{\circ}$C, cool down to 4 $^{\circ}$C.
+
+\item Let the Agencourt RNAClean XP beads come to room temperature during incubation of reverse transcription. Carefully resuspend beads before use. Transfer reaction to a 1.5 ml DNA LoBind tube and mix with 72 $\mu$l Agencourt RNAClean XP beads. Incubate 5 min at room temperature on a gentle rotator mixer.
+
+\item Collect beads on a magnetic stand and remove supernatant. Wash pelleted beads two times (30 sec) with 200 $\mu$l freshly prepared 70 \% ethanol. Remove supernatant. Spin sample down and place on magnet again. Remove any residual ethanol. 
+
+\item Resuspend beads in 20 $\mu$l nuclease-free water by gentle flicking and incubate 5 min at room temperature on a gentle rotator mixer. Collect beads on a magnetic stand and transfer 20 $\mu$l eluate in a fresh 1.5 ml DNA LoBind tube.
+
+\item For ligation of the RMX adapter, add the following to 20 $\mu$l eluate: 8 $\mu$l NEBNext Quick Ligation Reaction Buffer, 6 $\mu$l RMX (from SQK-RNA002), 3 $\mu$l nuclease-free water, 3 $\mu$l T4 DNA Ligase. Mix by pipetting and incubate 10 min at room temperature.
+
+\item Add 40 $\mu$l carefully resuspended Agencourt RNAClean XP beads to the reaction and mix by pipetting. Incubate 5 min at room temperature on a gentle rotator mixer.
+
+\item Collect beads on a magnetic stand and remove supernatant. Wash pelleted beads two times with 150 $\mu$l wash buffer (WSB, from SQK-RNA002). Resuspend beads by flicking, spin down and return to magnetic stand. Remove supernatant from pelleted beads.
+
+\item Resuspend beads in 21 $\mu$l elution buffer (EB, from SQK-RNA002) by gentle flicking and incubate 5 min at room temperature on a gentle rotator mixer. Pellet beads on a magnetic stand and transfer 21 $\mu$l eluate in a fresh 1.5 ml DNA LoBind tube.
+
+\item Quantify 1 $\mu$l of the library on a Qubit fluorometer with the Qubit dsDNA HS kit according to the manufacturerers protocol. Concentration should be usually in the range of 5 - 10 ng/$\mu$l.
+
+\item Insert MinION R9.4.1 Flow cell in the MinION or GridION sequencing device and perform Flow cell check in the MinKNOW software. For successful sequencing of mammalian polyA\textsuperscript{+} RNA at least 1,000 available pores are recommended.
+
+\item Prepare Priming Mix by adding 30 $\mu$l flush tether (FLT, from EXP-FLP002) to a vial of flush buffer (FB, from EXP-FLP002) and mix by pipetting. Open priming port. Remove air bubble from priming port by inserting the tip of a P1000 pipette into the priming port and slowly dialing up, until a small volume of storage buffer enters the pipette tip. Load 800 $\mu$l Priming Mix via the priming port and carefully avoid introduction of air bubbles. Close the priming port and wait for 5 min.
+
+\item Mix 20 $\mu$l library with 17.5 $\mu$l nuclease-free water and 37.5 $\mu$l RNA running buffer (RRB, from SQK-RNA002) and mix by pipetting. Open the priming port and the sample port. Load 200 $\mu$l Priming Mix via the priming port. Mix library by pipetting just before loading and load dropwise via the sample port. Carefully avoid introduction of air bubbles. Close the sample port and the priming port.
+
+\item Start sequencing for 48 to 72 h in the MinKNOW software. Choose direct RNA-sequencing kit and high-accuracy basecalling as parameters. We recommend to adjust the output filter to a minimum Q score of 7 (instead of 9).
+
+\end{enumerate}
+
 \subsection*{Preparation of an \emph{in vitro} transcriptome sample}
 \todo[inline]{Isabel}
 \subsection*{Nanopore read processing}

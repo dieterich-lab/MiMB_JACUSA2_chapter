@@ -57,7 +57,7 @@ Several approaches have been presented to map RNA modifications on RNA. Herein, 
 
 \subsection*{ONT direct RNA sequencing}
 \begin{enumerate}
-\item 500 ng polyA\textsuperscript{+} RNA isolated from total RNA e.g. with Oligotex mRNA kit (Qiagen) or Dynabeads oligo dT\textsubscript{25} beads (Thermo Fisher Scientific). Store RNA at -80 $^{\circ}$C and the mRNA purification kit as recommended by the manufacturer.
+\item 500 ng polyA\textsuperscript{+} RNA isolated from total RNA e.g. with Oligotex mRNA kit (Qiagen) or Dynabeads oligo dT\textsubscript{25} beads (Thermo Fisher Scientific) or \emph{in vitro} transcriptome sample. Store RNA at -80 $^{\circ}$C and the mRNA purification kit as recommended by the manufacturer.
 
 \item Nuclease-free water. Store at room temperature.
 
@@ -79,7 +79,7 @@ Several approaches have been presented to map RNA modifications on RNA. Herein, 
 
 \item Flow cell priming kit (EXP-FLP002, Oxford Nanopore Technologies). Store at -20 $^{\circ}$C.
 
-\item Thermo cycler.
+\item Thermocycler.
 
 \item Gentle rotator mixer.
 
@@ -91,7 +91,40 @@ Several approaches have been presented to map RNA modifications on RNA. Herein, 
 \end{enumerate}
 
 \subsection*{Preparation of an \emph{in vitro} transcriptome sample}
-\todo[inline]{Isabel}
+\begin{enumerate}
+\item 100 ng polyA\textsuperscript{+} RNA isolated from total RNA e.g. with Oligotex mRNA kit (Qiagen) or Dynabeads oligo dT\textsubscript{25} beads (Thermo Fisher Scientific). Store RNA at -80 $^{\circ}$C and the mRNA purification kit as recommended by the manufacturer
+
+\item 10 $\mu$M oligo(dT)-VN RT primer. TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTVN. Store at -20 $^{\circ}$C.
+
+\item 20 $\mu$M template switching oligo (TSO). ACTCTAATACGACTCACTATAGGGAGAGGGCrGrG+G. Store at -20 $^{\circ}$C.
+
+\item 10 $\mu$M T7 extension primer. GCTCTAATACGACTCACTATAGG. Store at -20 $^{\circ}$C.
+
+\item Nuclease-free water. Store at room temperature.
+
+\item dNTP Mix (10 mM each). Store at -20 $^{\circ}$C.
+
+\item Template Switching RT Enzyme Mix (New England Biolabs). Store at -20 $^{\circ}$C.
+
+\item Q5 Hot Start High-Fidelity 2X Master Mix (New England Biolabs). Store at -20 $^{\circ}$C.
+
+\item RNase H (5,000 U/ml) (New England Biolabs). Store at -20 $^{\circ}$C.
+
+\item NucleoSpin Gel and PCR Clean‑up, Mini kit for gel extraction and PCR clean up (Macherey-Nagel) or equivalent. Store at room temperature.
+
+\item MEGAscript T7 transcription kit (Thermo Fisher Scientific). Store at -20 $^{\circ}$C.
+
+\item RNA Clean \& Concentrator-25 kit (Zymo Research). Store at room temperature.
+
+\item Thermocycler.
+
+\item Table top centrifuge for 1.5 ml tubes.
+
+\item Nanodrop spectrophotometer or equivalent.
+
+\item 0.2  ml PCR tubes, 1.5 ml DNA LoBind tubes (Eppendorf).
+
+\end{enumerate}
 
 \subsection*{Hardware requirements}
 All analyses have been performed/tested on two alternative hardware systems:
@@ -105,15 +138,14 @@ Our analysis workflow has few requirements, which are detailed in Table \ref{tab
 \section*{METHODS}
 Overview Figure 1
 \subsection*{Nanopore direct RNA sequencing}
-\todo[inline]{Isabel}
 \begin{enumerate}
 \item Adjust 500 ng polyA\textsuperscript{+} RNA to a total volume of 9 $\mu$l with nuclease-free water. Complete RT adapter ligation reaction (in 0.2 ml PCR tube) with 3 $\mu$l NEBNext Quick Ligation Reaction Buffer, 0.5 $\mu$l RNA CS (RCS, from SQK-RNA002), 1 $\mu$l RT-Adapter (RTA, from SQK-RNA002) and 1.5 $\mu$l T4 DNA Ligase. Incubate 10 min at room temperature.
 
-\item Prepare reverse transcription master mix during ligation: 9 $\mu$l nuclease-free water, 2 $\mu$l 10 mM dNTPs, 8 $\mu$l 5x SuperScript IV first strand buffer, 4 $\mu$l 0.1 mM DTT.
+\item Prepare reverse transcription master mix on ice during ligation: 9 $\mu$l nuclease-free water, 2 $\mu$l 10 mM dNTPs, 8 $\mu$l 5x SuperScript IV first strand buffer, 4 $\mu$l 0.1 mM DTT.
 
 \item Add the reverse transcription master mix to the ligation reaction and mix by pipetting. Add 2 $\mu$l SuperScript IV reverse transcriptase and mix by pipetting. Incubate in a thermocycler with the following protocol: 50 min at 50 $^{\circ}$C, 10 min at 70 $^{\circ}$C, cool down to 4 $^{\circ}$C.
 
-\item Let the Agencourt RNAClean XP beads come to room temperature during incubation of reverse transcription. Carefully resuspend beads before use. Transfer reaction to a 1.5 ml DNA LoBind tube and mix with 72 $\mu$l Agencourt RNAClean XP beads. Incubate 5 min at room temperature on a gentle rotator mixer.
+\item Let the Agencourt RNAClean XP beads come to room temperature during reverse transcription. Carefully resuspend beads before use. Transfer reaction to a 1.5 ml DNA LoBind tube and mix with 72 $\mu$l Agencourt RNAClean XP beads. Incubate 5 min at room temperature on a gentle rotator mixer.
 
 \item Collect beads on a magnetic stand and remove supernatant. Wash pelleted beads two times (30 sec) with 200 $\mu$l freshly prepared 70 \% ethanol. Remove supernatant. Spin sample down and place on magnet again. Remove any residual ethanol. 
 
@@ -140,7 +172,26 @@ Overview Figure 1
 \end{enumerate}
 
 \subsection*{Preparation of an \emph{in vitro} transcriptome sample}
-\todo[inline]{Isabel}
+The \emph{in vitro} transcriptome sample is prepared based on a protocol published by Zhang \emph{et al.}~\cite{zhang2021systematic} with some modifications.
+
+\begin{enumerate}
+\item Adjust 100 ng polyA\textsuperscript{+} RNA to a total volume of 6 $\mu$l with nuclease-free water. Add 1 $\mu$l each of 10 $\mu$M oligo(dT)-VN RT primer and 10 mM dNTPs. Mix by pipetting and incubate in a thermocycler: 5 min at 75 $^{\circ}$C, 2 min at 42 $^{\circ}$C, cool to 4 $^{\circ}$C.
+
+\item Assemble 2.5 $\mu$l 4x template switching RT buffer, 0.5 $\mu$l 20 $\mu$M TSO, 1 $\mu$l 10x template switching RT enzyme mix and mix by pipetting. Combine with 6 $\mu$l RNA and incubate in a thermocycler: 90 min at 42 $^{\circ}$C, 10 min at 68 $^{\circ}$C, cool to 4 $^{\circ}$C.
+
+\item For Second strand synthesis add to First strand synthesis reaction: 50 $\mu$l Q5 Hot Start High-Fidelity 2X Master Mix, 5 $\mu$l RNase H, 2 $\mu$l 10 $\mu$M T7 extension primer, 33 $\mu$l nuclease-free water. Mix by pipetting and incubate in a thermocycler: 15 min at 37 $^{\circ}$C, 1 min at 95 $^{\circ}$C, 10 min at 65 $^{\circ}$C, cool to 4 $^{\circ}$C.
+
+\item Purify double stranded cDNA with NucleoSpin Gel and PCR Clean‑up kit according to the manufacturerers protocol and elute in 20 $\mu$l elution buffer. Determine concentration on a Nanodrop spectrophotometer. cDNA may be stored at -20 $^{\circ}$C.
+
+\item Combine 8 $\mu$l cDNA for \emph{in vitro} transcription with 2 $\mu$l each of ATP, GTP, CTP, UTP, 10x reaction buffer and enzyme mix from the MEGAscript T7 transcription kit. Incubate 3 h at 37 $^{\circ}$C.
+
+\item Digest template DNA by addition of 1 $\mu$l Turbo DNase. Mix by pipetting and incubate 15 min at 37 $^{\circ}$C.
+
+\item Adjust reaction volume to 100 $\mu$l with nuclease-free water and clean up with RNA Clean \& Concentrator-25 kit according to the manufacturers protocol, using two volumes of adjusted RNA binding buffer (1:1 RNA binding buffer : ethanol). Elute RNA in 25 $\mu$l nuclease-free water. Determine RNA concentration on a Nanodrop spectrophotometer. Store at -80 $^{\circ}$C.
+
+\end{enumerate}
+
+
 \subsection*{Nanopore read processing}
 Minimap2 and samtools
 \todo[inline]{Christoph}

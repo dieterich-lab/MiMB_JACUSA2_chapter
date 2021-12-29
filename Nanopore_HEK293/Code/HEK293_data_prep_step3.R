@@ -86,3 +86,4 @@ theme_bw()
 
 #critical need to check 
 ggsave("NMF4_ecdf.pdf",device="pdf")
+saveRDS(AllSitesScores,file="ScoreProfile_NMFall_plusNonCLIP.rds")

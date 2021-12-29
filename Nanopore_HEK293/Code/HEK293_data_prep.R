@@ -72,7 +72,7 @@ BigTable=merge(BigTable,data.frame(ID=rownames(Deletion),Deletion),by.x=1,by.y=1
 BigTable=merge(BigTable,data.frame(ID=rownames(Insertion),Insertion),by.x=1,by.y=1)
 
 
-motif=read.table("/prj/JACUSA2_TestField/Nanopore_HEK293/JACUSA2/checkMotif_reformat.txt",as.is=T,header=F)
+motif=read.table("/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/checkMotif_reformat.txt",as.is=T,header=F)
 motif[,1]=gsub("-",":-",motif[,1])
 motif[,1]=gsub("\\+",":\\+",motif[,1])
 

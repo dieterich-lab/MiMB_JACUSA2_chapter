@@ -3,7 +3,7 @@
 BigTable=readRDS("BigTable.rds")
 
 #read in miCLIP data
-Noverlap=read.delim("/Volumes/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)
+Noverlap=read.delim("/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/checkMotif_reformat.txt",header=F,as.is=T)
 
 #TODO: setup parameters: number of cores
 

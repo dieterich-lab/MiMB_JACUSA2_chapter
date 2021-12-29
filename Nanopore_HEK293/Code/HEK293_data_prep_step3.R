@@ -68,7 +68,7 @@ return(factor3Mat)
 #        }
 
 AllSites=as.matrix(BigTable[,1:15])
-AllSitesScores=bla2%*%t(h)
+AllSitesScores=AllSites%*%t(h)
 
 Noverlap=read.delim("/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)
 Noverlap.df=data.frame(ID=paste0(Noverlap[,1],":",Noverlap[,2]-2,"_",Noverlap[,3]+2,":",Noverlap[,6]),Type=Noverlap[,4])

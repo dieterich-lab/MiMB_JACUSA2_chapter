@@ -2,7 +2,10 @@
 #read in base call error profiles
 BigTable=readRDS("BigTable.rds")
 
-Noverlap=read.delim("/Volumes//prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)
+#read in miCLIP data
+Noverlap=read.delim("/Volumes/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)
+
+#TODO: setup parameters: number of cores
 
 Noverlap.df=data.frame(ID=paste0(Noverlap[,1],":",Noverlap[,2]-2,"_",Noverlap[,3]+2,":",Noverlap[,6]),Type=Noverlap[,4])
 rownames(Noverlap.df)=Noverlap.df[,1]
@@ -28,6 +31,7 @@ estim.r.random <- nmf(V.random, 2:10, nrun=10, seed=123456, .opt='vp3')
 pdf("NMF_assess.pdf")
 plot(estim.r,estim.r.random)
 dev.off()
+exit(0);
 #how can we select factorization rank ?
 res <- nmf(NMFtabSlim, 5, nrun=10, seed=123456, .opt='vp3')
 

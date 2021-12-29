@@ -1,9 +1,9 @@
 #Integrate results
-#working directory is /prj/JACUSA2_TestField/Nanopore_HEK293/JACUSA2
+#working directory is /prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2
 
 sort -k5,5gr  WT_vs_KO_RC22_call2_result.out |awk '($13=="A" && $12!~/Y/)' > WT_vs_KO_call2_result.txt
-sort -k5,5gr  WT_vs_IVT_RC22_call2_result.out |awk '($13=="A" && $13!~/Y/)' >  WT_vs_IVT_call2_result.txt
-sort -k5,5gr  KO_vs_IVT_RC22_call2_result.out |awk '($13=="A" && $13!~/Y/)' >  KO_vs_IVT_call2_result.txt
+sort -k5,5gr  WT_vs_IVT_RC22_call2_result.out |awk '($13=="A" && $12!~/Y/)' >  WT_vs_IVT_call2_result.txt
+sort -k5,5gr  KO_vs_IVT_RC22_call2_result.out |awk '($13=="A" && $12!~/Y/)' >  KO_vs_IVT_call2_result.txt
 
 
 cut -f 1-6 WT_vs_KO_call2_result.txt WT_vs_IVT_call2_result.txt KO_vs_IVT_call2_result.txt | awk '{print $1"\t"$2"\t"$3"\tCand\t0\t"$6;}' |sort -u > allSites.bed
@@ -24,3 +24,4 @@ srun bedtools getfasta -fi /biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa -b
 
 perl -ne 'while(<>){s/Cand:://; 's/\-/_/'; 's/[\(\)]//g'; print;}' checkMotif.txt >  checkMotif_reformat.txt
 #ok
+##

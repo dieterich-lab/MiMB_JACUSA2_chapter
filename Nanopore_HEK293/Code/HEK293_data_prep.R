@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
                                         #Read preprocessed JACUSA2 output
 print("Read")
-eins=read.delim("/Volumes//prj/JACUSA2_TestField/Nanopore_HEK293/JACUSA2/call2_SitesExt2_indel_slim2.txt",as.is=T,header=F)
+eins=read.delim("/Volumes/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/call2_SitesExt2_indel_slim2.txt",as.is=T,header=F)
 #
 #gzip#
                                         #Formatting

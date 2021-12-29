@@ -2,7 +2,7 @@ library(NMF)
 BigTable=readRDS("BigTable.rds")
 res=readRDS("NMF.rds");
 ##
-pdf("NMF_6cluster_new.pdf")
+pdf("NMF_cluster_new.pdf")
 layout(cbind(1,2))
 # basis components
 basismap(res)
@@ -23,19 +23,19 @@ pdf(paste0("Pattern_",k,"_barplot_NMF.pdf"),width=14,height=7)
 rep1=matrix(h[k,],ncol=5,byrow=T)[1:3,]
 rownames(rep1)=c("BASE","DEL","INS")
 colnames(rep1)=c("Pos1","Pos2","Pos3","Pos4","Pos5")
-barplot(rep1,legend=F, main="Experiment 1",col=cbbPalette,,cex.names=2,cex.axis=2)
+barplot(rep1,legend=F, main="Experiment 1",col=cbbPalette,cex.names=2,cex.axis=2)
 dev.off()
 }
 
                                         #Choice of best pattern for subsequent analysis
 
-wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
-print("Table of number of best hits for each pattern")
-TabPatternInstances=table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))}))
-print(TabPatternInstances)
-chosenPattern=which(TabPatternInstances==max(TabPatternInstances))
-print(paste0("We suggest to use pattern:",chosenPattern))
-tt=apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})
+#wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
+#print("Table of number of best hits for each pattern")
+#TabPatternInstances=table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))}))
+#print(TabPatternInstances)
+#chosenPattern=which(TabPatternInstances==max(TabPatternInstances))
+#print(paste0("We suggest to use pattern:",chosenPattern))
+#tt=apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})
 
 #Compute CountMatrix                                  
 CountMatrix<-function(inp,pseudo=0.01){
@@ -56,7 +56,7 @@ for(k in 1:5)
 return(factor3Mat)
 }
 
-                                        #motif search optional
+                                        #replace with ggseqlogo
 library(Logolas)
 for(k in 1:nrow(h))
     {
@@ -67,3 +67,22 @@ for(k in 1:nrow(h))
         dev.off()
         }
 
+AllSites=as.matrix(BigTable[,1:15])
+AllSitesScores=bla2%*%t(h)
+
+Noverlap=read.delim("/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)
+Noverlap.df=data.frame(ID=paste0(Noverlap[,1],":",Noverlap[,2]-2,"_",Noverlap[,3]+2,":",Noverlap[,6]),Type=Noverlap[,4])
+rownames(Noverlap.df)=Noverlap.df[,1]
+
+ins=intersect(rownames(BigTable),Noverlap.df$ID);
+
+dataGG=data.frame(AllSitesScores[ins,],Noverlap.df[ins,2])
+colnames(dataGG)=c(paste("NMF",1:nrow(h),sep=""),"CLIP")
+library(ggplot2)
+xdensity <- ggplot(dataGG, aes(NMF4, color=CLIP)) + 
+stat_ecdf() +
+scale_color_manual(values = cbbPalette) + 
+theme_bw()
+
+#critical need to check 
+ggsave("NMF4_ecdf.pdf",device="pdf")

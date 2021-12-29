@@ -40,4 +40,4 @@ dev.off()
 res <- nmf(NMFtabSlim, ChoseRank, nrun=10, seed=123456, .opt='vp3')
 
 saveRDS(res,file="NMF.rds")
-exit(0);
+

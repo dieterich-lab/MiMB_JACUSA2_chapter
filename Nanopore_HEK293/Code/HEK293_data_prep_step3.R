@@ -80,7 +80,7 @@ dataGG=data.frame(AllSitesScores[ins,],Noverlap.df[ins,2])
 colnames(dataGG)=c(paste("NMF",1:nrow(h),sep=""),"CLIP")
 
 colnames(AllSitesScores)=c(paste("NMF",1:nrow(h),sep=""))
-AllSitesScores=data.frame(AllSitesScores[rownames(BigTable),],BigTable[,c("Motif","DRACH")])
+AllSitesScores=data.frame(AllSitesScores[rownames(BigTable),],TotalScore=apply(AllSitesScores[rownames(BigTable),],1,sum),BigTable[,c("Motif","DRACH")])
 
 for(dude in colnames(dataGG)[1:nrow(h)])
     {

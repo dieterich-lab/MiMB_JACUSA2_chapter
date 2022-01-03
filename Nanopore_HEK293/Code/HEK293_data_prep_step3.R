@@ -63,7 +63,7 @@ for(k in 1:nrow(h))
          ggseqlogo(BigTable[names(which(tt==k)),"Motif"])
 #        logomaker(apply(CountMatrix(BigTable[names(which(tt==k)),"Motif"]),2,function(x){x/sum(x)}), type = "EDLogo", bg=apply(CountMatrix(BigTable[names(which(tt!=k)),"Motif"]),2,function(x){x/sum(x)}))
         #apply(CountMatrix(BigTable[names(which(tt!=k)),"Motif"]),2,function(x){x/sum(x)})
-        ggsave(paste0("Logo_",k,"_barplot_NMF.pdf"),width=7,height=7)
+        ggsave(paste0("SeqLogo_",k,"_NMF.pdf"),width=7,height=7,device="pdf")
        
         }
 

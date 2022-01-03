@@ -87,7 +87,7 @@ scale_color_manual(values = cbbPalette) +
 theme_bw()
 
 #critical need to check 
-ggsave("NMF4_ecdf.pdf",device="pdf")
+ggsave(paste0(dim,"_ecdf.pdf"),device="pdf")
 }
 saveRDS(AllSitesScores,file="ScoreProfile_NMFall_plusNonCLIP.rds")
 

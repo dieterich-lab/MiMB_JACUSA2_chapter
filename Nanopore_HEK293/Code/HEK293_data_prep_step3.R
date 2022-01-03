@@ -60,11 +60,11 @@ return(factor3Mat)
 library(ggseqlogo)
 for(k in 1:nrow(h))
     {
-        pdf(paste0("Logo_",k,"_barplot_NMF.pdf"),width=7,height=7)
-        logomaker(BigTable[names(which(tt==k)),"Motif"], type = "Logo")
+         ggseqlogo(BigTable[names(which(tt==k)),"Motif"])
 #        logomaker(apply(CountMatrix(BigTable[names(which(tt==k)),"Motif"]),2,function(x){x/sum(x)}), type = "EDLogo", bg=apply(CountMatrix(BigTable[names(which(tt!=k)),"Motif"]),2,function(x){x/sum(x)}))
         #apply(CountMatrix(BigTable[names(which(tt!=k)),"Motif"]),2,function(x){x/sum(x)})
-        dev.off()
+        ggsave(paste0("Logo_",k,"_barplot_NMF.pdf"),width=7,height=7)
+       
         }
 
 AllSites=as.matrix(BigTable[,1:15])

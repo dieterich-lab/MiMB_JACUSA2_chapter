@@ -23,7 +23,7 @@ pdf(paste0("Pattern_",k,"_barplot_NMF.pdf"),width=14,height=7)
 rep1=matrix(h[k,],ncol=5,byrow=T)[1:3,]
 rownames(rep1)=c("BASE","DEL","INS")
 colnames(rep1)=c("Pos1","Pos2","Pos3","Pos4","Pos5")
-barplot(rep1,legend=F, main="Experiment 1",col=cbbPalette,cex.names=2,cex.axis=2)
+barplot(rep1,legend=F, main=paste0("NMF_Pattern_",k),col=cbbPalette,cex.names=2,cex.axis=2)
 dev.off()
 }
 

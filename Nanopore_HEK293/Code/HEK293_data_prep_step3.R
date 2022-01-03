@@ -79,11 +79,15 @@ ins=intersect(rownames(BigTable),Noverlap.df$ID);
 dataGG=data.frame(AllSitesScores[ins,],Noverlap.df[ins,2])
 colnames(dataGG)=c(paste("NMF",1:nrow(h),sep=""),"CLIP")
 library(ggplot2)
-xdensity <- ggplot(dataGG, aes(NMF4, color=CLIP)) + 
+for(dim in colnames(dataGG)[1:nrow(h)])
+    {
+xdensity <- ggplot(dataGG, aes(dim, color=CLIP)) + 
 stat_ecdf() +
 scale_color_manual(values = cbbPalette) + 
 theme_bw()
 
 #critical need to check 
 ggsave("NMF4_ecdf.pdf",device="pdf")
+}
 saveRDS(AllSitesScores,file="ScoreProfile_NMFall_plusNonCLIP.rds")
+

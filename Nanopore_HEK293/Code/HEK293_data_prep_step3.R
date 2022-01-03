@@ -79,6 +79,9 @@ ins=intersect(rownames(BigTable),Noverlap.df$ID);
 dataGG=data.frame(AllSitesScores[ins,],Noverlap.df[ins,2])
 colnames(dataGG)=c(paste("NMF",1:nrow(h),sep=""),"CLIP")
 
+colnames(AllSitesScores)=c(paste("NMF",1:nrow(h),sep=""))
+AllSitesScores=data.frame(AllSitesScores[rownames(BigTable),],BigTable[,c("Motif","DRACH")])
+
 for(dude in colnames(dataGG)[1:nrow(h)])
     {
 xdensity <- ggplot(dataGG, aes_string(dude, color="CLIP")) + 

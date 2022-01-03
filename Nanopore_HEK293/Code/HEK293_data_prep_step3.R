@@ -29,13 +29,13 @@ dev.off()
 
                                         #Choice of best pattern for subsequent analysis
 
-#wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
-#print("Table of number of best hits for each pattern")
-#TabPatternInstances=table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))}))
-#print(TabPatternInstances)
+wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
+print("Table of number of best hits for each pattern")
+TabPatternInstances=table(apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))}))
+print(TabPatternInstances)
 #chosenPattern=which(TabPatternInstances==max(TabPatternInstances))
 #print(paste0("We suggest to use pattern:",chosenPattern))
-#tt=apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})
+tt=apply(wExtended[,1:nrow(h)],1,function(x){which(x==max(x))})
 
 #Compute CountMatrix                                  
 CountMatrix<-function(inp,pseudo=0.01){
@@ -57,15 +57,15 @@ return(factor3Mat)
 }
 
                                         #replace with ggseqlogo
-#library(Logolas)
-#for(k in 1:nrow(h))
-#    {
-#        pdf(paste0("Logo_",k,"_barplot_NMF.pdf"),width=7,height=7)
-#        logomaker(BigTable[names(which(tt==k)),"Motif"], type = "Logo")
+library(ggseqlogo)
+for(k in 1:nrow(h))
+    {
+        pdf(paste0("Logo_",k,"_barplot_NMF.pdf"),width=7,height=7)
+        logomaker(BigTable[names(which(tt==k)),"Motif"], type = "Logo")
 #        logomaker(apply(CountMatrix(BigTable[names(which(tt==k)),"Motif"]),2,function(x){x/sum(x)}), type = "EDLogo", bg=apply(CountMatrix(BigTable[names(which(tt!=k)),"Motif"]),2,function(x){x/sum(x)}))
         #apply(CountMatrix(BigTable[names(which(tt!=k)),"Motif"]),2,function(x){x/sum(x)})
-#        dev.off()
-#        }
+        dev.off()
+        }
 
 AllSites=as.matrix(BigTable[,1:15])
 AllSitesScores=AllSites%*%t(h)

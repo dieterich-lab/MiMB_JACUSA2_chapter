@@ -4,7 +4,7 @@ args = commandArgs(trailingOnly=TRUE)
                                         #Read preprocessed JACUSA2 output
 print("Read")
 prefix<-""; #/Volumes
-eins=read.delim(paste0(args[1],"/data_reformat.txt"),as.is=T,header=F)
+eins=read.delim(paste0(args[1],"/call2_SitesExt2_indel_slim2.txt"),as.is=T,header=F)
 #
 #gzip#
                                         #Formatting

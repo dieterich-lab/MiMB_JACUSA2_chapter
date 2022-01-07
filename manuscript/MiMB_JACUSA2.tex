@@ -193,11 +193,37 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 
 
 \subsection*{Nanopore read processing}
-Minimap2 and samtools
-\todo[inline]{Christoph}
+\begin{enumerate}
+	\item  JACUSA2 requires indexed BAM files. In order to create a BAM file index for an existing file align.bam, use samtools.
+	\begin{verbatim}
+	$ samtools index align.bam
+	\end{verbatim}
+	\item Add the MD tag field to the BAM files. This require the reference sequence reference.fasta. The MD tag field stores information on mismatched and deleted reference bases.
+	\begin{verbatim}
+	$ samtools calmd -b align.bam reference.fasta > align_md.bam
+	\end{verbatim}
+\end{enumerate}	
 \subsection*{Use Case 1: Comparison of wildtype and knock-out samples}
-Xpore data
-\todo[inline]{Christoph}
+The benchmark is composed of two sample types: wildtype and knock-out samples for Hek293 cell line with two replicates. 
+Given the preprocessed mapped reads as input (BAM files) 'HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam, HEK293T-KO-rep2.bam,HEK293T-KO-rep3.bam',
+\begin{enumerate} 
+	\item Identify read error profile: run JACUSA2 with paired samples option (call-2). One should specify the corresponding library information and may filter reads according to many parameters. Here, we are considering all positions with read coverage >4. The output resume read error profile where the format is a combination of BED6 with JACUSA2 methods specific columns and common info columns: "info", "filter", and "ref". See JACUSA2 manual for more details on JACUSA2 filter and output options.
+	\begin{verbatim}
+	JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND
+	-P2 FR-SECONDSTRAND -r WT_vs_KO_2samp_RC22_call2_result.out HEK293T-WT-rep2.bam,HEK293T-WT-rep3.bam	HEK293T-KO-rep2.bam,HEK293T-KO-rep3.bam
+	\end{verbatim}
+	\item Preprocess JACUSA2 output: given the JACUSA2 output, select non-overlapping sites of homo-polymer regions (JACUSA filter: Y) and within a 5mer of a central A nucleotide flanked by 2 adjacent random nucleotides (NNANN). Each position is represented by the insertion, deletion and mismatch scores and the position number within the 5mer specific context. The README\_processing.sh bash script perform the preprocessing and produces a txt file call2\_SitesExt2\_indel\_slim2.txt resuming the features for selected positions and a separate file representing the 5mer bases named checkMotif\_reformat.txt. One may precise the path to outputs within the command.
+	\begin{verbatim} 
+	bash README_processing.sh WT_vs_KO_RC22_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
+	\end{verbatim}
+	\item Extract 5mer features: extract features representing the insertion, deletion and mismatch within the specific 5mer context. To do so, run the R script HEK293\_data\_prep.R. This will produce an R object named BigTable.rds, representing the matrix of positions x 15 features which correspond to the insertion, deletion and mismatch scores for the observed position and its two flanking positions. To run the script, precise the path to outputs that contains already the reformatted data and provide also the sample's name as a label of the analysis.
+	\begin{verbatim} 
+Rscript Code/HEK293_data_prep.R path_to_output WT_vs_KO_RC22_call2_result.out
+\end{verbatim}
+\item Extract m6A modification patterns: now that one got the matrix of Sites X Features, the next step is to extract patterns allowing to predict m6A modified positions. To this end, the non-negative matrix factorization (NMF) analysis is suggested. The R script HEK293\_data\_prep\_step2.R allows to generate patterns from a subset of data associated to previously reported m6A positions. Here, the unsupervised pattern learning approach is based on 2401 m6A sites. Based on the silhouette and cophenetic correlation indices, we could identify an optimal factorization rank of 7 (fig. \ref{fig:pattern_WT.KO}).
+\item Predict m6A modifications: The cumulative density function of pattern 3 scores can be used to predict novel m6A sites.
+	
+\end{enumerate}
 \subsection*{Use Case 2: Comparison of wildtype and IVT samples}
 \todo[inline]{Christoph}
 \subsection*{Use Case 3: Comparison of wildtype to simulated IVT sample}
@@ -253,7 +279,16 @@ Xpore data
       \end{figure}
 \newpage
 
+\newpage
 
+\section*{FIGURE CAPTIONS}
+
+\begin{figure}[h!]
+	\includegraphics[width = 1\textwidth]{img/pattern_WT_KO.pdf}
+	\caption{\textbf{Main patterns for WT  vs KO case.} }
+	\label{fig:pattern_WT.KO}
+\end{figure}
+\newpage
 
 \section*{TABLE CAPTIONS}
 \section*{TABLES}

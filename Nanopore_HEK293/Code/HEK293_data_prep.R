@@ -1,8 +1,10 @@
 #!/usr/bin/env Rscript
+
+args = commandArgs(trailingOnly=TRUE)
                                         #Read preprocessed JACUSA2 output
 print("Read")
 prefix<-""; #/Volumes
-eins=read.delim("/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/call2_SitesExt2_indel_slim2.txt",as.is=T,header=F)
+eins=read.delim(paste0(args[1],"/data_reformat.txt"),as.is=T,header=F)
 #
 #gzip#
                                         #Formatting
@@ -11,9 +13,9 @@ colnames(eins)=c("ID","contig","position","RT","call2.score","deletion.score","i
 
 #Split by experiment#
 
-Exp1=subset(eins,eins$RT=="WT_vs_KO_RC22_call2_result.out")
-Exp2=subset(eins,eins$RT=="WT_vs_IVT_RC22_call2_result.out")
-Exp3=subset(eins,eins$RT=="KO_vs_IVT_RC22_call2_result.out")
+Exp1=subset(eins,eins$RT==args[2])
+Exp2=subset(eins,eins$RT==args[3])
+Exp3=subset(eins,eins$RT==args[4])
 
 print("Exp1")
 Call2=tapply(Exp1$call2.score,list(Exp1$ID,Exp1$Anchor),sum)
@@ -30,7 +32,6 @@ colnames(Insertion)<-paste0("Exp1InsertionScore_",colnames(Insertion))
 
 BigTable=merge(data.frame(ID=rownames(Call2),Call2),data.frame(ID=rownames(Deletion),Deletion),by.x=1,by.y=1)
 BigTable=merge(BigTable,data.frame(ID=rownames(Insertion),Insertion),by.x=1,by.y=1)
-
 print("Exp2")#
 
 Call2=tapply(Exp2$call2.score,list(Exp2$ID,Exp2$Anchor),sum)
@@ -72,9 +73,15 @@ BigTable=merge(BigTable,data.frame(ID=rownames(Deletion),Deletion),by.x=1,by.y=1
 BigTable=merge(BigTable,data.frame(ID=rownames(Insertion),Insertion),by.x=1,by.y=1)
 
 
-motif=read.table("/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/checkMotif_reformat.txt",as.is=T,header=F)
-motif[,1]=gsub("-",":-",motif[,1])
-motif[,1]=gsub("\\+",":\\+",motif[,1])
+motif=read.table(paste0(args[1],"/checkMotif_reformat.txt"),as.is=T,header=F)
+# motif[,1]=gsub("-",":-",motif[,1])
+# motif[,1]=gsub("\\+",":\\+",motif[,1])
+
+#*************************************BEGIN. Modified part *********************************************
+motif[,1]=gsub("-","_",motif[,1])
+motif[,1]=gsub("\\(\\_\\)",":-",motif[,1])
+motif[,1]=gsub("\\(\\+\\)",":\\+",motif[,1])
+#*************************************END. Modified part *********************************************
 
 BigTable=merge(BigTable,motif,by.x=1,by.y=1);
 
@@ -90,6 +97,6 @@ BigTable$DRACH<-rep(0,nrow(BigTable))
 BigTable$DRACH[grep("[AGT][AG]AC[ACT]",BigTable$Motif)]<-1
 
 
-saveRDS(BigTable,file="BigTable.rds")
+saveRDS(BigTable,file=paste0(args[1],"/BigTable.rds"))
 
 

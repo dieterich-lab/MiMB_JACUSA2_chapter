@@ -1,9 +1,10 @@
 #!/usr/bin/env Rscript
 #read in base call error profiles
-BigTable=readRDS("BigTable.rds")
+args = commandArgs(trailingOnly=TRUE)
 
+BigTable=readRDS(paste0(args[1],"/BigTable.rds"))
 #read in miCLIP data
-Noverlap=read.delim("/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)
+Noverlap=read.delim(args[2],header=F,as.is=T)
 
 #TODO: setup parameters: number of cores
 
@@ -14,13 +15,13 @@ ins=intersect(rownames(BigTable),subset(Noverlap.df$ID,Noverlap.df$Type=="Boulia
 #ins=intersect(rownames(BigTable),Noverlap.df$ID);
 
 NMFtab=BigTable[ins,]
-                                        #train NMF based on core miCLIP data WT_vs_KO shared across all 3 experiment
+                        #train NMF based on core miCLIP data WT_vs_KO shared across all 3 experiment
 
 library(NMF)
 nmfSeed('nndsvd')
 meth <- nmfAlgorithm(version='R')
 meth <- c(names(meth), meth)
-NMFtabSlim=NMFtab[,1:15]
+NMFtabSlim=NMFtab[,16:30]
 
 estim.r <- nmf(NMFtabSlim, 2:10, nrun=10, seed=123456, .opt='vp3')
 
@@ -32,12 +33,13 @@ DeltaSil=estim.r$measures$silhouette.consensus-estim.r.random$measures$silhouett
 DeltaCoph=estim.r$measures$cophenetic-estim.r.random$measures$cophenetic
 
 ChoseRank=min(which(DeltaSil==max(DeltaSil))+1,which(DeltaCoph==max(DeltaCoph))+1)
-pdf("NMF_assess.pdf")
+pdf(paste0(args[1],"/NMF_assess.pdf"))
 plot(estim.r,estim.r.random)
 dev.off()
 #exit(0);
 #how can we select factorization rank ?
+print(ChoseRank)
 res <- nmf(NMFtabSlim, ChoseRank, nrun=10, seed=123456, .opt='vp3')
 
-saveRDS(res,file="NMF.rds")
+saveRDS(res,file=paste0(args[1],"/NMF.rds"))
 

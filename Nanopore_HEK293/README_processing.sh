@@ -23,7 +23,7 @@ INP="$WT_vs_KO $WT_vs_IVT $KO_vs_IVT"
 srun bedtools intersect -filenames -loj -a $path/allSitesExt2.bed -b ${INP} > $path/call2_SitesExt2.bed
 
 #reformat
-cat $path/call2_SitesExt2.bed |perl Code/HEK293_data_prep.pl > $path/data_reformat.txt
+cat $path/call2_SitesExt2.bed |perl Code/HEK293_data_prep.pl > $path/call2_SitesExt2_indel_slim2.txt
 
 #5mer
 #srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -name -s -tab > $path/checkMotif.txt

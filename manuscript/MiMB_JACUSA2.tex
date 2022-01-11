@@ -194,40 +194,83 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 
 \subsection*{Nanopore read processing}
 \begin{enumerate}
-	\item  JACUSA2 requires indexed BAM files. In order to create a BAM file index for an existing file align.bam, use samtools.
+	\item \todo{first steps}
+	\item  JACUSA2 requires sorted and indexed BAM files. To sorte and create a BAM file index use the following SAMtools commands.
 	\begin{verbatim}
-	$ samtools index align.bam
+	$ samtools sorte mapping.bam mapping.sorted.bam
+	$ samtools index mapping.sorted.bam
 	\end{verbatim}
-	\item Add the MD tag field to the BAM files. This require the reference sequence reference.fasta. The MD tag field stores information on mismatched and deleted reference bases.
+	\item Add the MD tag field to the BAM files. This requires the reference sequence 'reference.fasta' used for the mapping. The MD tag field stores information on mismatched and deleted reference bases.
 	\begin{verbatim}
-	$ samtools calmd -b align.bam reference.fasta > align_md.bam
+	$ samtools calmd -b mapping.sorted.bam reference.fasta > align_md.bam
 	\end{verbatim}
 \end{enumerate}	
 \subsection*{Use Case 1: Comparison of wildtype and knock-out samples}
-The benchmark is composed of two sample types: wildtype and knock-out samples for Hek293 cell line with two replicates. 
-Given the preprocessed mapped reads as input (BAM files) 'HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam, HEK293T-KO-rep2.bam,HEK293T-KO-rep3.bam',
+The benchmark is composed of two samples from two conditions: wildtype (positive condition) and knock-out(control condition) for Hek293 cell line with two replicates. 
+Given the preprocessed mapped reads as input (BAM files) 'HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam representing the wildtype replicates and HEK293T-KO-rep2.bam and  HEK293T-KO-rep3.bam as the control replicates, 
 \begin{enumerate} 
-	\item Identify read error profile: run JACUSA2 with paired samples option (call-2). One should specify the corresponding library information and may filter reads according to many parameters. Here, we are considering all positions with read coverage >4. The output resume read error profile where the format is a combination of BED6 with JACUSA2 methods specific columns and common info columns: "info", "filter", and "ref". See JACUSA2 manual for more details on JACUSA2 filter and output options.
+	\item Identify read error profile: run JACUSA2 with paired samples option (call-2). One should specify the corresponding library information and may filter reads according to many parameters. Here, we consider all positions with read coverage $> 4$. The output consists of read error profile where the format is a combination of BED6 with JACUSA2 methods specific columns and common info columns: "info", "filter", and "ref". Check JACUSA2 manual for more details on JACUSA2 filter and output options.
 	\begin{verbatim}
-	JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND
+	$ JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND
 	-P2 FR-SECONDSTRAND -r WT_vs_KO_2samp_RC22_call2_result.out HEK293T-WT-rep2.bam,HEK293T-WT-rep3.bam	HEK293T-KO-rep2.bam,HEK293T-KO-rep3.bam
 	\end{verbatim}
-	\item Preprocess JACUSA2 output: given the JACUSA2 output, select non-overlapping sites of homo-polymer regions (JACUSA filter: Y) and within a 5mer of a central A nucleotide flanked by 2 adjacent random nucleotides (NNANN). Each position is represented by the insertion, deletion and mismatch scores and the position number within the 5mer specific context. The README\_processing.sh bash script perform the preprocessing and produces a txt file call2\_SitesExt2\_indel\_slim2.txt resuming the features for selected positions and a separate file representing the 5mer bases named checkMotif\_reformat.txt. One may precise the path to outputs within the command.
+	\item Preprocess JACUSA2 output: given the JACUSA2 output, select non-overlapping sites of homo-polymer regions (JACUSA filter: Y) and within a 5mer of a central A nucleotide flanked by 2 adjacent random nucleotides (NNANN). Each site is represented by the insertion, deletion and mismatch scores and the position number within the 5mer specific context. The 'README\_processing.sh' bash script performs the preprocessing and produces a text file 'call2\_SitesExt2\_indel\_slim2.txt' containing the features for the selected sites and a separate file representing the 5mer bases 'checkMotif\_reformat.txt'. One may precise the path to outputs within the command.
 	\begin{verbatim} 
-	bash README_processing.sh WT_vs_KO_RC22_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
+	$ bash README_processing.sh WT_vs_KO_RC22_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
 	\end{verbatim}
-	\item Extract 5mer features: extract features representing the insertion, deletion and mismatch within the specific 5mer context. To do so, run the R script HEK293\_data\_prep.R. This will produce an R object named BigTable.rds, representing the matrix of positions x 15 features which correspond to the insertion, deletion and mismatch scores for the observed position and its two flanking positions. To run the script, precise the path to outputs that contains already the reformatted data and provide also the sample's name as a label of the analysis.
+	\item Extract 5mer features: extract features representing the mismatch, insertion and deletion scores within the specific 5mer context. To do so, run the R script 'HEK293\_data\_prep.R'. This will produce an R object named BigTable.rds, representing the matrix of Sites x 15 features which correspond to the mismatch, insertion and deletion scores for the observed site and its two flanking positions. To run the script, precise the path to outputs that contains already the preprocessed data and provide also the sample's name as a label of the analysis.
 	\begin{verbatim} 
-Rscript Code/HEK293_data_prep.R path_to_output WT_vs_KO_RC22_call2_result.out
+$ Rscript Code/HEK293_data_prep.R path_to_output WT_vs_KO_RC22_call2_result.out
 \end{verbatim}
-\item Extract m6A modification patterns: now that one got the matrix of Sites X Features, the next step is to extract patterns allowing to predict m6A modified positions. To this end, the non-negative matrix factorization (NMF) analysis is suggested. The R script HEK293\_data\_prep\_step2.R allows to generate patterns from a subset of data associated to previously reported m6A positions. Here, the unsupervised pattern learning approach is based on 2401 m6A sites. Based on the silhouette and cophenetic correlation indices, we could identify an optimal factorization rank of 7 (fig. \ref{fig:pattern_WT.KO}).
-\item Predict m6A modifications: The cumulative density function of pattern 3 scores can be used to predict novel m6A sites.
+\item Extract m6A modification patterns: now that one got the matrix of Sites X Features, the next step is to extract patterns allowing to predict m6A modified positions. To this end, the non-negative matrix factorization (NMF) analysis is suggested. The R script 'HEK293\_data\_prep\_step2.R' allows generating patterns from a subset of the data associated to previously reported m6A sites. Here, the unsupervised pattern learning is based on 2401 m6A sites (\todo{reference}). Based on the silhouette and cophenetic correlation indices, we could identify an optimal factorization rank of 7 (fig. \ref{fig:pattern_WT.KO}).
+	\begin{verbatim} 
+$ Rscript HEK293_data_prep_step2.R path_to_output miCLIP_union_flat_exclude_Y_chromosome.bed
+	\end{verbatim} 
+	the 'miCLIP\_union\_flat\_exclude\_Y\_chromosome.bed' file contains all m6A sites reported in (\todo{reference}). 
+\item Predict m6A modifications: the empirical Cumulative Distribution Function (eCDF) of the detected patterns scores can be used to predict novel m6A sites. We examine the ability of prediction on a subset of ... reported m6A sites and we plot the eCDF of pattern 3 scores by category (fig. \ref{fig:ecdf_WT.KO}). The R script 'HEK293\_data\_prep\_step3.R' allows generating the eCDF probabilities of modification as fellow.
+	\begin{verbatim} 
+$ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union_flat_exclude_Y_chromosome.bed
+\end{verbatim} 
 	
 \end{enumerate}
 \subsection*{Use Case 2: Comparison of wildtype and IVT samples}
 \todo[inline]{Christoph}
 \subsection*{Use Case 3: Comparison of wildtype to simulated IVT sample}
-\todo[inline]{Christoph}
+In case the control condition is not available, NanoSim tool can generate  \emph{in silico} synthetic sample from the reference genome as a control condition. Then, use the simulated read for JACUSA2 paired conditions analysis.   
+\begin{enumerate}
+	\item Generate \emph{in silico} synthetic sample: the first step to generate \emph{in silico} reads is read characterization, which produces a set of read profiles serving as the input to the next step, the simulation stage. For more details check NanoSim manual on. We generate reads in genome mode, which takes a reference genome and a training read set in FASTA or FASTQ format as input:
+	\begin{verbatim} 
+	$ read_analysis.py genome -i data.fasta -ga G_ALNM -o HEK293_
+	\end{verbatim} 		
+	Then, the simulation stage (in a genome mode) takes reference genome and read profiles as input and outputs simulated reads in FASTA format.
+	\begin{verbatim} 
+	$ simulator.py genome -rg REF_G  -c HEK293_char -o HEK293_sim
+	\end{verbatim} 	
+	after getting the \emph{in silico} synthetic sample, the next steps are similar to the first cases.
+	
+	\item Identify read error profile: given the \emph{in silico} synthetic sequence, one can run JACUSA2 on paired conditions mode with the same parameters as the previously described cases. 
+	\begin{verbatim}
+	$ JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND
+	-P2 FR-SECONDSTRAND -r WT_vs_KO_2samp_RC22_call2_result.out HEK293T-WT-rep2.bam,HEK293T-WT-rep3.bam	HEK293T-IVT-rep1.bam,HEK293T-IVT-rep2.bam
+	\end{verbatim}
+	\item Preprocess JACUSA2 output: select the 5mer specific sites (NNANN) considering the Y filter as follows. 
+		\begin{verbatim} 
+	$ bash README_processing.sh WT_vs_IVT_RC22_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
+	\end{verbatim}
+	\item Extract 5mer features using the following command:
+		\begin{verbatim} 
+	$ Rscript Code/HEK293_data_prep.R path_to_output WT_vs_IVT_RC22_call2_result.out
+	\end{verbatim}
+	\item Extract m6A modification patterns based on 2401 m6A sites (\todo{reference}). From the silhouette and cophenetic correlation indices, we could identify an optimal factorization rank of 7 (fig. \ref{fig:pattern_WT.IVT}).
+		\begin{verbatim} 
+	$ Rscript HEK293_data_prep_step2.R path_to_output miCLIP_union_flat_exclude_Y_chromosome.bed
+	\end{verbatim} 
+	\item Predict m6A modifications: we plot the eCDF of pattern 7 scores by category (fig. \ref{fig:ecdf_WT.IVT})
+		\begin{verbatim} 
+	$ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union_flat_exclude_Y_chromosome.bed
+	\end{verbatim} 
+	
+\end{enumerate}
 
 \section*{NOTES}
 \subsection*{Tips and Tricks}
@@ -279,17 +322,32 @@ Rscript Code/HEK293_data_prep.R path_to_output WT_vs_KO_RC22_call2_result.out
       \end{figure}
 \newpage
 
-\newpage
-
-\section*{FIGURE CAPTIONS}
-
 \begin{figure}[h!]
 	\includegraphics[width = 1\textwidth]{img/pattern_WT_KO.pdf}
 	\caption{\textbf{Main patterns for WT  vs KO case.} }
 	\label{fig:pattern_WT.KO}
 \end{figure}
-\newpage
 
+\newpage
+\begin{figure}[h!]
+	\includegraphics[width = 1\textwidth]{img/ecdf_WT_KO.pdf}
+	\caption{\textbf{ecdf  for WT  vs KO case.} }
+	\label{fig:ecdf_WT.KO}
+\end{figure}
+\newpage
+\begin{figure}[h!]
+	\includegraphics[width = 1\textwidth]{img/pattern_WT_IVT.pdf}
+	\caption{\textbf{Main patterns for WT  vs IVT case.} }
+	\label{fig:pattern_WT.IVT}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\includegraphics[width = 1\textwidth]{img/ecdf_WT_IVT.pdf}
+	\caption{\textbf{ecdf  for WT  vs IVT case.} }
+	\label{fig:ecdf_WT.IVT}
+\end{figure}
+\newpage
 \section*{TABLE CAPTIONS}
 \section*{TABLES}
 

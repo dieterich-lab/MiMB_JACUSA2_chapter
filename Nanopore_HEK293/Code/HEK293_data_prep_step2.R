@@ -28,7 +28,7 @@ library(NMF)
 nmfSeed('nndsvd')
 meth <- nmfAlgorithm(version='R')
 meth <- c(names(meth), meth)
-NMFtabSlim=NMFtab[,args[1]]
+NMFtabSlim=NMFtab[,eval(parse(text=args[1]))]
 
 estim.r <- nmf(NMFtabSlim, 2:10, nrun=10, seed=123456, .opt='vp3')
 

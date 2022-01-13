@@ -17,7 +17,7 @@ NoCLIPsites=setdiff(rownames(AllSitesScores),ins)
 print(length(ins))
 print(length(NoCLIPsites))
 
-dataGG=data.frame(AllSitesScores[ins,-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],Noverlap.df[ins,2])
+dataGG=data.frame(AllSitesScores[c(ins,NoCLIPsites),-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],CLIP=c(Noverlap.df[ins,2],rep("NoCLIP",)length(NoCLIPsites)))
 NumberOfFactors=ncol(AllSitesScores)-2
 colnames(dataGG)=c(paste("NMF",1:NumberOfFactors,sep=""),"CLIP")
 

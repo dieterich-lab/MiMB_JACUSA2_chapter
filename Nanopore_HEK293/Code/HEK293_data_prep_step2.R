@@ -1,5 +1,11 @@
 #!/usr/bin/env Rscript
 #read in base call error profiles
+args = commandArgs(trailingOnly=TRUE)
+
+#BigTable=readRDS(paste0(args[1],"/BigTable.rds"))
+#read in miCLIP data
+#Noverlap=read.delim(args[2],header=F,as.is=T)
+
 BigTable=readRDS("BigTable.rds")
 
 #read in miCLIP data
@@ -20,7 +26,7 @@ library(NMF)
 nmfSeed('nndsvd')
 meth <- nmfAlgorithm(version='R')
 meth <- c(names(meth), meth)
-NMFtabSlim=NMFtab[,1:15]
+NMFtabSlim=NMFtab[,args[1]]
 
 estim.r <- nmf(NMFtabSlim, 2:10, nrun=10, seed=123456, .opt='vp3')
 

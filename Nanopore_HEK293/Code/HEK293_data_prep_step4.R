@@ -22,6 +22,14 @@ NumberOfFactors=ncol(AllSitesScores)-2
 colnames(dataGG)=c(paste("NMF",1:NumberOfFactors,sep=""),"CLIP")
 
 library(ggplot2)
+require(plotROC)
+p<-ggplot(dataGG, aes(m = NMF2, d = CLIP)) + geom_roc(labels=F)
+#color = Base_1
+p<-p+geom_abline(slope=1,intercept=0)
+p
+ggsave("roc.pdf")
+
+calc_auc(p)
 
 for(dude in colnames(dataGG)[1:NumberOfFactors])
     {
@@ -34,13 +42,5 @@ theme_bw()
 ggsave(paste0(dude,"_ecdf.pdf"),device="pdf")
 }
 
-require(plotROC)
-p<-ggplot(dataGG, aes(m = NMF2, d = CLIP)) + geom_roc(labels=F)
-#color = Base_1
-p<-p+geom_abline(slope=1,intercept=0)
-p
-ggsave(roc.pdf")
-
-calc_auc(p)
 
 #19:3976465-3976470:- ##

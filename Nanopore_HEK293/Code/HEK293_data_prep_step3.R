@@ -82,15 +82,5 @@ colnames(dataGG)=c(paste("NMF",1:nrow(h),sep=""),"CLIP")
 colnames(AllSitesScores)=c(paste("NMF",1:nrow(h),sep=""))
 AllSitesScores=data.frame(AllSitesScores[rownames(BigTable),],TotalScore=apply(AllSitesScores[rownames(BigTable),],1,sum),BigTable[,c("Motif","DRACH")])
 
-for(dude in colnames(dataGG)[1:nrow(h)])
-    {
-xdensity <- ggplot(dataGG, aes_string(dude, color="CLIP")) + 
-stat_ecdf() +
-scale_color_manual(values = cbbPalette) + 
-theme_bw()
-
-#critical need to check 
-ggsave(paste0(dude,"_ecdf.pdf"),device="pdf")
-}
 saveRDS(AllSitesScores,file="ScoreProfile_NMFall_plusNonCLIP.rds")
-
+#AllSitesScores

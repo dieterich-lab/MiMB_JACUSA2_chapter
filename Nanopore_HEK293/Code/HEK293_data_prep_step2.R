@@ -20,6 +20,7 @@ ins=intersect(rownames(BigTable),subset(Noverlap.df$ID,Noverlap.df$Type=="Boulia
 #ins=intersect(rownames(BigTable),Noverlap.df$ID);
 
 NMFtab=BigTable[ins,]
+print(dim(NMFtab))
                                         #train NMF based on core miCLIP data WT_vs_KO shared across all 3 experiment
 
 library(NMF)

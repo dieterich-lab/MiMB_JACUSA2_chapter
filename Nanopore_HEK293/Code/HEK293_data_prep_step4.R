@@ -12,6 +12,10 @@ Noverlap.df=data.frame(ID=paste0(Noverlap[,1],":",Noverlap[,2]-2,"_",Noverlap[,3
 rownames(Noverlap.df)=Noverlap.df[,1]
 
 ins=intersect(rownames(AllSitesScores),Noverlap.df$ID);
+NoCLIPsites=setdiff(rownames(AllSitesScores),ins)
+
+print(length(ins))
+print(length(NoCLIPsites))
 
 dataGG=data.frame(AllSitesScores[ins,-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],Noverlap.df[ins,2])
 NumberOfFactors=ncol(AllSitesScores)-2

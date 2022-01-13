@@ -13,7 +13,7 @@ rownames(Noverlap.df)=Noverlap.df[,1]
 
 ins=intersect(rownames(AllSitesScores),Noverlap.df$ID);
 
-dataGG=data.frame(AllSitesScores[ins,-c(1,2)],Noverlap.df[ins,2])
+dataGG=data.frame(AllSitesScores[ins,-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],Noverlap.df[ins,2])
 NumberOfFactors=ncol(AllSitesScores)-2
 colnames(dataGG)=c(paste("NMF",1:NumberOfFactors,sep=""),"CLIP")
 

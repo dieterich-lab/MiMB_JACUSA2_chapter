@@ -17,18 +17,19 @@ NoCLIPsites=setdiff(rownames(AllSitesScores),ins)
 print(length(ins))
 print(length(NoCLIPsites))
 
-dataGG=data.frame(AllSitesScores[c(ins,NoCLIPsites),-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],CLIP=c(Noverlap.df[ins,2],rep("NoCLIP",length(NoCLIPsites))))
+dataGG=data.frame(AllSitesScores[c(ins,NoCLIPsites),-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],CLIP=c(as.character(Noverlap.df[ins,2]),rep("NoCLIP",length(NoCLIPsites))))
 NumberOfFactors=ncol(AllSitesScores)-2
 colnames(dataGG)=c(paste("NMF",1:NumberOfFactors,sep=""),"CLIP")
 
+rocca<-data.frame(NMF2=dataGG[,"NMF2"],CLIP=c(rep(1,length(ins)),rep(0,length(NoCLIPsites))))
 library(ggplot2)
 require(plotROC)
-p<-ggplot(dataGG, aes(m = NMF2, d = CLIP)) + geom_roc(labels=F)
+p<-ggplot(rocca, aes(m = NMF2, d = CLIP)) + geom_roc(labels=F)
 #color = Base_1
 p<-p+geom_abline(slope=1,intercept=0)
 p
 ggsave("roc.pdf")
-
+#ok, kinda works
 calc_auc(p)
 
 for(dude in colnames(dataGG)[1:NumberOfFactors])

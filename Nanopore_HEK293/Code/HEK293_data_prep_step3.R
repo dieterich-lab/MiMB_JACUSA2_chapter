@@ -67,7 +67,7 @@ for(k in 1:nrow(h))
        
         }
 
-AllSites=as.matrix(BigTable[,1:15])
+AllSites=as.matrix(BigTable[,16:30])
 AllSitesScores=AllSites%*%t(h)
 
 Noverlap=read.delim("/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)

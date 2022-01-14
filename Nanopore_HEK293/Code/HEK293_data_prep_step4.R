@@ -4,6 +4,9 @@
 
 AllSitesScores=readRDS("ScoreProfile_NMFall_plusNonCLIP.rds")
 
+#Just focus on DRACH site
+AllSitesScores=subset(AllSitesScores,AllSitesScores$DRACH==1)
+
 # The palette with black:
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -22,16 +25,38 @@ NumberOfFactors=ncol(AllSitesScores)-2
 colnames(dataGG)=c(paste("NMF",1:NumberOfFactors,sep=""),"CLIP")
 
 library(ggplot2)
-require(plotROC)
 
-for(dude in colnames(dataGG)[1:NumberOfFactors])
-    {
-        rocca<-data.frame(NMF2=dataGG[,dude],CLIP=c(rep(1,length(ins)),rep(0,length(NoCLIPsites))))
-        p<-ggplot(rocca, aes(m = NMF2, d = CLIP)) + geom_roc(labels=F)
-        p<-p+geom_abline(slope=1,intercept=0)
-        ggsave(paste0(dude,"_roc.pdf"),device="pdf")
-        calc_auc(p)
-    }
+                                        #All experimental below
+
+#require(plotROC)
+#ROC plots do not make sense.
+#for(dude in colnames(dataGG)[1:NumberOfFactors])
+#    {
+#        rocca<-data.frame(NMF2=dataGG[,dude],CLIP=c(rep(1,length(ins)),rep(0,length(NoCLIPsites))))
+#        p<-ggplot(rocca, aes(m = NMF2, d = CLIP)) + geom_roc(labels=F)
+#        p<-p+geom_abline(slope=1,intercept=0)
+#        ggsave(paste0(dude,"_roc.pdf"),device="pdf")
+#        calc_auc(p)
+#    }
+
+
+p <- ggplot(data.frame(PerfbgSub[which(PerfbgSub[,2]>10),]), aes(x = Score))
+p <- p + ylab("% predicted targets")
+
+p <- p + ggtitle("AATF (55315, 55317) vs eCLIP et al. (GFPcdAdar subtracted)")
+#p <- p + ggtitle("AATF (52653, 52655) vs eCLIP et al. (GFPcdAdar subtracted)")
+
+  p <- p + geom_line(aes(y = PercentOverlap, colour = "% overlap with eCLIP"))
+  
+  # adding the relative humidity data, transformed to match roughly the range of the temperature
+  p <- p + geom_line(aes(y = PercentOriginal, colour = "% predicted targets"))
+
+  # now adding the secondary axis, following the example in the help file ?scale_y_continuous
+  # and, very important, reverting the above transformation
+  p <- p + scale_y_continuous(sec.axis = sec_axis(~.*1, name = "% overlap with eCLIP"))
+  
+  # modifying colours and theme options
+  p <- p + scale_colour_manual(values = c("blue", "red"))
 
 for(dude in colnames(dataGG)[1:NumberOfFactors])
     {

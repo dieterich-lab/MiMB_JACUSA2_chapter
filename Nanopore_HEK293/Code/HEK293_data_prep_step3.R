@@ -1,4 +1,6 @@
 library(NMF)
+args = commandArgs(trailingOnly=TRUE)
+
 BigTable=readRDS("BigTable.rds")
 res=readRDS("NMF.rds");
 ##
@@ -16,7 +18,7 @@ h <- coef(res)
 # The palette with black:
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-                                        #revcovered pattern
+                                        #revcovered pattern#
 for(k in 1:nrow(h))
     {
 pdf(paste0("Pattern_",k,"_barplot_NMF.pdf"),width=14,height=7)
@@ -67,7 +69,7 @@ for(k in 1:nrow(h))
        
         }
 
-AllSites=as.matrix(BigTable[,16:30])
+AllSites=as.matrix(BigTable[,eval(parse(text=args[1]))])
 AllSitesScores=AllSites%*%t(h)
 
 Noverlap=read.delim("/prj/JACUSA2_TestField/Nanopore_HEK293/miCLIP2/miCLIP_union_flat_exclude_Y_chromosome.bed",header=F,as.is=T)

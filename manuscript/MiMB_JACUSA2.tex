@@ -243,10 +243,10 @@ $ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union.bed
 \end{enumerate}
 
 \subsection*{Use Case 2: Comparison of wildtype and IVT samples}
-The second benchmarck is composed of wildtype HEK293 cell line from \cite{pratanwanich2021identification} and the synthetised IVT samples described in section 2.    
+The second benchmark is composed of wildtype HEK293 cell line from \cite{pratanwanich2021identification} and the synthesized sample described in section 2.    
 The analysis steps are similar to the first case. 
 \begin{enumerate}
-\item Identify read error profile: given the synthetised sequence, run JACUSA2 on paired conditions mode with the same parameters as the previously described case. 
+\item Identify read error profile: given the synthesized sequence, run JACUSA2 on paired conditions mode with the same parameters as the previously described case. 
 \begin{verbatim}
 $ JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND
 -P2 FR-SECONDSTRAND -r WT_vs_realIVT_v202_call2_result.out HEK293T-WT-rep2.bam,HEK293T-WT-rep3.bam	HEK293T-IVT-rep1.bam,HEK293T-IVT-rep2.bam

@@ -186,4 +186,3 @@ g+ ggtitle(paste0('SUM_NMF ROC Curve ', '(AUC = ', auc, ')'))+    theme_minimal(
 
 #critical need to check 
 ggsave(paste0(args[1],"/SUM_NMF_roc2.pdf"),device="pdf")
-

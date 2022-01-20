@@ -195,11 +195,11 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 
 \subsection*{Nanopore read processing}
 \begin{enumerate}
-	\item Following standard steps, base call the ionic current stored in FAST5 file using Guppy. The output is FASTQ files. For the IVT readout, we adopted real-time base calling with the integrated MinKNOW Guppy. Otherwise, Guppy base caller software could be used. The base caller requires the path to FAST5 files, the output path, and the config file or the flowcell/kit combination. More details can be found in \cite{Guppymanual}.
+	\item Following standard steps, base call the ionic current signal stored in FAST5 file using Guppy. The output is FASTQ files. For the IVT readout, we adopted real-time base calling with the MinKNOW-embedded Guppy basecaller. Otherwise, Guppy basecaller software could be used. Guppy basecaller requires the path to FAST5 files, the output path, and the config file or the flowcell/kit combination and outputs a compressed fastq files using the option --compress\_fastq. Additional details can be found in \cite{Guppymanual}.
 		\begin{spverbatim}
-	$ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output --cpu_threads_per_caller 14 --num_callers 1 -c config_file.cfg
+	$ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_file.cfg
 		\end{spverbatim}
-	\item  Align reads to the transcriptome using Minimap2 software with the recommended setting for DirectRNA Sequencing (-ax map-ont). The output is a SAM file that should be converted into a compressed form as a BAM file using SAMtools command. The alignement requires the reference transcriptome/ genome. We used GRCh38 Ensembl annotations and FASTA file release version 96(\todo{Explain the rest of considered parameters}) . Check the Minimap2 manual for more details \cite{Minimap2manual}.
+	\item  Align reads to the transcriptome using Minimap2 software with the recommended setting for DirectRNA Sequencing (-ax map-ont). The output is a SAM file that have to be converted to a compressed form as a BAM file using SAMtools command. The alignement requires the reference transcriptome/ genome. We used GRCh38 Ensembl annotations and FASTA file release version 96(\todo{AL: Explain the rest of considered parameters}) . Check the Minimap2 manual for more details \cite{Minimap2manual}.
 	\begin{spverbatim}
 	$ minimap2 --secondary=no -ax map-ont -uf -k14 reference.fasta Reads.fastq |samtools view -bS > mapping.bam	
 	\end{spverbatim}			
@@ -214,28 +214,28 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 %	\end{spverbatim}
 \end{enumerate}	
 \subsection*{Use Case 1: Comparison of wildtype and knock-out samples}
-We used a published dataset of Hek293 cell line \cite{pratanwanich2021identification}. The benchmark is composed of two samples from two conditions: wild type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The FASTQ files are preprocessed and mapped according to the steps described above.
+The conventional way to detect RNA modification using direct RNA sequencing is to compare a modified sample to unmodified control sample. To assess the ability of JACUSA2 RNA modification detection in this case, we used a published dataset of HEK293 cell line \cite{pratanwanich2021identification}. The benchmark is composed of two samples from two conditions: wild type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The FASTQ files are preprocessed and mapped according to the steps described in the previous section.
  
-Given the preprocessed mapped reads as input (BAM files) 'HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam representing the wild type replicates and HEK293T-KO-rep2.bam and  HEK293T-KO-rep3.bam as the control replicates, 
+Given the preprocessed mapped reads as input (BAM files) 'HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam representing the wildtype replicates and HEK293T-KO-rep2.bam and  HEK293T-KO-rep3.bam as the control replicates, 
 \begin{enumerate} 
-	\item Identify read error profile: run JACUSA2 in paired samples mode (call-2). The method requires setting the BAM files of the paired conditions, the corresponding library information, and the output file. Plus, it allows filtering reads according to many parameters. Here, we consider all sites with read coverage $> 4$. The output consists of a read error profile where the format is a combination of BED6 with JACUSA2 call-2 specific columns and common info columns: "info", "filter", and "ref". Check JACUSA2 manual for more details on JACUSA2 filter and output options \cite{JACUSA2manual}.
+	\item Identify read error profile: run JACUSA2 in pairwise conditions mode (call-2). The method requires the BAM files of the paired conditions, the corresponding library information, and the output file name. Plus, it allows filtering reads according to many parameters. Here, we consider all sites with read coverage $> 4$. The output consists of a read error profile where the format is a combination of BED6 with JACUSA2 call-2 specific columns and common info columns: info, filter, and ref. Check JACUSA2 manual for more details on JACUSA2 filter and output options \cite{JACUSA2manual}.
 	\begin{spverbatim}
 	$ JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND -P2 FR-SECONDSTRAND -r WT_vs_KO_call2_result.out HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam	HEK293T-KO-rep2.bam, HEK293T-KO-rep3.bam
 	\end{spverbatim}
-	\item Preprocess JACUSA2 output: given the JACUSA2 output, select non-overlapping sites of homo-polymer regions (JACUSA filter: Y) and within a 5mer of a central nucleotide A flanked by 2 adjacent random nucleotides (NNANN). Selected sites are characterized by the insertion, deletion and mismatch scores, and the position number within the specific 5mer context. The 'README\_processing.sh' bash script performs the preprocessing step and produces a text file 'call2\_SitesExt2\_indel\_slim2.txt' containing tabular features of the selected sites and a separate file representing the 5mer bases 'checkMotif\_reformat.txt'. The path to outputs could be specified within the command.
+	\item Preprocess JACUSA2 output: from the JACUSA2 call-2 output, select all sites within 5mer of a central nucleotide 'A' flanked by 2 random nucleotides (NNANN) and filter out sites of the homo-polymer regions (JACUSA filter: Y). The 'README\_processing.sh' bash script performs the preprocessing step by providing the JAUSA2 call-2 output, the reference genome and the output folder. The output of the preprocessing is a text file 'call2\_SitesExt2\_indel\_slim2.txt' containing tabular features of the selected sites. Eventually, sites are characterized by the main scores: mismatch, deletion, and insertion and additional information: reference base, strand and position number within the specific 5mer context. 
 	\begin{spverbatim} 
-	$ bash README_processing.sh WT_vs_KO_RC22_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
+	$ bash README_processing.sh WT_vs_KO_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
 	\end{spverbatim}
-	\item Extract 5mer features: rebuild the tabular features such that the scores: mismatch, insertion and deletion are represented for each position of the specific 5mer (NNANN). To do so, run the R script 'HEK293\_data\_prep.R'. This produces an R object named 'BigTable.rds', representing the matrix of Sites$\times$15 features corresponding to the mismatch, insertion and deletion scores for the observed site and its two flanking positions. Be aware to precise the path to outputs that contains already the preprocessed data and provide the sample's name as a label of the analysis.
+	Then, using the R script 'HEK293\_data\_prep.R', rebuild the tabular features such that the observations are only sites with a reference base A. Each site is characterized by 15 features corresponding to the mismatch, insertion and deletion scores for the observed site and its two flanking positions. The output is an R object 'BigTable.rds', representing the matrix of Sites$\times$15 features. Be aware to precise the path to outputs that contains already the preprocessed data and provide the sample's name as a label of the analysis.
 	\begin{spverbatim} 
-	$ Rscript HEK293_data_prep.R path_to_output WT_vs_KO_RC22_call2_result.out
+	$ Rscript HEK293_data_prep.R path_to_output WT_vs_KO_call2_result.out
 	\end{spverbatim}
-	\item Extract m6A modification pattern: given the matrix of Sites$\times$Features, the next step is to learn a model representing the m6A modification pattern. To this end, the conventional non-negative matrix factorization (NMF) analysis is suggested \cite{lee1999learning}. Briefly, NMF factorizes a non-negative data matrix $X$ (here: $n$ sites and $m$ features) into two non-negative matrices as $X \approx WH$, such that $W$ is an $n\times k$ matrix containing basis vectors and $H$ is an $k \times m$ matrix containing coefficient vectors. The coefficient vectors and their combination can be viewed as a pattern for m6A modification. The R script 'HEK293\_data\_prep\_step2.R' allows generating patterns from a subset of the data related to previously reported m6A sites. Here, the unsupervised pattern training is based on $2401$ common reported m6A sites in \cite{koh2019atlas} {\todo{references}}. Based on the Silhouette and Cophenetic Correlation indices, we could identify an optimal factorization rank of 7. We then analyzed the identified patterns. According to the membership indicator of each site in matrix $W$, more than $80\%$ of m6A modification sites can be represented by five patterns (Patterns 2,3,4,6,7). The linear combination of these five patterns in fig (\ref{fig:WT_KO}A) highlights the importance of position 3 and eventually the implication of all scores.
+	\item Extract m6A modification pattern: given the matrix of Sites$\times$Features, the next step is to learn a model representing the m6A modification pattern. To this end, the conventional non-negative matrix factorization (NMF) analysis is suggested \cite{lee1999learning}. Briefly, NMF factorizes a non-negative data matrix $X$ (here: $n$ sites and $m$ features) into two non-negative matrices as $X \approx WH$, such that $W$ is an $n\times k$ matrix containing basis vectors and $H$ is an $k \times m$ matrix containing coefficient vectors. The coefficient vectors and their combination can be viewed as a pattern for m6A modification. The R script 'HEK293\_data\_prep\_step2.R' allows generating patterns from a subset of the data related to previously reported m6A sites. Here, the unsupervised pattern training is based on $2401$ common reported m6A sites in \cite{koh2019atlas} {\todo{AL: references}}. Based on the Silhouette and Cophenetic Correlation indices \today{AL: explain more}, we could identify an optimal factorization rank of 7 (figure \ref{fig:WT_KO}A). We then analyzed the identified patterns. According to the membership indicator of each site in matrix $W$, more than $80\%$ of m6A modification sites can be represented by five patterns (Patterns 2,3,4,6,7) (figure \ref{fig:WT_KO}B). Interestingly, the linear combination of these five patterns in figure (\ref{fig:WT_KO}C) highlights the importance of position 3 and eventually the implication of all scores.
 	\begin{spverbatim} 
 	$ Rscript HEK293_data_prep_step2.R path_to_output miCLIP_union.bed
 	\end{spverbatim} 
-	The 'miCLIP\_union.bed' file contains all m6A sites reported in \cite{koh2019atlas} (\todo{ reference}). 
-\item Predict m6A modification: The additive linear combination of the coefficient vectors (patterns) with features can be used to predict m6A modification. We examine the ability of prediction on a subset of data of more than $1,98$ million sites with $22248$ miCLIP m6A validated sites {\todo{reference + description of categories}}. We opt for the linear combination of the five important patterns described in the previous section. The empirical Cumulative Distribution Function (eCDF) of the inferred scores shows a significant difference between the different miCLIP m6A categories and the unmodified sites (fig. \ref{fig:WT_KO}B). As the number of negative samples is much larger than the number of positive samples, we particularly recommend investigating the Positive Predictive Value (PPV) of the predictions. Here, (fig. \ref{fig:WT_KO}C) shows a moderate PPV that increases with the cut-off.  The R script 'HEK293\_data\_prep\_step3.R' allows generating the scores, eCDF probabilities of modification, and the corresponding eCDF and PPV plots.
+	The 'miCLIP\_union.bed' file contains all m6A sites reported in \cite{koh2019atlas} (\todo{AL: reference + description}). 
+\item Predict m6A modification: the additive linear combination of the coefficient vectors (patterns) with features can be used to predict m6A modification. We examine the ability of prediction on a subset of data of more than $1,98$ million sites with $22248$ miCLIP m6A validated sites {\todo{AL: reference + description of categories}}. We opt for the linear combination of the five important patterns described in the previous section. The empirical Cumulative Distribution Function (eCDF) of the inferred scores shows clearly a significant difference between the different miCLIP m6A categories and the unmodified sites (figure \ref{fig:WT_KO}D). As the number of negative samples is much larger than the number of positive samples, we particularly recommend investigating the Positive Predictive Value (PPV) of the predictions. Here, (figure \ref{fig:WT_KO}E) shows a moderate PPV that increases with the cut-off.  The R script 'HEK293\_data\_prep\_step3.R' allows generating the scores, eCDF probabilities of modification, and the corresponding eCDF and PPV plots.
 	\begin{spverbatim} 
 $ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union.bed
 \end{spverbatim} 
@@ -243,30 +243,30 @@ $ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union.bed
 \end{enumerate}
 
 \subsection*{Use Case 2: Comparison of wildtype and IVT samples}
-The second benchmark is composed of wildtype HEK293 cell line from \cite{pratanwanich2021identification} and the synthesized sample described in section 2.    
-The analysis steps are similar to the first case. 
+An alternative way to detect RNA modification is to compare modified sample to an \emph{in-vitro} (IVT) synthesized control sample. Therefore, we benchmark JACUSA2 on a sample set of wildtype HEK293 cell line (modified sample) with two replicates (2 and 3) from \cite{pratanwanich2021identification} and a modification-free RNA synthesized sample (control sample).    
+The analysis steps are similar to case 1. 
 \begin{enumerate}
-\item Identify read error profile: given the synthesized sequence, run JACUSA2 on paired conditions mode with the same parameters as the previously described case. 
-\begin{verbatim}
+\item Identify read error profile: we use JACUSA2 call-2 with the same parameters as the previously described case. The input BAM files are associated to the replicates of the wildtype and IVT replicate samples.
+\begin{spverbatim}
 $ JACUSA2 2.0.0-RC22 call-2 -m 1 -q 1 -c 4 -p 10 -D -I -a D,Y -P1 FR-SECONDSTRAND
--P2 FR-SECONDSTRAND -r WT_vs_realIVT_v202_call2_result.out HEK293T-WT-rep2.bam,HEK293T-WT-rep3.bam	HEK293T-IVT-rep1.bam,HEK293T-IVT-rep2.bam
-\end{verbatim}
-\item Preprocess JACUSA2 output: select the 5mer specific sites (NNANN) considering the Y filter as follows. 
-\begin{verbatim} 
-$ bash README_processing.sh WT_vs_IVT_RC22_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
-\end{verbatim}
-\item Extract 5mer features using the following command:
-\begin{verbatim} 
-$ Rscript Code/HEK293_data_prep.R path_to_output WT_vs_IVT_RC22_call2_result.out
-\end{verbatim}
-\item Extract m6A modification patterns based on 2401 m6A sites (\todo{reference}). From the Silhouette and Cophenetic Correlation indices, we could identify an optimal factorization rank of 6 (fig. \ref{fig:WT_IVT}).
-\begin{verbatim} 
-$ Rscript HEK293_data_prep_step2.R path_to_output miCLIP_union_flat_exclude_Y_chromosome.bed
-\end{verbatim} 
-\item Predict m6A modifications: we examine the prediction of modification using the detected patterns on the test set of $22248$ m6A sites. So here, we plot the eCDF of pattern 6 scores by category (fig. \ref{fig:WT_IVT})
-\begin{verbatim} 
-$ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union_flat_exclude_Y_chromosome.bed
-\end{verbatim} 
+-P2 FR-SECONDSTRAND -r WT_vs_IVT_call2_result.out HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam	HEK293T-IVT-rep1.bam, HEK293T-IVT-rep2.bam
+\end{spverbatim}
+\item Preprocess JACUSA2 output: we select all sites within the specific 5mer (NNANN) and we consider the Y filter that excludes sites within the homo-polymer regions. 
+\begin{spverbatim} 
+$ bash README_processing.sh WT_vs_IVT_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
+\end{spverbatim}
+Then, we extract 5mer features such that the selected sites are represented by the three scores: Mismatch, Deletion and Insertion for the observed site and its two flanking positions.
+\begin{spverbatim} 
+$ Rscript HEK293_data_prep.R path_to_output WT_vs_IVT_call2_result.out
+\end{spverbatim}
+\item Extract m6A modification pattern: using NMF factorization, we extract patterns from 2401 m6A sites (\todo{AL: reference}). Based on the silhouette and cophenetic Correlation indices, we could identify an optimal factorization rank of 6 (figure \ref{fig:WT_IVT}A). We determined the predominant factors from matrix $W$. Herein, more than $80\%$ of m6A modification sites can be represented by four patterns (Patterns: 1,2,3,6) (figure \ref{fig:WT_IVT}E). In agreement with case 1, the linear combination of the four patterns confirms the importance of position 3 and the implication of all scores as shown in figure (\ref{fig:WT_IVT}C).
+\begin{spverbatim} 
+$ Rscript HEK293_data_prep_step2.R path_to_output miCLIP_union.bed
+\end{spverbatim} 
+\item Predict m6A modifications: we evaluate the prediction ability of the detected patterns on a test set of $22248$ m6A sites. We consider the linear combination of the four patterns (1,2,3,6). Figure \ref{fig:WT_IVT}D shows the eCDF of the inferred scores. The difference between the cumulative distribution of non miCLIP sites and miCLIP sites can be nicely observed, while, the PPV plot shows a lower performance as compared to case 1 (figure \ref{fig:WT_IVT}E). The decrease in performance is likely explained by the absence of all modifications and not exclusively m6A in the control condition which induces noise to the score estimation by JACUSA2 call2 method \todo{CD:to be confirmed}.
+\begin{spverbatim} 
+$ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union.bed
+\end{spverbatim} 
 
 \end{enumerate}
 
@@ -322,15 +322,15 @@ $ Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union_flat_exclude_Y_ch
 \newpage
 
 \begin{figure}[h!]
-	\includegraphics[width = 1\textwidth]{img/wt_ko.pdf}
-	\caption{\textbf{Case 01. WT  versus KO.}  \textbf{A}: Barplots representing the linear combination of the top 5 patterns (y-axis) by position in the specific 5mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 5 patterns (coefficient vectors: 2,3,4,6,7) are selected according to the predominant columns in matrix W.  \textbf{B}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{C}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
+	\includegraphics[width = 1\textwidth]{img/res_wt_ko.pdf}
+	\caption{\textbf{Case 01. WT  versus KO.}  \textbf{A}: NMF rank selection. Comparison of cophenetic correlation and silhoutte resulting from the NMF factorization of the original and the randomized data \textbf{B}: NMF result represented by the basis matrix $W$ and the coefficient matrix $H$. The matrix $H$ induces the RNA modification pattern. \textbf{B}: Barplots representing the linear combination of the top 5 patterns (y-axis) by position in the specific 5mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 5 patterns (coefficient vectors: 2,3,4,6,7) are selected according to the predominant columns in matrix W.  \textbf{C}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{D}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
 	\label{fig:WT_KO}
 \end{figure}
 
 \newpage
 \begin{figure}[h!]
-	\includegraphics[width = 1\textwidth]{img/wt_ivt.pdf}
-	\caption{\textbf{Case 02. WT  versus IVT.}  \textbf{A}: Barplots representing the linear combination of the top 4 patterns (y-axis) by position in the specific 5mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 4 patterns (coefficient vectors: 1,2,3,6) are selected according to the predominant columns in matrix W.  \textbf{B}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{C}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
+	\includegraphics[width = 1\textwidth]{img/res_wt_ivt.pdf}
+	\caption{\textbf{Case 02. WT  versus IVT.}  \textbf{A}: NMF rank selection. Comparison of cophenetic correlation and silhoutte resulting from the NMF factorization of the original and the randomized data \textbf{B}: NMF result represented by the basis matrix $W$ and the coefficient matrix $H$. The matrix $H$ induces the RNA modification pattern. \textbf{B}: Barplots representing the linear combination of the top 4 patterns (y-axis) by position in the specific 5mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 4 patterns (coefficient vectors: 1,2,3,6) are selected according to the predominant columns in matrix W.  \textbf{C}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{D}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
 	\label{fig:WT_IVT}
 \end{figure}
 \newpage

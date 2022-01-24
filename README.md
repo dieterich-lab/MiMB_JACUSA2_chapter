@@ -13,6 +13,9 @@ openjdk | 11.0.13
 R | 4.0.5
 PERL | 5.28.1
 bedtools | 2.29.2
+
+R Package | Version
+--- | ---
 ggplot2 | 3.3.5
 NMF | 0.23.0
 pROC | 1.18.0

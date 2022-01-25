@@ -200,9 +200,17 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 	$ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_file.cfg --cpu_threads_per_caller 14 --num_callers 1
 		\end{spverbatim}
 	Set the number of threads "cpu\_threads\_per\_caller" and the number of parallel basecallers "num\_caller" according to your resources. Additional details can be found in \cite{Guppymanual}.
-	\item  Align reads to the transcriptome using Minimap2 software. The output is a SAM file that has to be converted to a compressed form as BAM file using SAMtools command. The alignment requires the reference sequence. Here, we used GRCh38 Ensembl annotation and FASTA file release version 96. For Direct RNA Sequencing, it is recommended to use the default setting "-ax map-ont", "-uf" to force the alignment to the forward strand of the reference, and a small k-mer size "-k [=14]" to enhance sensitivity. We recommend to output primary alignments and up to "-N [=100]" top secondary alignments if the ratio of their chaining scores compared to the corresponding primary alignments is at least "-p [=1]" \todo{CD: not sure about minimap2 step specifically these 2 parameters -N and -p. need to be validated}. Customize the number of threads "-t" according to your resources. Check Minimap2 manual for more details \citep{Minimap2manual}.
+	\item  Align reads to the transcriptome using Minimap2 software. The output is a SAM file that has to be converted to a compressed form as BAM file using SAMtools command. The alignment requires the reference sequence. Here, we used GRCh38 Ensembl annotation and FASTA file release version 96. To reduce indexing time of the human genome, save the index with option "-d" before the mapping and use the index instead of the reference file on the minimap2 command line. 
 	\begin{spverbatim}
-	$ minimap2 -t 5 -ax map-ont -uf -k14 -p 1.0 -N 100 reference.fasta Reads.fastq |samtools view -bS > mapping.bam	
+$ minimap2 -d reference.mmi reference.fa 
+	\end{spverbatim}	
+	To allow spliced alignments, use the setting “-ax splice --junc-bed annotation.bed --junc-bonus”  where "--junc-bonus" is used to tune the bonus scores and the BED file provides the splice junctions. The BED file can be generated using the following command:
+	\begin{spverbatim}
+	$paftools.js gff2bed annotation.gtf > annotation.bed
+	\end{spverbatim}		
+	Use "-ub" to allow alignement to both strands or '-uf' to force the alignment to the forward strand uniquley. For Direct RNA Sequencing, it is recommended to set a small k-mer size "-k [=14]" to enhance sensitivity. We recommend to output primary alignments "--secondary=no". Use the parameter '--MD' to add the reference sequence to the alignment. This is recommended for the downstream analyis. Customize the number of threads "-t" according to your resources. Check Minimap2 manual for more details \citep{Minimap2manual}.
+	\begin{spverbatim}
+	$ minimap2 -t 5 --MD -ax splice --junc-bonus 1 -k14 --secondary=no --junc-bed final_annotation_96.bed -ub reference.mmi Reads.fastq.gz |samtools view -bS > mapping.bam	
 	\end{spverbatim}
 	\item  Map RNA modifications using JACUSA2 software \citep{piechotta2021rna}. JACUSA2 rapidly detects RNA modifications based on a comparative strategy where the mapping features (mismatch, insertion and deletion) of a sample of interest is compared to a reference sequence (call-1) or against a sample without RNA modifications, e.g. a knock-out of an RNA modifying enzyme or an IVT (call-2). Moreover, it allows the integration of information from replicate experiments. Further details on how to use JACUSA2 is presented in the next section.
 	

@@ -1,0 +1,300 @@
+configfile: "config.yaml"
+import pandas as pd
+import numpy as np
+# from sklearn.model_selection import train_test_split
+##########################################################Global variables
+out_analysis = "{path_out}/analysis/".format(**config)
+out_jacusa = "{path_out}/jacusa/".format(**config)
+out_bam = "{path_out}/bam/".format(**config)
+out = config['path_out']
+try:
+    seqid = config['id']
+except Exception:
+    seqid = []
+comb = config['combination']
+#Extract data from the dictionnary
+data = config['data']
+status= "bivariate_"
+cond1= data['cond1']
+cond2= data['cond2']
+
+label = config['label']
+method = config['analysis_params']['method']
+LOF_contamination = str(config['analysis_params']['LOF_contamination'])
+LOF_neigh = config['analysis_params']['LOF_neighbors']
+
+sampling_seed = config['mixing_params']['sampling_seed']
+sampling_cov = config['mixing_params']['sampling_cov']
+mixing_seed =  config['mixing_params']['mixing_seed']
+mixing_thre =  config['mixing_params']['mixing_thre']
+downs_seed= config['sampling_params']['seed']
+downs_cov= config['sampling_params']['coverage']
+
+jarfile= config["path_jar"]    
+java_params= config["java_params"]
+javaparams = ""
+for key in java_params:
+      javaparams = javaparams + "-"+key+ " " +str(java_params[key])+ " "
+
+#Combine all jacusa params in one string    
+parameters= config["jacusa_params"]
+allparams = ''
+for key in parameters:
+    if key == 'b':
+        merged = touch(parameters[key]+".contigous_regions.bed")
+        allparams = allparams + "-"+key+ " " +merged+ " "
+    else: 
+        allparams = allparams + "-"+key+ " " +str(parameters[key])+ " "
+        
+NMF_params = config['NMF_params']
+
+####################################################Rules
+
+#Analysis of the whole data
+rule analysis_aggregate:
+    input:
+        out_analysis+status+label+"/with_Cond1/prediction"
+        
+rule run_nmf:
+    input:
+        out_analysis+status+label+"/with_Cond1/pattern/viz"
+        
+#Analysis based on downsampled data
+rule downsampling_aggregate:
+    input:
+        expand(out_analysis+status+label+".sampled{var1}/DowS{var2}/with_Cond1/"+method+LOF_contamination, var1=downs_cov, var2=downs_seed  )
+
+#Analysis based on mixtures of condition1 and condition2
+rule mixing_aggregate: 
+    input: expand(out_analysis+status+label+".sampled"+sampling_cov+"/DowS"+sampling_seed+"/with_MixS{seed}/{var1}_Cond1/"+method+LOF_contamination, var1=mixing_thre, seed=mixing_seed)
+
+
+
+
+#Filter out secondary and poor alignments. 
+rule filter: 
+    input:config['path_inp']+"/{sample}.bam"
+    output: out_bam+label+"/{sample}.filtered.bam"
+    shell:
+        """
+        samtools view -F 3328 -b {input} > {output}
+        """
+#Add "MD"-field.         
+rule MDtag: 
+    input:out_bam+label+"/{sample}.filtered.bam"
+    output:
+        bam_c = out_bam+label+"/{sample}.filtered.calmd.bam",
+        bai_c = out_bam+label+"/{sample}.filtered.calmd.bam.bai"
+    params : config['path_ref']
+    shell:
+        """
+        samtools calmd -b {input} {params} > {output.bam_c}
+        samtools index {output.bam_c} > {output.bai_c}
+        """
+#Annotate duplicates 
+rule remove_duplicate: 
+    input:out_bam+label+"/{sample}.filtered.calmd.bam"
+    output:
+        bam= out_bam+label+"/{sample}.filtered.calmd.dup.bam",
+        duplicate= out_bam+label+"/{sample}.filtered.calmd.dup.info",
+        bai= out_bam+label+"/{sample}.filtered.calmd.dup.bam.bai"
+    params: config['picard_jar']
+    shell:
+        """
+        java -jar {params} MarkDuplicates \
+        I={input} \
+        O={output.bam} \
+        M={output.duplicate}
+        samtools index {output.bam} > {output.bai}
+        """
+
+#Downsample any sample to a certain amount of reads
+rule downsampling:
+    input:
+        bam = out_bam+label+"/{sample}.filtered.calmd.dup.bam"
+    output:
+        bam = out_bam+label+"/{sample}.filtered.calmd.dup.sampled{thre}/DowS{seed}.bam",
+        bai = out_bam+label+"/{sample}.filtered.calmd.dup.sampled{thre}/DowS{seed}.bam.bai"
+    params: 
+        thre = "{thre}",
+        seq = config["id"],
+        seed = "{seed}"
+    shell:
+        """
+        function SubSample {{
+        FACTOR=$(
+            samtools view $1 \
+            | cut -f3 |grep -o $2 -c \
+            | awk -v COUNT=$3 -v seed=$6 '
+                BEGIN {{total=0}}
+                {{total += $1}}
+                END {{ printf "%f", seed+COUNT/total }}
+            ')
+        if [[ $FACTOR != $6.* ]]
+          then 
+            echo '[ERROR]: Requested number of reads exceeds total read count in' $1 '-- exiting' && exit 1
+        fi
+        samtools view -s $FACTOR -b $1 > $4
+        samtools index $4 > $5
+
+        }}
+
+        SubSample {input.bam} {params.seq} {params.thre} {output.bam} {output.bai} {params.seed}
+        """
+
+# Apply JACUSA call2 with replicates       
+
+def get_bam1(wildcards):
+
+    if "Cond1" in wildcards.sample1: 
+        c1= cond1
+    elif "Cond2" in wildcards.sample1:
+        c1= cond2
+    else:
+        c1= cond3
+        
+        
+    if wildcards.sample2 == "Cond1": 
+        c2= cond1
+    elif wildcards.sample2 == "Cond2":
+        c2= cond2
+    else:
+        c2= cond3
+    if wildcards.thre =='':
+        bam1 =  expand(out_bam+label+"/{var1}.filtered.calmd"+wildcards.type+".bam", var1 =c1) 
+    else:
+        bam1 =  expand(out_bam+label+"/"+wildcards.thre+ "_{var1}ADD{var2}.filtered.calmd"+wildcards.type+wildcards.type2+".bam", var1=c1, var2=c2)  
+    return bam1
+    
+def get_bam2(wildcards):
+    if wildcards.sample2 == "Cond1": 
+        c= cond1
+    elif wildcards.sample2 == "Cond2":
+        c= cond2
+    else:
+        c= cond3
+    bam2 =  expand(out_bam+label+"/{var1}.filtered.calmd"+wildcards.type+".bam" , var1 =c) 
+    return bam2
+    
+rule jacusaCall2: 
+    input:
+       bam1=get_bam1,
+       bam2= get_bam2
+    output: out_jacusa+label+"{type, .{0}|.sampled[0-9]+\/DowS[0-9]+}{type2, .{0}|\/MixS.+}/{thre, .{0}|[^\/][+-]?([0-9]*[.])?[0-9]+}{sample1, [^0-9][a-zA-Z0-9_\-]+}vs{sample2}Call2.out"
+    run:
+        input_str_bam1 = ''
+        for i in input.bam1:
+         input_str_bam1 = input_str_bam1+i+','
+        input_str_bam1 = input_str_bam1[:-1]
+        
+        input_str_bam2 = ''
+        for i in input.bam2:
+         input_str_bam2 = input_str_bam2+i+','
+        input_str_bam2 = input_str_bam2[:-1]
+        
+        shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
+
+
+# Mixing condition1 and condition2 with diffrent percentages
+rule mixing:
+      input: bam1= out_bam+label+"/{cond1}.filtered.calmd.dup.sampled{sampling_param}.bam",
+             bam2= out_bam+label+"/{cond2}.filtered.calmd.dup.sampled{sampling_param}.bam"
+      output:
+             out1= temp(out_bam+label+'/{cond2}{cond1}{thre}'+label+"{seed}{sampling_param}.bam"),
+             out2= temp(out_bam+label+'/{cond1}{cond2}{thre}'+label+"{seed}{sampling_param}.bam"),
+             out3= out_bam+label+"/{thre,[+-]?([0-9]*[.])?[0-9]+}_{cond1}ADD{cond2}.filtered.calmd.dup.sampled{sampling_param}/MixS{seed}.bam",
+             out4= out_bam+label+"/{thre}_{cond1}ADD{cond2}.filtered.calmd.dup.sampled{sampling_param}/MixS{seed}.bam.bai"
+
+      params:
+          seed_val = lambda wc: float(wc.seed),
+          mixing_thre = lambda wc: float(wc.seed)+ float(wc.thre),
+          rest = lambda wc: float(wc.seed)+1- float(wc.thre)
+      shell: 
+          """
+          if [[ {params.mixing_thre} = 1 ]]
+          then 
+              cp {input.bam1} {output.out3}
+              cp {input.bam1}.bai {output.out4}
+
+              touch {output.out2}   
+              touch {output.out1}   
+              exit 0
+          fi
+          if [[ {params.mixing_thre} = 0 ]]
+          then 
+              cp {input.bam2} {output.out3}
+              cp {input.bam2}.bai {output.out4}
+
+              touch {output.out2}   
+              touch {output.out1}   
+              exit 0
+          fi
+              samtools view -s {params.mixing_thre} -b {input.bam1} > {output.out1}
+              samtools view -s {params.rest} -b {input.bam2} > {output.out2}
+              samtools merge {output.out3} {output.out1} {output.out2}
+              samtools index {output.out3} > {output.out4}
+
+          """
+def get_jacusa_out(wildcards):
+    print("snake")
+    if status == "3way_":
+        inp = [out_jacusa+"{var1}/{var2}vsCond2Call2.out",out_jacusa+"{var1}/Cond2vsCond3Call2.out" ,out_jacusa+"{var1}/{var2}vsCond3Call2.out"]
+    else:
+        inp = [out_jacusa+"{var1}/{var2}vsCond2Call2.out"]
+    return inp
+    
+rule get_features: 
+#     input:  get_jacusa_out
+    input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/WT_vs_KO_RC22_call2_result.out"
+    output: 
+        out = out_analysis+status+"{var1}/with_{var2}/features/features.rds",
+        
+    params: 
+        mod = config['mod_file'],
+        ref = config['path_ref'],
+        hg38 = config['hg38'],
+        inter = out_analysis+status+"{var1}/with_{var2}/tmp"
+        
+    shell: 
+        """
+        #bash preprocessing.sh {input} {params.hg38} {params.ref} {params.inter}
+        Rscript HEK293_data_prep.R {params.inter} {output.out}
+        """
+        
+rule split:
+    input: out_analysis+status+"{var1}/with_{var2}/features/features.rds"
+    output: 
+        out_analysis+status+"{var1}/with_{var2}/features/train_features.rds" ,
+        out_analysis+status+"{var1}/with_{var2}/features/test_features.rds"    
+    params: 
+        mod = config['mod_file']        
+    script:"split.R"
+        
+rule get_pattern: 
+    input: out_analysis+status+"{var1}/with_{var2}/features/train_features.rds" 
+    output: 
+        data=out_analysis+status+"{var1}/with_{var2}/pattern/NMF.rds",
+        rank_selection= out_analysis+status+"{var1}/with_{var2}/pattern/asses_NMF.pdf"
+    params: 
+        mod = config['mod_file']
+    script: "HEK293_data_prep_step2.R"
+        
+rule visualize_pattern: 
+    input: 
+        bigtable = out_analysis+status+"{var1}/with_{var2}/features/features.rds",
+        nmf = out_analysis+status+"{var1}/with_{var2}/pattern/NMF.rds" 
+    output: 
+        data=directory(out_analysis+status+"{var1}/with_{var2}/pattern/viz")
+    params: 
+        mod = config['mod_file']
+    script: "HEK293_data_prep_step3.R"
+        
+rule predict_mod: 
+    input: 
+        bigtable = out_analysis+status+"{var1}/with_{var2}/features/test_features.rds" ,
+        nmf = out_analysis+status+"{var1}/with_{var2}/pattern/NMF.rds" 
+    output: 
+        data=directory(out_analysis+status+"{var1}/with_{var2}/prediction")
+    params: 
+        mod = config['mod_file']
+    script: "HEK293_data_prep_step4.R"

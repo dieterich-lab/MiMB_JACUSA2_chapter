@@ -7,7 +7,7 @@ We provide a pipeline for rRNA modification analysis of Nanopore sequencing read
 - JACUSA2 can detect RNA modification rapidly.
 - JACUSA2 detect modification based on mapping characteristics, it requires BAM files as input.
 - JACUSA2 can be run in single mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
-- JACUSA2 output can be used to predict RNA modification.
+- JACUSA2 output can be used to predict RNA modifications.
 # Download
 Download JACUSA2 JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file.
 

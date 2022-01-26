@@ -1,28 +1,17 @@
-#!/usr/bin/env Rscript
-#read in base call error profiles
+library(NMF)
 args = commandArgs(trailingOnly=TRUE)
 
-BigTable=readRDS(paste0(args[1],"/BigTable.rds"))
-#read in miCLIP data
-Noverlap=read.delim(args[2],header=F,as.is=T)
+NMFtab = readRDS(args[1])
 
-#TODO: setup parameters: number of cores
-
-Noverlap.df=data.frame(ID=paste0(Noverlap[,1],":",Noverlap[,2]-2,"_",Noverlap[,3]+2,":",Noverlap[,6]),Type=Noverlap[,4])
-rownames(Noverlap.df)=Noverlap.df[,1]
-
-ins=intersect(rownames(BigTable),subset(Noverlap.df$ID,Noverlap.df$Type=="Boulias,Koertel,Koh")); #
-#ins=intersect(rownames(BigTable),Noverlap.df$ID);
-
-NMFtab=BigTable[ins,]
-                        #train NMF based on core miCLIP data WT_vs_KO shared across all 3 experiment
-
-library(NMF)
+if (dir.exists(dirname(args[2]))== FALSE) {
+  dir.create(dirname(args[2]))
+}
+print(NMFtab)
 nmfSeed('nndsvd')
 meth <- nmfAlgorithm(version='R')
 meth <- c(names(meth), meth)
-NMFtabSlim=NMFtab[,16:30]
-
+NMFtabSlim=NMFtab[,1:15]
+print(dim(NMFtabSlim))
 estim.r <- nmf(NMFtabSlim, 2:10, nrun=10, seed=123456, .opt='vp3')
 
 V.random <- randomize(NMFtabSlim)
@@ -33,13 +22,21 @@ DeltaSil=estim.r$measures$silhouette.consensus-estim.r.random$measures$silhouett
 DeltaCoph=estim.r$measures$cophenetic-estim.r.random$measures$cophenetic
 
 ChoseRank=min(which(DeltaSil==max(DeltaSil))+1,which(DeltaCoph==max(DeltaCoph))+1)
-pdf(paste0(args[1],"/NMF_assess.pdf"))
+val_matrix = matrix(, nrow = length(DeltaCoph), ncol = 2)
+val_matrix[,1] = DeltaSil 
+val_matrix[,2] = DeltaCoph
+pdf(args[4])
+barplot(t(val_matrix), names.arg = 2:(length(DeltaCoph)+1), beside = TRUE, col = c("#009E73", "#D55E00"), legend.text = c("Silhouette", "Cophenetic"),ylim=range(pretty(c(0, DeltaSil))), xlab="Rank", 
+        ylab="Delta", main = "Difference between original and randomized data")
+abline(h=c(max(DeltaSil) , max(DeltaCoph)) , col=c("#009E73", "#D55E00"))
+dev.off()
+
+pdf(args[3])
 plot(estim.r,estim.r.random)
 dev.off()
 #exit(0);
 #how can we select factorization rank ?
 print(ChoseRank)
 res <- nmf(NMFtabSlim, ChoseRank, nrun=10, seed=123456, .opt='vp3')
-
-saveRDS(res,file=paste0(args[1],"/NMF.rds"))
+saveRDS(res,file=args[2])
 

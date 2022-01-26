@@ -1,0 +1,41 @@
+# INFOS PARAMS
+label: "HEK293_WT_KO5"                 # Label of the analysis, it should be unique for the analysis of one sequence ID and a specific for a set of conditions
+
+# JACUSA PARAMS
+path_jar : "../../../MiMB_JACUSA2_chapter-copie/JACUSA2/JACUSA_v2.0.2-RC.jar"    # Path to the JAR file 
+jacusa_params:                       #add any parameter as a name of the key and affect the appropriate value
+             p: 16 
+             D: ''
+             I: ''
+             P1: 'FR-SECONDSTRAND' 
+             P2: 'FR-SECONDSTRAND'             
+             m: 1 
+             q: 1 
+             c: 4
+             a: 'D,Y'
+java_params:
+             Xmx20g: ''
+             XX:ParallelGCThreads=10: ''
+             
+# INPUT & OUTPUT PATH
+path_out: "../../output"     # Path to the output directory, if it doesn't exist it will be created 
+path_inp: "../../../data"           # Path to the directory containg inputs - all input files are relative to this directory
+path_ref : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # Reference squence 
+mod_file: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed"   # rRNA modification status file
+hg38: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome"
+        
+# INPUTS PARAMS
+data:
+    cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
+    cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
+#NMF params
+# NMF_params:
+#            nrun: 10
+#            rank_range: [2,5]
+#COMBINATION OF FEATURES           
+combination:       # combination of features based on a specific pattern
+        pattern: 
+            pt1: [2,3,4,6]
+            pt2: [2,3,4]   #patterns to use
+        external_pattern: ""     # path to patern  
+        internal_pattern: "Boulias,Koertel,Koh"

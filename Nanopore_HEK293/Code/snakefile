@@ -1,0 +1,152 @@
+configfile: "config.yaml"
+import pandas as pd
+import numpy as np
+##########################################################Global variables
+out_analysis = "{path_out}/analysis/{label}/".format(**config)
+out_jacusa = "{path_out}/jacusa/{label}/".format(**config)
+out_bam = "{path_out}/bam/{label}/".format(**config)
+out = config['path_out']
+
+comb = config['combination']
+
+#Extract data from the dictionnary
+data = config['data']
+cond1= data['cond1']
+cond2= data['cond2']
+ground_truth = config['mod_file']
+
+#Java params
+jarfile= config["path_jar"]    
+java_params= config["java_params"]
+javaparams = ""
+for key in java_params:
+      javaparams = javaparams + "-"+key+ " " +str(java_params[key])+ " "
+
+#Combine all jacusa params in one string    
+parameters= config["jacusa_params"]
+allparams = ''
+for key in parameters:
+    if key == 'b':
+        merged = touch(parameters[key]+".contigous_regions.bed")
+        allparams = allparams + "-"+key+ " " +merged+ " "
+    else: 
+        allparams = allparams + "-"+key+ " " +str(parameters[key])+ " "
+        
+####################################################Rules
+
+# Create index for bam file
+rule index: 
+    input:config['path_inp']+"/{sample}.bam"
+    output: out_bam+"{sample}.bam.bai"
+    shell:
+        """
+        samtools index {input} > {output}
+        """
+#Filter out secondary and poor alignments. 
+
+rule filter: 
+    input:config['path_inp']+"/{sample}.bam"
+    output: 
+        bam = out_bam+"{sample}.filtered.bam",
+        bai = out_bam+"{sample}.filtered.bam.bai"
+        
+    shell:
+        """
+        samtools view -F 3328 -b {input} > {output.bam}
+        samtools index {output.bam} > {output.bai}
+        """
+
+# Apply JACUSA call2 with replicates       
+    
+rule jacusa2Call2: 
+    input:
+       bam1=expand(out_bam+"{c1}.filtered.bam",c1=cond1),
+       bam2= expand(out_bam+"{c2}.filtered.bam",c2=cond2)
+    output: out_jacusa+"Cond1vsCond2Call2.out"
+    run:
+        input_str_bam1 = ''
+        for i in input.bam1:
+         input_str_bam1 = input_str_bam1+i+','
+        input_str_bam1 = input_str_bam1[:-1]
+        
+        input_str_bam2 = ''
+        for i in input.bam2:
+         input_str_bam2 = input_str_bam2+i+','
+        input_str_bam2 = input_str_bam2[:-1]
+        
+        shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
+
+# preprocess jacusa2 output
+rule get_features: 
+    #input:  out_jacusa+"Cond1vsCond2Call2.out"
+    input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/WT_vs_KO_RC22_call2_result.out"
+    output: 
+        out = out_analysis +"features/features.rds",
+        
+    params: 
+        mod = ground_truth,
+        ref = config['path_ref'],
+        hg38 = config['hg38'],
+        inter = out_analysis +"tmp"
+        
+    shell: 
+        """
+        bash preprocessing.sh {input} {params.hg38} {params.ref} {params.inter}
+        Rscript HEK293_data_prep.R {params.inter} {output.out}
+        """
+# split data into test set and traning set  for internal pattern use case      
+rule split:
+    input: out_analysis +"features/features.rds"
+    output: 
+        train=out_analysis +"features/train_features.rds" ,
+        test=out_analysis +"features/test_features.rds"    
+    params: 
+        int_pt = comb['internal_pattern']
+    run:
+        if comb['external_pattern'] != "":
+            shell(" cp {input} {output.test}")
+            shell("touch {output.train}")
+        else:
+            shell("Rscript split.R {input} {ground_truth} {output.train} {output.test} {params.int_pt}")
+        
+# Extract pattern or use an exernal pattern        
+rule get_pattern: 
+    input: out_analysis +"features/train_features.rds" 
+    output: 
+        data=out_analysis +"pattern/NMF.rds",
+        rank1= out_analysis +"pattern/asses_NMF1.pdf" ,       
+        rank2= out_analysis +"pattern/asses_NMF2.pdf"
+    params: 
+        mod = config['mod_file'],
+        ext_pat =comb['external_pattern']
+    run:
+        if comb['external_pattern']!= "":
+            shell(" cp {params.ext_pat} {output.data}")
+            shell(" touch {output.rank1} {output.rank2}")
+
+        else:
+            shell("Rscript HEK293_data_prep_step2.R {input} {output.data} {output.rank1} {output.rank2}")
+            
+# Visualize patterns        
+rule visualize_pattern: 
+    input: 
+        bigtable = out_analysis +"features/features.rds",
+        nmf = out_analysis +"pattern/NMF.rds" 
+    output: 
+        data=directory(out_analysis +"pattern/viz")
+    params: 
+        mod = ground_truth,
+        pattern = comb['pattern']
+    script: "HEK293_data_prep_step3.R"
+
+# Perform prediction on test set
+rule predict_modification: 
+    input: 
+        bigtable = out_analysis +"features/test_features.rds" ,
+        nmf = out_analysis +"pattern/NMF.rds" 
+    output: 
+        data=directory(out_analysis +"prediction")
+    params: 
+        mod = ground_truth,
+        pattern = comb['pattern']
+    script: "HEK293_data_prep_step4.R"

@@ -26,11 +26,11 @@ srun bedtools intersect -filenames -loj -a $path/allSitesExt2.bed -b ${INP} > $p
 cat $path/call2_SitesExt2.bed |perl Code/HEK293_data_prep.pl > $path/data_reformat.txt
 
 #5mer
-srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -name -s -tab > $path/checkMotif.txt
+# srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -name -s -tab > $path/checkMotif.txt
 
 #sed -e 's/Cand:://' checkMotif.txt |sed -e 's/\-/_/' |awk '{gsub("[\(\)]","");print $1,$2;}' > checkMotif_reformat.txt
 
-cat $path/checkMotif.txt | perl -e 'while(<>){s/Cand:://; 's/\-/_/'; 's/[\(\)]//g'; print;}' >  $path/checkMotif_reformat.txt
+# cat $path/checkMotif.txt | perl -e 'while(<>){s/Cand:://; 's/\-/_/'; 's/[\(\)]//g'; print;}' >  $path/checkMotif_reformat.txt
 
 #*************************************BEGIN. Modified part *********************************************
 srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -s -tab > $path/checkMotif_reformat.txt

@@ -7,12 +7,11 @@ while(<>)
 	my @tmp = split(/\t+/,$_);
 	my $offset=$#tmp-15;
 
-     
-	#print $offset,"\n";
+# 	print $offset,"\n";
 	#if($#tmp==19){}
 	#elsif($#tmp==20){print "HO";}
 	#exit(0);
-	my ($contig, $ref_position, $sample, $callScore, $Indel, $base, $site, $strand) = ($tmp[0],$tmp[1]."_".$tmp[2],$tmp[6],$tmp[11],0,$tmp[$offset+15], $tmp[8], $tmp[12]);
+	my ($contig, $ref_position, $callScore, $Indel, $base, $site, $strand) = ($tmp[0],$tmp[1]."_".$tmp[2],$tmp[10],0,$tmp[$offset+15], $tmp[7], $tmp[11]);
 	my($deletionScore, $insertionScore) = (0,0);
 	if(/deletion\_score\=([\d\.]+)/)
 	{ $deletionScore=$1;}
@@ -23,7 +22,7 @@ while(<>)
 	$site=$site-$tmp[1]+1 if($strand eq '+');
         $site=$tmp[2]-$site if($strand eq '-');
 							  
-	printf("%s\t%s\t%s\t%s\t%.2f\t%.2f\t%.2f\t%s\t%d\t%s\n",$contig.":".$ref_position.":".$strand, $contig, $ref_position, $sample, $callScore, $deletionScore, $insertionScore, $base, $site, $strand);
+	printf("%s\t%s\t%s\t%.2f\t%.2f\t%.2f\t%s\t%d\t%s\n",$contig.":".$ref_position.":".$strand, $contig, $ref_position, $callScore, $deletionScore, $insertionScore, $base, $site, $strand);
 }
 
 #strand !#####

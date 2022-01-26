@@ -1,3 +1,45 @@
+
+######## snakemake preamble start (automatically inserted, do not edit) ########
+library(methods)
+Snakemake <- setClass(
+    "Snakemake",
+    slots = c(
+        input = "list",
+        output = "list",
+        params = "list",
+        wildcards = "list",
+        threads = "numeric",
+        log = "list",
+        resources = "list",
+        config = "list",
+        rule = "character",
+        bench_iteration = "numeric",
+        scriptdir = "character",
+        source = "function"
+    )
+)
+snakemake <- Snakemake(
+    input = list('../../output/analysis/HEK293_WT_KO/features/test_features.rds', '../../output/analysis/HEK293_WT_KO/pattern/NMF.rds', "bigtable" = '../../output/analysis/HEK293_WT_KO/features/test_features.rds', "nmf" = '../../output/analysis/HEK293_WT_KO/pattern/NMF.rds'),
+    output = list('../../output/analysis/HEK293_WT_KO/prediction', "data" = '../../output/analysis/HEK293_WT_KO/prediction'),
+    params = list('/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed', c(c(10, 2, 3), c(2, 5)), "mod" = '/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed', "pattern" = c(c(10, 2, 3), c(2, 5))),
+    wildcards = list(),
+    threads = 1,
+    log = list(),
+    resources = list('tmpdir', "tmpdir" = '/tmp'),
+    config = list("label" = 'HEK293_WT_KO', "path_jar" = 'JACUSA_v2.0.2-RC.jar', "jacusa_params" = list("p" = 16, "D" = '', "I" = '', "P1" = 'FR-SECONDSTRAND', "P2" = 'FR-SECONDSTRAND', "m" = 1, "q" = 1, "c" = 4, "a" = 'D,Y'), "java_params" = list("Xmx20g" = '', "XX:ParallelGCThreads=10" = ''), "path_out" = '../../output', "path_inp" = '../../data', "path_ref" = '/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa', "mod_file" = '/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed', "hg38" = '/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome', "data" = list("cond1" = c('HEK293T-WT-rep2', 'HEK293T-WT-rep3'), "cond2" = c('HEK293T-KO-rep2', 'HEK293T-KO-rep3')), "NMF_params" = list("nrun" = 10, "rank_range" = c(2, 5)), "traning" = NULL, "combination" = list("pattern" = c(c(10, 2, 3), c(2, 5)), "external_pattern" = '', "internal_pattern" = 'Boulias,Koertel,Koh')),
+    rule = 'predict_modification',
+    bench_iteration = as.numeric(NA),
+    scriptdir = '',
+    source = function(...){
+        wd <- getwd()
+        setwd(snakemake@scriptdir)
+        source(...)
+        setwd(wd)
+    }
+)
+
+
+######## snakemake preamble end #########
 library(NMF)
 library(ggplot2)   
 
@@ -10,7 +52,8 @@ AllSites=as.matrix(BigTable[,1:15])
 h = coef(res)
 h = rbind(h, t(colSums(h)))
 for (pt in snakemake@params[[2]]){
-h = rbind(h, t(colSums(h[pt,])))
+print(pt)
+# h = rbind(h, t(colSums(h[pt,])))
 }
 
 AllSitesScores=AllSites%*%t(h)
@@ -54,9 +97,8 @@ ggsave(paste0(snakemake@output[[1]],"/",dude,"_ecdf.pdf"),device="pdf")
 }
 ######################################### eCDF with two classws###################################
 dataGG_<-data.frame(dataGG[,1:NumberOfFactors],CLIP=c(rep("CLIP",length(ins)),rep("noCLIP",length(NoCLIPsites))))
-print(colnames(dataGG_))
 
-for(dude in colnames(dataGG_)[9:NumberOfFactors])
+for(dude in colnames(dataGG_)[8:NumberOfFactors])
     {
 xdensity <- ggplot(dataGG_, aes_string(dude, color="CLIP")) + 
 stat_ecdf() +
@@ -77,7 +119,6 @@ priceColor <- "#D55E00"
 dataGG=data.frame(AllSitesScores[c(ins2,NoCLIPsites),-c(ncol(AllSitesScores)-1,ncol(AllSitesScores))],CLIP=c(as.character(Noverlap.df[ins2,2]),rep("NoCLIP",length(NoCLIPsites))))
 
 x<-data.frame(dataGG[,-ncol(dataGG)],CLIP=c(rep(1,length(ins2)),rep(0,length(NoCLIPsites))))
-print(colnames(x))
 for(dude in colnames(x)[9:NumberOfFactors])
     {
 print(dude)

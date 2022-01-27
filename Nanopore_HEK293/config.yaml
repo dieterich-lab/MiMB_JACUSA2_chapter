@@ -1,9 +1,22 @@
 # INFOS PARAMS
-label: "HEK293_WT_KO5"                 # Label of the analysis, it should be unique for the analysis of one sequence ID and a specific for a set of conditions
+label: "HEK293_WT_KO_new"   # label of the analysis
+             
+# INPUT & OUTPUT PATH
+path_out: "../../output"     # path to the output directory, if it doesn't exist it will be created 
+path_inp: "../../data"    # path to the directory containg inputs - all input files are relative to this directory
+reference : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # path to reference squence 
+modified_sites: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed"   # known modified sites
+hg38: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome"
+        
+# INPUTS PARAMS
+data:
+    cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
+    cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
 
 # JACUSA PARAMS
-path_jar : "../../../MiMB_JACUSA2_chapter-copie/JACUSA2/JACUSA_v2.0.2-RC.jar"    # Path to the JAR file 
-jacusa_params:                       #add any parameter as a name of the key and affect the appropriate value
+jar : "../../../MiMB_JACUSA2_chapter-copie/JACUSA2/JACUSA_v2.0.2-RC.jar"    # path to JACUISA2 JAR file 
+jacusa_params:                       #add any parameter as a name of the key and set its appropriate value as [key: value].
+                                     # please use "" if no value is affected to the parameter.
              p: 16 
              D: ''
              I: ''
@@ -16,26 +29,11 @@ jacusa_params:                       #add any parameter as a name of the key and
 java_params:
              Xmx20g: ''
              XX:ParallelGCThreads=10: ''
-             
-# INPUT & OUTPUT PATH
-path_out: "../../output"     # Path to the output directory, if it doesn't exist it will be created 
-path_inp: "../../../data"           # Path to the directory containg inputs - all input files are relative to this directory
-path_ref : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # Reference squence 
-mod_file: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed"   # rRNA modification status file
-hg38: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome"
-        
-# INPUTS PARAMS
-data:
-    cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
-    cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
-#NMF params
-# NMF_params:
-#            nrun: 10
-#            rank_range: [2,5]
-#COMBINATION OF FEATURES           
-combination:       # combination of features based on a specific pattern
-        pattern: 
-            pt1: [2,3,4,6]
-            pt2: [2,3,4]   #patterns to use
-        external_pattern: ""     # path to patern  
-        internal_pattern: "Boulias,Koertel,Koh"
+
+# COMBINATION OF PATTERNS           
+pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
+        internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set 
+        external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
+        combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+                    pt1: [2,4,1,8,5,7]  
+                    pt2: [2,3,4]

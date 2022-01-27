@@ -1,15 +1,12 @@
 #!/usr/bin/env Rscript
 
 args = commandArgs(trailingOnly=TRUE)
-                                        #Read preprocessed JACUSA2 output
+#Read preprocessed JACUSA2 output
 print("Rebuild matrix of features ...")
-print("Read")
-prefix<-""; #/Volumes
+# prefix<-""; #/Volumes
 Exp1=read.delim(paste0(args[1],"/data_reformat.txt"),as.is=T,header=F)
-#
-#gzip#
-                                        #Formatting
-print("Format")
+
+#Formatting
 colnames(Exp1)=c("ID","contig","position","call2.score","deletion.score","insertion.score","Base","Anchor","Strand")
 if (dir.exists(dirname(args[2]))== FALSE) {
   dir.create(dirname(args[2]))
@@ -21,22 +18,17 @@ if (dir.exists(dirname(args[2]))== FALSE) {
 # Exp2=subset(eins,eins$RT==args[3])
 # Exp3=subset(eins,eins$RT==args[4])
 
-print("Exp1")
-print(dim(Exp1))
 Call2=tapply(Exp1$call2.score,list(Exp1$ID,Exp1$Anchor),sum)
 Call2[is.na(Call2)]<-0
 colnames(Call2)<-paste0("Exp1Call2Score_",colnames(Call2))
-print('ste')
 
 Deletion=tapply(Exp1$deletion.score,list(Exp1$ID,Exp1$Anchor),sum)
 Deletion[is.na(Deletion)]<-0
 colnames(Deletion)<-paste0("Exp1DeletionScore_",colnames(Deletion))
-print('ste')
 
 Insertion=tapply(Exp1$insertion.score,list(Exp1$ID,Exp1$Anchor),sum)
 Insertion[is.na(Insertion)]<-0
 colnames(Insertion)<-paste0("Exp1InsertionScore_",colnames(Insertion))
-print('ste')
 BigTable=merge(data.frame(ID=rownames(Call2),Call2),data.frame(ID=rownames(Deletion),Deletion),by.x=1,by.y=1)
 BigTable=merge(BigTable,data.frame(ID=rownames(Insertion),Insertion),by.x=1,by.y=1)
 # print("Exp2")#
@@ -102,8 +94,8 @@ BigTable=BigTable[,-1]
 
 BigTable$DRACH<-rep(0,nrow(BigTable))
 BigTable$DRACH[grep("[AGT][AG]AC[ACT]",BigTable$Motif)]<-1
-BigTable2=readRDS("../../../MiMB_JACUSA2_chapter-copie/Nanopore_HEK293/Res_WT_KO/BigTable.rds")
-BigTable = BigTable2
+# BigTable2=readRDS("../../MiMB_JACUSA2_chapter-copie/Nanopore_HEK293/Res_WT_RealIVT/BigTable.rds")
+# BigTable = BigTable2
 
 saveRDS(BigTable,file=args[2])
 

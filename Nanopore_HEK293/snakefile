@@ -1,22 +1,21 @@
 configfile: "config.yaml"
-import pandas as pd
-import numpy as np
+
 ##########################################################Global variables
 out_analysis = "{path_out}/analysis/{label}/".format(**config)
 out_jacusa = "{path_out}/jacusa/{label}/".format(**config)
 out_bam = "{path_out}/bam/{label}/".format(**config)
 out = config['path_out']
 
-comb = config['combination']
+comb = config['pattern_params']
 
 #Extract data from the dictionnary
 data = config['data']
 cond1= data['cond1']
 cond2= data['cond2']
-ground_truth = config['mod_file']
+ground_truth = config['modified_sites']
 
 #Java params
-jarfile= config["path_jar"]    
+jarfile= config["jar"]    
 java_params= config["java_params"]
 javaparams = ""
 for key in java_params:
@@ -35,17 +34,16 @@ for key in parameters:
 ####################################################Rules
 
 # Create index for bam file
-rule index: 
+rule sort_bam: 
     input:config['path_inp']+"/{sample}.bam"
-    output: out_bam+"{sample}.bam.bai"
+    output: out_bam+"{sample}.sorted.bam"
     shell:
         """
-        samtools index {input} > {output}
+        samtools sort {input} > {output}
         """
 #Filter out secondary and poor alignments. 
-
-rule filter: 
-    input:config['path_inp']+"/{sample}.bam"
+rule filter_bam: 
+    input: out_bam+"{sample}.sorted.bam"
     output: 
         bam = out_bam+"{sample}.filtered.bam",
         bai = out_bam+"{sample}.filtered.bam.bai"
@@ -56,9 +54,8 @@ rule filter:
         samtools index {output.bam} > {output.bai}
         """
 
-# Apply JACUSA call2 with replicates       
-    
-rule jacusa2Call2: 
+#apply JACUSA call2 with replicates           
+rule jacusa2_call2: 
     input:
        bam1=expand(out_bam+"{c1}.filtered.bam",c1=cond1),
        bam2= expand(out_bam+"{c2}.filtered.bam",c2=cond2)
@@ -85,17 +82,17 @@ rule get_features:
         
     params: 
         mod = ground_truth,
-        ref = config['path_ref'],
+        ref = config['reference'],
         hg38 = config['hg38'],
         inter = out_analysis +"tmp"
         
     shell: 
         """
         bash preprocessing.sh {input} {params.hg38} {params.ref} {params.inter}
-        Rscript HEK293_data_prep.R {params.inter} {output.out}
+        Rscript get_features.R {params.inter} {output.out}
         """
 # split data into test set and traning set  for internal pattern use case      
-rule split:
+rule split_train_test:
     input: out_analysis +"features/features.rds"
     output: 
         train=out_analysis +"features/train_features.rds" ,
@@ -117,7 +114,7 @@ rule get_pattern:
         rank1= out_analysis +"pattern/asses_NMF1.pdf" ,       
         rank2= out_analysis +"pattern/asses_NMF2.pdf"
     params: 
-        mod = config['mod_file'],
+        mod = ground_truth,
         ext_pat =comb['external_pattern']
     run:
         if comb['external_pattern']!= "":
@@ -125,28 +122,28 @@ rule get_pattern:
             shell(" touch {output.rank1} {output.rank2}")
 
         else:
-            shell("Rscript HEK293_data_prep_step2.R {input} {output.data} {output.rank1} {output.rank2}")
+            shell("Rscript get_pattern.R {input} {output.data} {output.rank1} {output.rank2}")
             
 # Visualize patterns        
 rule visualize_pattern: 
     input: 
-        bigtable = out_analysis +"features/features.rds",
         nmf = out_analysis +"pattern/NMF.rds" 
     output: 
         data=directory(out_analysis +"pattern/viz")
     params: 
         mod = ground_truth,
-        pattern = comb['pattern']
-    script: "HEK293_data_prep_step3.R"
+        pattern = comb['combined_patterns']
+    script: "pattern_viz.R"
 
 # Perform prediction on test set
 rule predict_modification: 
     input: 
-        bigtable = out_analysis +"features/test_features.rds" ,
+        bigtable = out_analysis +"features/features.rds" ,
         nmf = out_analysis +"pattern/NMF.rds" 
     output: 
         data=directory(out_analysis +"prediction")
     params: 
         mod = ground_truth,
-        pattern = comb['pattern']
-    script: "HEK293_data_prep_step4.R"
+        pattern = comb['combined_patterns'],
+        int_pt = comb['internal_pattern']
+    script: "prediction.R"

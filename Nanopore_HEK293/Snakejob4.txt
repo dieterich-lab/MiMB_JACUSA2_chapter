@@ -1,0 +1,49 @@
+Unlocking working directory.
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 10
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+predict_modification        1              1              1
+total                       1              1              1
+
+Select jobs to execute...
+
+[Thu Jan 27 15:50:22 2022]
+rule predict_modification:
+    input: ../../output/analysis/HEK293_WT_KO_new/features/features.rds, ../../output/analysis/HEK293_WT_KO_new/pattern/NMF.rds
+    output: ../../output/analysis/HEK293_WT_KO_new/prediction
+    jobid: 0
+    resources: tmpdir=/tmp
+
+Loading required package: pkgmaker
+Loading required package: registry
+Loading required package: rngtools
+Loading required package: cluster
+NMF - BioConductor layer [OK] | Shared memory capabilities [NO: bigmemory] | Cores 39/40
+  To enable shared memory capabilities, try: install.extras('
+NMF
+')
+Type 'citation("pROC")' for a citation.
+
+Attaching package: ‘pROC’
+
+The following object is masked from ‘package:BiocGenerics’:
+
+    var
+
+The following objects are masked from ‘package:stats’:
+
+    cov, smooth, var
+
+[1] "Predict modification ..."
+Saving 7 x 7 in image
+Saving 7 x 7 in image
+Saving 7 x 7 in image
+Saving 7 x 7 in image
+[1] "Pattern8"
+Setting levels: control = 0, case = 1
+Setting direction: controls < cases
+Saving 7 x 7 in image

@@ -39,25 +39,37 @@ The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "refe
  paftools.js gff2bed annotation.gtf > annotation.bed
   ```
   - ”-ub” to align reads to both strands of the reference, 
-  - a small k-mer size ”-k [=14]” to enhance sensitivity.
+  - small k-mer size ”-k [=14]” to enhance sensitivity.
 
 We recommend outputting primary alignments ”–secondary=no”. ’–MD’ parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
 
 ## Detect RNA modification
-Run JACUSA2 call-2. Make sure that you set the path to the jar file.
-```  
-java -jar JACUSA2.jar call-2 -q 1 -m 1 -c 4 -p 10 -D -I -a Y -P1 FR-SECONDSTRAND -P2 FR-SECONDSTRAND -r WT_vs_KO_call2_result.out HEK293T-WT-rep2.bam,HEK293T-WT-rep3.bam	HEK293T-KO-rep2.bam, HEK293T-KO-rep3.bam
-```
+We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and require setting diffrent parameters.
+
+Be aware to set all parameters before running the pipeline. 
+describe all parameters ...............................................................................
 The inputs are BAM files "HEK293T-WT-rep2.bam" and "HEK293T-WT-rep3.bam	" for wild-type replicates and "HEK293T-KO-rep2.bam" and "HEK293T-KO-rep3.bam" for the Knock-out replicates. Make sure to set "-P1" and "-P2" according to the corresponding library. The mismach score is produce by default but you need to add "-D" and "-I" to output the deletion and insertion scores. Filter reads according with base calling quality "-q [$>1$]", mapping quality "-m [$>1$] and read coverage "-c [$>4$]". Plus, consider the filter feature "-a [=Y]" to exclude sites within homopolymer regions to improve sensitivity. The output -r "WT_vs_KO_call2_result.out" consists of a read error profile where the format is a combination of BED6 with JACUSA2 call-2 specific columns and common info columns: info, filter, and ref. The number of threads can be customized via the parameter "-p". Check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details.
-```
-bash README_processing.sh WT_vs_KO_call2_result.out hg38.genome GRCh38_96.fa path_to_output.
-```
-```
-Rscript HEK293_data_prep_step2.R path_to_output miCLIP_union.bed
-```
-```
-Rscript HEK293_data_prep_step3.R path_to_output miCLIP_union.bed
+.....................................................
+
+- Run JACUSA2 call-2 rule to call variants using paired conditions. Make sure that you set the path to the jar file.
 ```  
+srun snakemake --cores all jacusa2_call2
+```
+- Run get_features rule to preprocess JACUSA2 call2 output and extract features.
+```
+$ srun snakemake --cores all get_features
+```
+- Run get_pattern rule to lear patterns representing m6A modification
+```
+$ srun snakemake --cores all get_pattern
+```
+- Run predict_modification rule to predict modified sites
+```
+$ srun snakemake --cores all predict_modification
+```  
+Note that the rules are linked so that the workflow are determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
+executed accordingly from bottom to top 4. Therefore, running ”predict modification” rule leads to excuting all rules in its pipeline.
+
 # Dependencies and versions
 Software | Version 
 --- | ---
@@ -67,6 +79,7 @@ openjdk | 11.0.13
 R | 4.0.5
 PERL | 5.28.1
 bedtools | 2.29.2
+snakemake | 6.8.1
 
 R Package | Version
 --- | ---

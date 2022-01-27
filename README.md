@@ -8,14 +8,30 @@ We provide a pipeline for rRNA modification analysis of Nanopore sequencing read
 - JACUSA2 detect modification based on mapping characteristics, it requires BAM files as input.
 - JACUSA2 can be run in single mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
 - JACUSA2 output can be used to predict RNA modifications.
-# Download
-Download JACUSA2 JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file.
-
-Download the analysis scripts to your cluster by the following command.
-
+- 
+# Installation
+We recommend to install software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
+Make sure you install the [Miniconda Python3 distribution](https://docs.conda.io/en/latest/miniconda.html#linux-installers).
 ```
-git clone https://github.com/dieterich-lab/MiMB_JACUSA2_chapter.git
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
 ```
+For performance and compatibility reasons you should install `Mamba` via conda to install Snakemake. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
+```
+conda install -c conda-forge mamba
+```
+Once you have installed Conda and Mamba, you can download the Snakemake pipeline and the example datasets.
+```
+git clone https://github.com/dieterich-lab/rRNA_by_ONT.git
+cd rRNA_by_ONT/Computational\ Analysis/
+```
+
+Then, you install the required packages after creating an environment with Snakemake installed `environment.yml` file.
+```
+mamba env create -f environment.yaml
+conda activate rRNA_by_ONT_env
+```
+Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file.
 # Usage
 The following pipeline is used to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021].
 

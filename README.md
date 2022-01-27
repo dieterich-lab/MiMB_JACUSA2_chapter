@@ -22,16 +22,17 @@ conda install -c conda-forge mamba
 ```
 Once you have installed Conda and Mamba, you can download the Snakemake pipeline and the example datasets.
 ```
-git clone https://github.com/dieterich-lab/rRNA_by_ONT.git
-cd rRNA_by_ONT/Computational\ Analysis/
+git clone https://github.com/dieterich-lab/MiMB_JACUSA2_chapter.git
+cd Nanopore_HEK293
 ```
 
 Then, you install the required packages after creating an environment with Snakemake installed `environment.yml` file.
 ```
 mamba env create -f environment.yaml
-conda activate rRNA_by_ONT_env
+conda activate JACUSA2pipeline_env
 ```
 Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file.
+
 # Usage
 The following pipeline is used to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021].
 

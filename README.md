@@ -28,21 +28,21 @@ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_f
 The inputs are: the path to FAST5 files, the output folder, and the config file or the flowcell/kit combination. The output is FASTQ files that can
 be compressed using the option ”–compress fastq”. Set the number of threads ”cpu threads per caller” and the number of parallel basecallers ”num caller” according to your resources. Additional details can be found [here](https://github.com/metagenomics/denbi-nanopore-training/blob/master/docs/basecalling/basecalling.rst).
 
-- Align reads to the transcriptome using the following Minimap2 command. 
+- Align reads to the transcriptome using the following Minimap2 command. To reduce the indexing time of the human genome, save the index with the option ”-d” before the mapping and use the index instead of the reference file in the minimap2 command line
 ```
-minimap2 -t 5 -ax map-ont -uf -k14 -p 1.0 -N 100 reference.fasta Reads.fastq |samtools view -bS > mapping.bam	
+minimap2 -d reference.mmi reference.fa
+minimap2 -t 5 --MD -ax splice --junc-bonus 1 -k14 --secondary=no --junc-bed final_annotation_96.bed -ub reference.mmi Reads.fastq.gz |samtools view -bS > mapping.bam
 ```
-The inputs are the FASTQ files "Reads.fastq" and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file "mapping.bam" using samtools command.  Use the default setting for Direct RNA-seq ”-ax map-ont”, ”-uf” to force the alignment to the forward strand of the reference, and a small k-mer size ”-k [=14]” to enhance sensitivity. Also, set  ”-N [=100]” to output primary alignments and up to "100” top secondary alignments if the ratio of their chaining scores compared to the corresponding primary alignments is equal to ”-p [=1]”. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
+The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file "mapping.bam" using samtools command.  The setting is used for spliced alignments of the dierct RNA sequencing :
+  - "-ax splice --junc-bed annotation.bed --junc-bonus INT" where annotation.bed is the file contaning  the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
+ ```
+ paftools.js gff2bed annotation.gtf > annotation.bed
+  ```
+  - ”-ub” to align reads to both strands of the reference, 
+  - a small k-mer size ”-k [=14]” to enhance sensitivity.
 
-Sorte BAM file using the following command:
-```
-samtools sorte mapping.bam mapping.sorted.bam  
-```
+We recommend outputting primary alignments ”–secondary=no”. ’–MD’ parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
 
-Create an index of the BAM file
-```
-samtools index mapping.sorted.bam
-```  
 ## Detect RNA modification
 Run JACUSA2 call-2. Make sure that you set the path to the jar file.
 ```  

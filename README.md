@@ -103,3 +103,4 @@ R Package | Version
 ggplot2 | 3.3.5
 NMF | 0.23.0
 pROC | 1.18.0
+stringr |

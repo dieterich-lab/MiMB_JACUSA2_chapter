@@ -47,4 +47,3 @@ barplot(height=TabPatternInstances, names=1:(dim(w)[2]), main="NMF_Patterns_Scor
         ylab="Membership Indicator (basis matrix)",ylim=range(pretty(c(0, TabPatternInstances))))
 dev.off()
 
-

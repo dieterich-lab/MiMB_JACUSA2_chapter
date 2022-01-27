@@ -23,14 +23,22 @@ INP="$WT_vs_KO $WT_vs_IVT $KO_vs_IVT"
 srun bedtools intersect -filenames -loj -a $path/allSitesExt2.bed -b ${INP} > $path/call2_SitesExt2.bed
 
 #reformat
-cat $path/call2_SitesExt2.bed |perl Code/HEK293_data_prep.pl > $path/data_reformat.txt
+cat $path/call2_SitesExt2.bed |perl Code/HEK293_data_prep.pl > $path/call2_SitesExt2_indel_slim2.txt
 
 #5mer
+<<<<<<< HEAD
 # srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -name -s -tab > $path/checkMotif.txt
 
 #sed -e 's/Cand:://' checkMotif.txt |sed -e 's/\-/_/' |awk '{gsub("[\(\)]","");print $1,$2;}' > checkMotif_reformat.txt
 
 # cat $path/checkMotif.txt | perl -e 'while(<>){s/Cand:://; 's/\-/_/'; 's/[\(\)]//g'; print;}' >  $path/checkMotif_reformat.txt
+=======
+#srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -name -s -tab > $path/checkMotif.txt
+
+#sed -e 's/Cand:://' checkMotif.txt |sed -e 's/\-/_/' |awk '{gsub("[\(\)]","");print $1,$2;}' > checkMotif_reformat.txt
+
+#cat $path/checkMotif.txt | perl -e 'while(<>){s/Cand:://; 's/\-/_/'; 's/[\(\)]//g'; print;}' >  $path/checkMotif_reformat.txt
+>>>>>>> faee041c25d14a304326c6111ce00a0e109f378f
 
 #*************************************BEGIN. Modified part *********************************************
 srun bedtools getfasta -fi $GRCh38_96 -bed $path/allSitesExt2.bed -s -tab > $path/checkMotif_reformat.txt

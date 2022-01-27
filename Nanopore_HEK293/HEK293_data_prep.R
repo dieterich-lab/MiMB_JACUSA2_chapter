@@ -104,6 +104,7 @@ BigTable$DRACH<-rep(0,nrow(BigTable))
 BigTable$DRACH[grep("[AGT][AG]AC[ACT]",BigTable$Motif)]<-1
 BigTable2=readRDS("../../../MiMB_JACUSA2_chapter-copie/Nanopore_HEK293/Res_WT_KO/BigTable.rds")
 BigTable = BigTable2
+
 saveRDS(BigTable,file=args[2])
 
 

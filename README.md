@@ -1,7 +1,7 @@
 # MiMB_JACUSA2_chapter
 JACUSA2 - A framework for the mapping of RNA modifications
 
-We provide a pipeline for rRNA modification analysis of Nanopore sequencing reads based on multiple conditions and replicates.
+We provide a pipeline for RNA modification detection of direct nanopore sequencing based on multiple conditions and replicates.
 
 # General description
 - JACUSA2 can detect RNA modification rapidly.

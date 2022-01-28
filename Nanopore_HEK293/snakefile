@@ -75,8 +75,8 @@ rule jacusa2_call2:
 
 # preprocess jacusa2 output
 rule get_features: 
-    #input:  out_jacusa+"Cond1vsCond2Call2.out"
-    input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/bams/WT_vs_realIVT_v202_call2_result.out"
+    input:  out_jacusa+"Cond1vsCond2Call2.out"
+    #input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/bams/WT_vs_realIVT_v202_call2_result.out"
     output: 
         out = out_analysis +"features/features.rds",
         

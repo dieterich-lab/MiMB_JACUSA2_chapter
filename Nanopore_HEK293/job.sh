@@ -17,6 +17,6 @@ module load bedtools
 module load R
 srun snakemake --cores --unlock
 
-srun snakemake --cores all predict_modification --rerun-incomplete
-# srun snakemake --cores all visualize_pattern --rerun-incomplete
+# srun snakemake --cores all predict_modification --rerun-incomplete
+srun snakemake --cores all visualize_pattern --rerun-incomplete
 # snakemake --dag predict_modification | dot -Tsvg > dag.svg

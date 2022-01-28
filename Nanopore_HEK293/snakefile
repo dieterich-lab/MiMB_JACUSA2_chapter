@@ -76,7 +76,7 @@ rule jacusa2_call2:
 # preprocess jacusa2 output
 rule get_features: 
     #input:  out_jacusa+"Cond1vsCond2Call2.out"
-    input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/WT_vs_KO_RC22_call2_result.out"
+    input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/bams/WT_vs_realIVT_v202_call2_result.out"
     output: 
         out = out_analysis +"features/features.rds",
         
@@ -84,12 +84,13 @@ rule get_features:
         mod = ground_truth,
         ref = config['reference'],
         hg38 = config['hg38'],
-        inter = out_analysis +"tmp"
+        inter = out_analysis +"tmp", 
+        sites = config['sites']
         
     shell: 
         """
-        bash preprocessing.sh {input} {params.hg38} {params.ref} {params.inter}
-        Rscript get_features.R {params.inter} {output.out}
+        bash scripts/preprocessing.sh {input} {params.hg38} {params.ref} {params.inter} {params.sites}
+        Rscript scripts/get_features.R {params.inter} {output.out}
         """
 # split data into test set and traning set  for internal pattern use case      
 rule split_train_test:
@@ -104,7 +105,7 @@ rule split_train_test:
             shell(" cp {input} {output.test}")
             shell("touch {output.train}")
         else:
-            shell("Rscript split.R {input} {ground_truth} {output.train} {output.test} {params.int_pt}")
+            shell("Rscript scripts/split.R {input} {ground_truth} {output.train} {output.test} {params.int_pt}")
         
 # Extract pattern or use an exernal pattern        
 rule get_pattern: 
@@ -122,7 +123,7 @@ rule get_pattern:
             shell(" touch {output.rank1} {output.rank2}")
 
         else:
-            shell("Rscript get_pattern.R {input} {output.data} {output.rank1} {output.rank2}")
+            shell("Rscript scripts/get_pattern.R {input} {output.data} {output.rank1} {output.rank2}")
             
 # Visualize patterns        
 rule visualize_pattern: 
@@ -133,7 +134,7 @@ rule visualize_pattern:
     params: 
         mod = ground_truth,
         pattern = comb['combined_patterns']
-    script: "pattern_viz.R"
+    script: "scripts/pattern_viz.R"
 
 # Perform prediction on test set
 rule predict_modification: 
@@ -146,4 +147,4 @@ rule predict_modification:
         mod = ground_truth,
         pattern = comb['combined_patterns'],
         int_pt = comb['internal_pattern']
-    script: "prediction.R"
+    script: "scripts/prediction.R"

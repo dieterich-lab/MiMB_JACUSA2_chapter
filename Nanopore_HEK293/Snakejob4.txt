@@ -4,17 +4,17 @@ Using shell: /usr/bin/bash
 Provided cores: 10
 Rules claiming more threads will be scaled down.
 Job stats:
-job                     count    min threads    max threads
---------------------  -------  -------------  -------------
-predict_modification        1              1              1
-total                       1              1              1
+job                  count    min threads    max threads
+-----------------  -------  -------------  -------------
+visualize_pattern        1              1              1
+total                    1              1              1
 
 Select jobs to execute...
 
-[Thu Jan 27 15:50:22 2022]
-rule predict_modification:
-    input: ../../output/analysis/HEK293_WT_KO_new/features/features.rds, ../../output/analysis/HEK293_WT_KO_new/pattern/NMF.rds
-    output: ../../output/analysis/HEK293_WT_KO_new/prediction
+[Fri Jan 28 00:17:44 2022]
+rule visualize_pattern:
+    input: ../../output/analysis/HEK293_WT_KO_old/pattern/NMF.rds
+    output: ../../output/analysis/HEK293_WT_KO_old/pattern/viz
     jobid: 0
     resources: tmpdir=/tmp
 
@@ -26,24 +26,16 @@ NMF - BioConductor layer [OK] | Shared memory capabilities [NO: bigmemory] | Cor
   To enable shared memory capabilities, try: install.extras('
 NMF
 ')
-Type 'citation("pROC")' for a citation.
+[1] "Vizualize patterns ..."
+null device 
+          1 
+[1] "Table of number of best hits for each pattern"
 
-Attaching package: ‘pROC’
-
-The following object is masked from ‘package:BiocGenerics’:
-
-    var
-
-The following objects are masked from ‘package:stats’:
-
-    cov, smooth, var
-
-[1] "Predict modification ..."
-Saving 7 x 7 in image
-Saving 7 x 7 in image
-Saving 7 x 7 in image
-Saving 7 x 7 in image
-[1] "Pattern8"
-Setting levels: control = 0, case = 1
-Setting direction: controls < cases
-Saving 7 x 7 in image
+  1   2   3   4   5   6 
+312 525 248 284 183 353 
+null device 
+          1 
+[Fri Jan 28 00:17:51 2022]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /beegfs/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/MiMB_JACUSA2_chapter/Nanopore_HEK293/.snakemake/log/2022-01-28T001742.366907.snakemake.log

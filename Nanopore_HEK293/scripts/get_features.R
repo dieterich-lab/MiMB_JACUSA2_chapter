@@ -3,10 +3,8 @@
 args = commandArgs(trailingOnly=TRUE)
 #Read preprocessed JACUSA2 output
 print("Rebuild matrix of features ...")
-# prefix<-""; #/Volumes
 Exp1=read.delim(paste0(args[1],"/data_reformat.txt"),as.is=T,header=F)
 
-#Formatting
 colnames(Exp1)=c("ID","contig","position","call2.score","deletion.score","insertion.score","Base","Anchor","Strand")
 if (dir.exists(dirname(args[2]))== FALSE) {
   dir.create(dirname(args[2]))

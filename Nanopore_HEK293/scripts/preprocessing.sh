@@ -1,14 +1,10 @@
 #!/bin/bash
-#Integrate results
-#working directory is /prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2
-
 jacusa_out=$1 
-# WT_vs_IVT=$2 
-# KO_vs_IVT=$3 
 genome=$2
 GRCh38_96=$3
 path=$4
 sites=$5
+
 echo "Preprocessing JACUSA2 output ..."
 
 mkdir -p $path

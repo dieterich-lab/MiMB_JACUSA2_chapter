@@ -9,7 +9,6 @@ if (dir.exists(snakemake@output[[1]])== FALSE) {
     }
 
 #load data and patterns
-# BigTable=readRDS(snakemake@input[[1]])
 res=readRDS(snakemake@input[[1]]);
 colnames(res)= c("Mismatch_Pos1","Mismatch_Pos2","Mismatch_Pos3","Mismatch_Pos4","Mismatch_Pos5","Deletion_Pos1","Deletion_Pos2","Deletion_Pos3","Deletion_Pos4","Deletion_Pos5","Insertion_Pos1","Insertion_Pos2","Insertion_Pos3","Insertion_Pos4","Insertion_Pos5")
 pdf(paste0(snakemake@output[[1]],"/NMF_matrices.pdf"))
@@ -38,7 +37,6 @@ for(k in 1:nrow(h))
     }
 
 #Choice of best pattern for subsequent analysis
-# wExtended=data.frame(w,BigTable[rownames(w),"Motif"])
 print("Table of number of best hits for each pattern")
 TabPatternInstances=table(apply(w,1,function(x){which(x==max(x))}))
 print(TabPatternInstances)

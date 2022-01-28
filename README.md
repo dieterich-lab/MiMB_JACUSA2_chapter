@@ -37,7 +37,7 @@ Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.c
 The following pipeline is used to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021].
 
 ## Preprocessing of Direct RNAseq
-- Base call the ionic current signal stored in FAST5 file using Guppy basecaller.
+1. Base call the ionic current signal stored in FAST5 file using Guppy basecaller.
 ```
 guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_file.cfg --cpu_threads_per_caller 14 --num_callers 1
 ```
@@ -45,54 +45,54 @@ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_f
 The inputs are: the path to FAST5 files, the output folder, and the config file or the flowcell/kit combination. The output is FASTQ files that can
 be compressed using the option ”–compress fastq”. Set the number of threads ”cpu threads per caller” and the number of parallel basecallers ”num caller” according to your resources. Additional details can be found [here](https://github.com/metagenomics/denbi-nanopore-training/blob/master/docs/basecalling/basecalling.rst).
 
-- Align reads to the transcriptome using the following Minimap2 command. To reduce the indexing time of the human genome, save the index with the option ”-d” before the mapping and use the index instead of the reference file in the minimap2 command line
+2. Align reads to the transcriptome using the following Minimap2 command. To reduce the indexing time of the human genome, save the index with the option ”-d” before the mapping and use the index instead of the reference file in the minimap2 command line
 ```
 minimap2 -d reference.mmi reference.fa
 minimap2 -t 5 --MD -ax splice --junc-bonus 1 -k14 --secondary=no --junc-bed final_annotation_96.bed -ub reference.mmi Reads.fastq.gz |samtools view -bS > mapping.bam
 ```
 The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file "mapping.bam" using samtools command.  The setting is used for spliced alignments of the dierct RNA sequencing :
-  - "-ax splice --junc-bed annotation.bed --junc-bonus INT" where annotation.bed is the file contaning  the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
+  * "-ax splice --junc-bed annotation.bed --junc-bonus INT" where annotation.bed is the file contaning  the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
  ```
  paftools.js gff2bed annotation.gtf > annotation.bed
   ```
-  - ”-ub” to align reads to both strands of the reference, 
-  - small k-mer size ”-k [=14]” to enhance sensitivity.
+  * ”-ub” to align reads to both strands of the reference, 
+  * small k-mer size ”-k [=14]” to enhance sensitivity.
 
 We recommend outputting primary alignments ”–secondary=no”. ’–MD’ parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
 
 ## Detect RNA modification
 We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and require setting diffrent parameters.
 
-Be aware to set all parameters before running the pipeline. 
+- Be aware to set all parameters before running the pipeline. 
 
-    * General
-          * label: 'WT_vs_KO' label of the analysis
-          * jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
-          * path_out: './output' # path to the output directory, if it doesn't exist it will be created 
-          * path_inp: './data' # path to the directory containg inputs - all input files are relative to this directory
-          * reference : 'GRCh38_96.fa' # path to reference squence 
-          * modified_sites: 'miCLIP_union.bed' #BED6 file contaning known modified sites where 'name' refers to the annotation of the position. usefull for learning patterns (traning and test set).
-          * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
-          * regions: "target_region.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
-          * data: a dictionnary of two keys (cond1, cond2) refering to the paired conditions inputs. The value is the list of replicates names without ".bam" extention.
-            * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
-            * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
-    * jacusa_params: a dictionnary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
-          * P1: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the first consition sample.
-          * P2: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the second consition sample.
-          * m: 1  # filter reads by mapping quality
-          * q: 1  # filter reads by base calling quality
-          * c: 4  # filter reads by coverage
-          * a: 'Y'  # Mandatory parameters to filter sites within the holypolymer regions.
-          * p: 16    # parameter to custemize number of threads
-          * D: ''  # Mandatory parameter to output deletion score.
-          * I: ''  # Mandatory parameter to output insertion score.
-    * pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
-          * internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set. in case you use external pattern put "". 
-          * external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
-          * combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
-                    pt1: [1,2,4,6]  
-                    pt2: [1,2,3,4,6]
+      * General
+            * label: 'WT_vs_KO' label of the analysis
+            * jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
+            * path_out: './output' # path to the output directory, if it doesn't exist it will be created 
+            * path_inp: './data' # path to the directory containg inputs - all input files are relative to this directory
+            * reference : 'GRCh38_96.fa' # path to reference squence 
+            * modified_sites: 'miCLIP_union.bed' #BED6 file contaning known modified sites where 'name' refers to the annotation of the position. usefull for learning patterns (traning and test set).
+            * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
+            * regions: "target_region.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
+            * data: a dictionnary of two keys (cond1, cond2) refering to the paired conditions inputs. The value is the list of replicates names without ".bam" extention.
+              * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
+              * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
+      * jacusa_params: a dictionnary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
+            * P1: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the first consition sample.
+            * P2: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the second consition sample.
+            * m: 1  # filter reads by mapping quality
+            * q: 1  # filter reads by base calling quality
+            * c: 4  # filter reads by coverage
+            * a: 'Y'  # Mandatory parameters to filter sites within the holypolymer regions.
+            * p: 16    # parameter to custemize number of threads
+            * D: ''  # Mandatory parameter to output deletion score.
+            * I: ''  # Mandatory parameter to output insertion score.
+      * pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
+            * internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set. in case you use external pattern put "". 
+            * external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
+            * combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+                      pt1: [1,2,4,6]  
+                      pt2: [1,2,3,4,6]
 
 
 Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use parameters.

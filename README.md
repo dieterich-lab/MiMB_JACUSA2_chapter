@@ -8,7 +8,7 @@ We provide a pipeline for rRNA modification analysis of Nanopore sequencing read
 - JACUSA2 detects modification based on mapping characteristics, it requires BAM files as input.
 - JACUSA2 can be run in single-mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
 - JACUSA2 output can be used to predict RNA modifications.
-- 
+
 # Installation
 We recommend installing software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
 Make sure you install the [Miniconda Python3 distribution](https://docs.conda.io/en/latest/miniconda.html#linux-installers).
@@ -34,7 +34,7 @@ conda activate JACUSA2pipeline_env
 Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file.
 
 # Usage
-The following pipeline is used to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021].
+The following pipeline is used to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [We limited the analysis to the set of sites in the 'data/regions.bed' file]
 
 ## Preprocessing of Direct RNAseq
 1. Base call the ionic current signal stored in FAST5 file using Guppy basecaller.
@@ -73,7 +73,7 @@ We provide a snakemake pipeline for JACUSA2 variant calling using call2 method a
             * reference : 'GRCh38_96.fa' # path to reference squence 
             * modified_sites: 'miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
             * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
-            * regions: "" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
+            * regions: "regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
             * data: a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
               * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
               * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]

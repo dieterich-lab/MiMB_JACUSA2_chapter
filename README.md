@@ -142,7 +142,7 @@ The output is a BED6 file(s) contaning score of the selected pattern(s) for the 
 For the testing example, the eCDF will look like the following figure: 
 
 <p align="center">
-  <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/pattern_ecdf.png" width="300">
+  <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/pattern_ecdf.png" width="500">
 </p>
 
 Note that rules are linked so that the workflow are determined from top (e.g. predict modification) to bottom (e.g. sort bam) and

@@ -204,7 +204,7 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 	\begin{spverbatim}
 $ minimap2 -d reference.mmi reference.fa 
 	\end{spverbatim}	
-	\textcolor{red}{To allow spliced alignments, use the setting “-ax splice --junc-bed annotation.bed --junc-bonus”  where "--junc-bonus" allows to tune the bonus score and the BED file "--junc-bed annotation.bed" provides the splice junctions. The BED file can be generated using the following command:}
+	\textcolor{red}{To enable spliced alignments, use the setting “-ax splice --junc-bed annotation.bed --junc-bonus”  where "--junc-bonus" allows to tune the bonus score and the BED file "--junc-bed annotation.bed" provides the splice junctions. The BED file can be generated using the following command:}
 	\begin{spverbatim}
 	$paftools.js gff2bed annotation.gtf > annotation.bed
 	\end{spverbatim}		

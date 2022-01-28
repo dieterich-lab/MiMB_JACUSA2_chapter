@@ -8,5 +8,5 @@ dependencies:
   - samtools=1.12
   - openjdk=10.0.2
   - Minimap2 	2.22
-  - R 	4.0.5
-  - bedtools 	2.29.2
+  - r-base=4.0.5
+  - bedtools=2.29.2

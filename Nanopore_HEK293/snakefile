@@ -83,13 +83,13 @@ rule get_features:
     params: 
         mod = ground_truth,
         ref = config['reference'],
-        hg38 = config['hg38'],
+        chr_size = config['chr_size'],
         inter = out_analysis +"tmp", 
-        sites = config['sites']
+        sites = config['regions']
         
     shell: 
         """
-        bash scripts/preprocessing.sh {input} {params.hg38} {params.ref} {params.inter} {params.sites}
+        bash scripts/preprocessing.sh {input} {params.chr_size} {params.ref} {params.inter} {params.sites}
         Rscript scripts/get_features.R {params.inter} {output.out}
         """
 # split data into test set and traning set  for internal pattern use case      

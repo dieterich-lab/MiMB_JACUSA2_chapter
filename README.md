@@ -73,7 +73,7 @@ We provide a snakemake pipeline for JACUSA2 variant calling using call2 method a
             * reference : 'GRCh38_96.fa' # path to reference squence 
             * modified_sites: 'miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
             * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
-            * regions: "target_region.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
+            * regions: "" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
             * data: a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
               * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
               * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]

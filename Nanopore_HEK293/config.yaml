@@ -7,7 +7,7 @@ path_inp: "../../data"    # path to the directory containg inputs - all input fi
 reference : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # path to reference squence 
 modified_sites: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed"   # known modified sites
 chr_size: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome" # file contaning size of chromosomes
-regions: "sites.bed"  # BED6 file contaning set of 5-mer (NNANN) to work on, if ="", all 5-mers (NNANN) will be considered    
+regions: "sites.bed"  # BED6 file contaning set of 5-mer (NNANN) to analyze on, if ="", all 5-mers (NNANN) will be considered    
 # INPUTS PARAMS
 data:
     cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1

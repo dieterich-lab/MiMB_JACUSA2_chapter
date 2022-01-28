@@ -5,12 +5,12 @@ We provide a pipeline for rRNA modification analysis of Nanopore sequencing read
 
 # General description
 - JACUSA2 can detect RNA modification rapidly.
-- JACUSA2 detect modification based on mapping characteristics, it requires BAM files as input.
-- JACUSA2 can be run in single mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
+- JACUSA2 detects modification based on mapping characteristics, it requires BAM files as input.
+- JACUSA2 can be run in single-mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
 - JACUSA2 output can be used to predict RNA modifications.
 - 
 # Installation
-We recommend to install software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
+We recommend installing software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
 Make sure you install the [Miniconda Python3 distribution](https://docs.conda.io/en/latest/miniconda.html#linux-installers).
 ```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -42,7 +42,7 @@ The following pipeline is used to predict m6A modification from nanopore RNA dir
 guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_file.cfg --cpu_threads_per_caller 14 --num_callers 1
 ```
 
-The inputs are: the path to FAST5 files, the output folder, and the config file or the flowcell/kit combination. The output is FASTQ files that can
+The inputs are the path to FAST5 files, the output folder, and the config file or the flowcell/kit combination. The output is FASTQ files that can
 be compressed using the option ”–compress fastq”. Set the number of threads ”cpu threads per caller” and the number of parallel basecallers ”num caller” according to your resources. Additional details can be found [here](https://github.com/metagenomics/denbi-nanopore-training/blob/master/docs/basecalling/basecalling.rst).
 
 2. Align reads to the transcriptome using the following Minimap2 command. To reduce the indexing time of the human genome, save the index with the option ”-d” before the mapping and use the index instead of the reference file in the minimap2 command line
@@ -50,8 +50,8 @@ be compressed using the option ”–compress fastq”. Set the number of thread
 minimap2 -d reference.mmi reference.fa
 minimap2 -t 5 --MD -ax splice --junc-bonus 1 -k14 --secondary=no --junc-bed final_annotation_96.bed -ub reference.mmi Reads.fastq.gz |samtools view -bS > mapping.bam
 ```
-The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file "mapping.bam" using samtools command.  The setting is used for spliced alignments of the dierct RNA sequencing :
-  * "-ax splice --junc-bed annotation.bed --junc-bonus INT" where annotation.bed is the file contaning  the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
+The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file "mapping.bam" using samtools command.  The setting is used for spliced alignments of the direct RNA sequencing :
+  * "-ax splice --junc-bed annotation.bed --junc-bonus INT" where annotation.bed is the file containing the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
  ```
  paftools.js gff2bed annotation.gtf > annotation.bed
   ```
@@ -61,7 +61,7 @@ The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "refe
 We recommend outputting primary alignments ”–secondary=no”. ’–MD’ parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
 
 ## Detect RNA modification
-We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and require setting diffrent parameters.
+We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and requires setting different parameters.
 
 - Be aware to set all parameters before running the pipeline. 
 
@@ -69,26 +69,26 @@ We provide a snakemake pipeline for JACUSA2 variant calling using call2 method a
             * label: 'WT_vs_KO' label of the analysis
             * jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
             * path_out: './output' # path to the output directory, if it doesn't exist it will be created 
-            * path_inp: './data' # path to the directory containg inputs - all input files are relative to this directory
+            * path_inp: './data' # path to the directory containing inputs - all input files are relative to this directory
             * reference : 'GRCh38_96.fa' # path to reference squence 
-            * modified_sites: 'miCLIP_union.bed' #BED6 file contaning known modified sites where 'name' refers to the annotation of the position. usefull for learning patterns (traning and test set).
+            * modified_sites: 'miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
             * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
             * regions: "target_region.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
-            * data: a dictionnary of two keys (cond1, cond2) refering to the paired conditions inputs. The value is the list of replicates names without ".bam" extention.
+            * data: a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
               * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
               * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
-      * jacusa_params: a dictionnary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
-            * P1: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the first consition sample.
-            * P2: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the second consition sample.
+      * jacusa_params: a dictionary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
+            * P1: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the first condition sample.
+            * P2: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the second condition sample.
             * m: 1  # filter reads by mapping quality
             * q: 1  # filter reads by base calling quality
             * c: 4  # filter reads by coverage
-            * a: 'Y'  # Mandatory parameters to filter sites within the holypolymer regions.
-            * p: 16    # parameter to custemize number of threads
+            * a: 'Y'  # Mandatory parameters to filter sites within the holy-polymer regions.
+            * p: 16    # parameter to customize the number of threads
             * D: ''  # Mandatory parameter to output deletion score.
             * I: ''  # Mandatory parameter to output insertion score.
       * pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
-            * internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set. in case you use external pattern put "". 
+            * internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "". 
             * external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
             * combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
                       pt1: [1,2,4,6]  
@@ -97,7 +97,7 @@ We provide a snakemake pipeline for JACUSA2 variant calling using call2 method a
 
 Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use parameters.
 
-- Run JACUSA2_call-2 rule to call variants using paired conditions.
+- Run JACUSA2_call2 rule to call variants using paired conditions.
 ```  
 srun snakemake --cores all jacusa2_call2
 ```
@@ -111,7 +111,7 @@ The output is an R object "features.rds" under "./output/analysis/label[WT_vs_KO
 ```
 $ srun snakemake --cores all get_pattern
 ```
-The output is an R object "NMF.rds" contaning the facotorization result, including basis and coefficien matrices, Plus, plots showing the rank selection result. The output is under "./output/analysis/label[WT_vs_KO]/pattern/". Implicitly, traning and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
+The output is an R object "NMF.rds" containing the factorization result, including basis and coefficient matrices, Plus, plots showing the rank selection result. The output is under "./output/analysis/label[WT_vs_KO]/pattern/". Implicitly, training and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
 
 For the testing example, the prediction.csv is supposed to contain 1905 sites.
 
@@ -119,7 +119,7 @@ For the testing example, the prediction.csv is supposed to contain 1905 sites.
 ```
 $ srun snakemake --cores all visualize_pattern
 ```  
-The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulted matrices, The output can be found under "./output/analysis/label[WT_vs_KO]/pattern/viz/".
+The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under "./output/analysis/label[WT_vs_KO]/pattern/viz/".
 
 For the testing example, the scoring pattern will look like the following barplots.
 
@@ -145,8 +145,8 @@ For the testing example, the eCDF will look like the following figure:
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/Pattern_ecdf.png" width="500">
 </p>
 
-Note that rules are linked so that the workflow are determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
-executed accordingly from bottom to top 4. Therefore, running ”predict modification” rule leads to excuting all rules in its pipeline.
+Note that rules are linked so that the workflow is determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
+executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules in its pipeline.
 
 
 <p align="center">

@@ -7,6 +7,6 @@ dependencies:
   - python=3.7.6
   - samtools=1.12
   - openjdk=10.0.2
-  - Minimap2 	2.22
+  - Minimap2=2.22
   - r-base=4.0.5
   - bedtools=2.29.2

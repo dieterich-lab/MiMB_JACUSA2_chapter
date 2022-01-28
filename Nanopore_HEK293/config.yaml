@@ -1,10 +1,22 @@
 # INFOS PARAMS
-label: "HEK293_WT_KO"                 # Label of the analysis, it should be unique for the analysis of one sequence ID and a specific for a set of conditions
+label: "HEK293_WT_KO_new"   # label of the analysis
+             
+# INPUT & OUTPUT PATH
+path_out: "../../output"     # path to the output directory, if it doesn't exist it will be created 
+path_inp: "../../data"    # path to the directory containg inputs - all input files are relative to this directory
+reference : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # path to reference squence 
+modified_sites: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed"   # known modified sites
+hg38: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome"
+        
+# INPUTS PARAMS
+data:
+    cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
+    cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
 
 # JACUSA PARAMS
-path_jar : "JACUSA_v2.0.2-RC.jar"    # Path to the JAR file 
-picard_jar : '/biosw/picard-tools/2.5.0/picard.jar'
-jacusa_params:                       #add any parameter as a name of the key and affect the appropriate value
+jar : "../../../MiMB_JACUSA2_chapter-copie/JACUSA2/JACUSA_v2.0.2-RC.jar"    # path to JACUISA2 JAR file 
+jacusa_params:                       #add any parameter as a name of the key and set its appropriate value as [key: value].
+                                     # please use "" if no value is affected to the parameter.
              p: 16 
              D: ''
              I: ''
@@ -17,64 +29,11 @@ jacusa_params:                       #add any parameter as a name of the key and
 java_params:
              Xmx20g: ''
              XX:ParallelGCThreads=10: ''
-             
-nanosim_params:
-            threads: 10
-            fast_file: ''
-            ref_genome: ''
-            annotation: ''
-            num_reads:  ''
-            seed: ''
-            basecaller: ''
-            
-# INPUT & OUTPUT PATH
-path_out: "output"     # Path to the output directory, if it doesn't exist it will be created 
-path_inp: "../../data"           # Path to the directory containg inputs - all input files are relative to this directory
-path_ref : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # Reference transcriptome 
-mod_file: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/Amina/data/miCLIP_union_flat_exclude_Y_chromosome.bed"   # rRNA modification status file
-hg38: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome"
-id : ['1','20','2', '5']     # ID of sequence
-filter:
-        base: 'A'
-        min_mis: 1
-        
-target: []         # Target positions of the Knockout
 
-# INPUTS PARAMS
-data:
-    cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
-    cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
-#     cond2: ["HEK293_WT_out_seed42_aligned_reads", "HEK293_WT_out_aligned_reads"]         # list of all replicates bam file without the extension .bam for condition2
-#NMF params
-NMF_params:
-           NMF_permuation: 30
-           nmf_rank: 3
-           nrun: 10
-           rank_range: [2,5]
-           thread: 10
-traning: 
-#COMBINATION OF FEATURES           
-combination:       # combination of features based on a specific pattern
-        pattern: [1,2,3]   #patterns to use
-        external_pattern: ""     # path to patern  
-        internal_pattern: ["1",'2','5']
-# DOWNSAMPLING PARAMS        
-sampling_params:
-        seed: ['0','2'] # Seed values 
-        coverage : ['300','1000']        # Amount of reads to be sampled
-
-# MIXING WT & KO ANALYSIS
-mixing_params:
-        sampling_cov: '1000'                    # The number of reads to be considered for both WT and KO samples
-        sampling_seed: '42'                    # The seed value to be coonsided for the downsampling of WT and KO samples 
-        mixing_thre: ['0.1', '0.5']      # Franction of WT to be considered
-        mixing_seed: ['0','2'] 
-
-# ANALYSIS PARAMS
-analysis_params:
-        method: 'LOF'                          # IQR or LOF, if LOF, LOF_contamination_univariate and LOF_neighbors_univariate should be specified otherwise use ""
-        LOF_neighbors:  [20,60]              # Range of the number of neighbors to consider for the Local Outlier Fcator method
-        LOF_contamination : 0.05     #  Contamination value for the Local Outlier Fcator method
-
-
-        
+# COMBINATION OF PATTERNS           
+pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
+        internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set 
+        external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
+        combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+                    pt1: [2,4,1,8,5,7]  
+                    pt2: [2,3,4]

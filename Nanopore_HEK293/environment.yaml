@@ -4,7 +4,6 @@ channels:
   - bioconda
 dependencies:
   - snakemake=6.8.1
-  - python=3.7.6
   - samtools=1.12
   - openjdk=10.0.2
   - Minimap2=2.22

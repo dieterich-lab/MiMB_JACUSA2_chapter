@@ -23,7 +23,7 @@ conda install -c conda-forge mamba
 Once you have installed Conda and Mamba, you can download the Snakemake pipeline and the example datasets.
 ```
 git clone https://github.com/dieterich-lab/MiMB_JACUSA2_chapter.git
-cd Nanopore_HEK293
+cd MiMB_JACUSA2_chapter/Nanopore_HEK293
 ```
 
 Then, you install the required packages after creating an environment with Snakemake installed `environment.yml` file.

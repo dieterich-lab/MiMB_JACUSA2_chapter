@@ -111,7 +111,7 @@ The output is an R object "features.rds" under "./output/analysis/label[WT_vs_KO
 ```
 $ srun snakemake --cores all get_pattern
 ```
-The output is an R object "NMF.rds" containing the factorization result, including basis and coefficient matrices, Plus, plots showing the rank selection result. The output is under "./output/analysis/label[WT_vs_KO]/pattern/". Implicitly, training and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
+The output is an R object "NMF.rds" containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under "./output/analysis/label[WT_vs_KO]/pattern/". Implicitly, training and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
 
 For the testing example, the prediction.csv is supposed to contain 1905 sites.
 
@@ -127,7 +127,7 @@ For the testing example, the scoring pattern will look like the following barplo
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/pattern_scores.png" width="300">
 </p>
 
-the combination of patterns representing more than 80% will look like this:
+The combination of patterns representing more than 80% will look like this:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/barplot_NMF.png" width="300">

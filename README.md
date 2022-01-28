@@ -113,11 +113,25 @@ $ srun snakemake --cores all get_pattern
 ```
 The output is an R object "NMF.rds" contaning the facotorization result, including basis and coefficien matrices, Plus, plots showing the rank selection result. The output is under "./output/analysis/label[WT_vs_KO]/pattern/". Implicitly, traning and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
 
+For the testing example, the prediction.csv is supposed to contain 1905 sites.
+
 - Run visualize_pattern rule to predict modified sites
 ```
 $ srun snakemake --cores all visualize_pattern
 ```  
 The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulted matrices, The output can be found under "./output/analysis/label[WT_vs_KO]/pattern/viz/".
+
+For the testing example, the scoring pattern will look like the following barplots.
+
+<p align="center">
+  <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/pattern_scores.png" width="300">
+</p>
+
+the combination of patterns representing more than 80% will look like this:
+
+<p align="center">
+  <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/barplot_NMF.png" width="300">
+</p>
 
 - Run predict_modification rule to predict modified sites
 ```
@@ -125,8 +139,15 @@ $ srun snakemake --cores all predict_modification
 ```  
 The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under "./output/analysis/label[WT_vs_KO]/prediction/". andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
 
+For the testing example, the eCDF will look like the following figure: 
+
+<p align="center">
+  <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/pattern_ecdf.png" width="300">
+</p>
+
 Note that rules are linked so that the workflow are determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
 executed accordingly from bottom to top 4. Therefore, running ”predict modification” rule leads to excuting all rules in its pipeline.
+
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/snakemake.png" width="500">

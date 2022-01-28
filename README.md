@@ -64,28 +64,73 @@ We recommend outputting primary alignments ”–secondary=no”. ’–MD’ pa
 We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and require setting diffrent parameters.
 
 Be aware to set all parameters before running the pipeline. 
-describe all parameters ...............................................................................
-The inputs are BAM files "HEK293T-WT-rep2.bam" and "HEK293T-WT-rep3.bam	" for wild-type replicates and "HEK293T-KO-rep2.bam" and "HEK293T-KO-rep3.bam" for the Knock-out replicates. Make sure to set "-P1" and "-P2" according to the corresponding library. The mismach score is produce by default but you need to add "-D" and "-I" to output the deletion and insertion scores. Filter reads according with base calling quality "-q [$>1$]", mapping quality "-m [$>1$] and read coverage "-c [$>4$]". Plus, consider the filter feature "-a [=Y]" to exclude sites within homopolymer regions to improve sensitivity. The output -r "WT_vs_KO_call2_result.out" consists of a read error profile where the format is a combination of BED6 with JACUSA2 call-2 specific columns and common info columns: info, filter, and ref. The number of threads can be customized via the parameter "-p". Check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details.
-.....................................................
 
-- Run JACUSA2 call-2 rule to call variants using paired conditions. Make sure that you set the path to the jar file.
+    * General
+          * label: 'WT_vs_KO' label of the analysis
+          * jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
+          * path_out: './output' # path to the output directory, if it doesn't exist it will be created 
+          * path_inp: './data' # path to the directory containg inputs - all input files are relative to this directory
+          * reference : 'GRCh38_96.fa' # path to reference squence 
+          * modified_sites: 'miCLIP_union.bed' #BED6 file contaning known modified sites where 'name' refers to the annotation of the position. usefull for learning patterns (traning and test set).
+          * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
+          * regions: "target_region.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
+          * data: a dictionnary of two keys (cond1, cond2) refering to the paired conditions inputs. The value is the list of replicates names without ".bam" extention.
+            * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
+            * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
+    * jacusa_params: a dictionnary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
+          * P1: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the first consition sample.
+          * P2: 'FR-SECONDSTRAND'  # Mandatory parameters refering to the library of the second consition sample.
+          * m: 1  # filter reads by mapping quality
+          * q: 1  # filter reads by base calling quality
+          * c: 4  # filter reads by coverage
+          * a: 'Y'  # Mandatory parameters to filter sites within the holypolymer regions.
+          * p: 16    # parameter to custemize number of threads
+          * D: ''  # Mandatory parameter to output deletion score.
+          * I: ''  # Mandatory parameter to output insertion score.
+    * pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
+          * internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set. in case you use external pattern put "". 
+          * external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
+          * combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+                    pt1: [1,2,4,6]  
+                    pt2: [1,2,3,4,6]
+
+
+Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use parameters.
+
+- Run JACUSA2_call-2 rule to call variants using paired conditions.
 ```  
 srun snakemake --cores all jacusa2_call2
 ```
+The output is a file called "Cond1vsCond2Call2.out" under "./output/jacusa/label[WT_vs_KO]/" and filtered bam file under "./output/bam/label[WT_vs_KO]/".
 - Run get_features rule to preprocess JACUSA2 call2 output and extract features.
 ```
 $ srun snakemake --cores all get_features
 ```
-- Run get_pattern rule to lear patterns representing m6A modification
+The output is an R object "features.rds" under "./output/analysis/label[WT_vs_KO]/features/".
+- Run get_pattern rule to learn patterns representing m6A modification.
 ```
 $ srun snakemake --cores all get_pattern
 ```
+The output is an R object "NMF.rds" contaning the facotorization result, including basis and coefficien matrices, Plus, plots showing the rank selection result. The output is under "./output/analysis/label[WT_vs_KO]/pattern/". Implicitly, traning and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
+
+- Run visualize_pattern rule to predict modified sites
+```
+$ srun snakemake --cores all visualize_pattern
+```  
+The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulted matrices, The output can be found under "./output/analysis/label[WT_vs_KO]/pattern/viz/".
+
 - Run predict_modification rule to predict modified sites
 ```
 $ srun snakemake --cores all predict_modification
 ```  
-Note that the rules are linked so that the workflow are determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
+The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under "./output/analysis/label[WT_vs_KO]/prediction/". andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
+
+Note that rules are linked so that the workflow are determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
 executed accordingly from bottom to top 4. Therefore, running ”predict modification” rule leads to excuting all rules in its pipeline.
+
+<p align="center">
+  <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/snakemake.png" width="500">
+</p>
 
 # Dependencies and versions
 Software | Version 
@@ -103,4 +148,4 @@ R Package | Version
 ggplot2 | 3.3.5
 NMF | 0.23.0
 pROC | 1.18.0
-stringr |
+stringr | 1.4.0

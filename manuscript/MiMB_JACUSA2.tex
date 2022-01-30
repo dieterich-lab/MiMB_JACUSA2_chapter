@@ -137,7 +137,7 @@ The workflow requires a multi-core processor system with minimal main memory of 
 and several GBs of free disk space (depending on data set size).
 
 \subsection*{Software dependencies and installation}
-Our analysis workflow has few requirements, which are detailed in Table 1. Specifically, to execute our workflow, the following prerequisites are necessary: a BASH shell, a JAVA runtime environment, a working PERL and R installation. Additional i.e. non-standard software to process and map Nanopore reads (bedtools, samtools and Minimap2) are obligatory. Table 2 lists some additional R packages, which are required to run the R code. Detailed instructions on how to setup are found under \url{https://github.com/dieterich-lab/MiMB_JACUSA2_chapter}.
+Our analysis workflow has few requirements, which are detailed in Table 1. Specifically, to execute our workflow, the following prerequisites are necessary: a BASH shell, a JAVA runtime environment, a working PERL and R installation. Additional i.e. non-standard software to process and map Nanopore reads (bedtools, samtools and Minimap2) are obligatory. Table 2 lists some additional R packages, which are required to run the R code. Detailed installation instructions and corresponding workflow code are deposited under \url{https://github.com/dieterich-lab/MiMB_JACUSA2_chapter}.
 
 \section*{METHODS}
 Our workflow is based on the pairwise comparison of samples with different modification status (Figure \ref{fig:graphicsummary}). The sample of interest (yellow) may be compared to different samples lacking certain modifications. If available, the wild type (WT) sample can be compared to a knock out (KO) sample lacking specific enzymatic activities (green), as outlined in Use Case 1. Alternatively, a sample lacking all modifications may be used for comparison (blue). This may be either a simulated sample (i.e. with NanoSim) or an \textit{in vitro} transcribed sample derived from cDNA. Such an analysis is detailed in Use Case 2. In any setting, JACUSA2 calculates scores for the Mismatch, Insertion and Deletion rates of the pairwise comparisons as outlined above (Figure \ref{fig:graphicsummary}, right).
@@ -244,39 +244,42 @@ The JACUSA2 workflow detects RNA modifications using direct RNA sequencing by co
 
 Starting with the preprocessed mapped reads as inputs (BAM files), 'HEK293T-WT-rep2.bam' and 'HEK293T-WT-rep3.bam' represent the wildtype replicates and 'HEK293T-KO-rep2.bam' and  'HEK293T-KO-rep3.bam' the control replicates,
 \begin{enumerate} 
-	\item Compute read error profile with the \texttt{jacusa2\_call2} rule:  The method requires BAM files of the paired conditions and the corresponding library information "-P1" and "-P2". In addition to the mismatch score, add "-D" and "-I" to output the deletion and insertion scores. JACUSA2 allows filtering reads according to many parameters. Here, we consider all sites with base calling quality "-q [$>1$]", mapping quality "-m [$>1$] and read coverage "-c [$>4$]". Here, \textcolor{red}{ we consider filtering sites within homopolymer regions "-a [=Y]". The output (named here, "Cond1vsCond2Call2.out")} consists of a read error profile where the format is a combination of BED6 with JACUSA2 call-2 specific columns and common info columns: info, filter, and ref. Check JACUSA2 manual for more details on JACUSA2 filter and output options \citep{JACUSA2manual}. The number of threads can be customized via the parameter "-p". \textcolor{red}{All parameters related to the JACUSA2 method can be added under the field "jacusa\_params" in the config file by setting the name of the parameter followed by the corresponding value [key: value]. Be aware to set all parameters before running the pipeline. } 
-	\begin{spverbatim}
-	$ srun snakemake --cores all jacusa2_call2 	$
+	\item Compute read error profile with the \texttt{jacusa2\_call2} rule: 
+		\begin{spverbatim}
+	$ snakemake --cores all jacusa2_call2 	$
 	\end{spverbatim}
-	\item Preprocess JACUSA2 output: from JACUSA2 call-2 output, \textcolor{red}{we} select all sites within 5-mer of a central nucleotide 'A' flanked by 2 random nucleotides (NNANN) and \textcolor{red}{we} filter out sites of the homo-polymer regions (JACUSA filter: Y).
-	 \textcolor{red}{Then, we rebuild the tabular features such that the observations are only sites with a reference base 'A'. Each site is characterized by 15 features corresponding to the mismatch, insertion and deletion scores for the observed site and its two flanking positions from both sides. 
-	 The rule "get\_features" performs the preprocessing step. Use the parameter 'region' with a file containing target 5-mers to limit the analysis to specific sites. For comparison reasons, we consider common sites between use cases 1 and 2 \todo{Is this the reason why you chose to work on the three outputs together WT\_IV,WT\_KO, KO\_IVT}. The output is an R object "features/features.rds", representing the matrix of Sites$\times$15 features. %Additional files generated from the intermediate preprocessing steps are in "tmp" folder.
- }
-	\begin{spverbatim} 
-	$ srun snakemake --cores all get_features 	
-	\end{spverbatim}
+	The method requires BAM files of the paired conditions and the corresponding library information "-P1" and "-P2". In addition to the mismatch score, add "-D" and "-I" to output the deletion and insertion scores. JACUSA2 allows filtering reads according to many parameters. Here, we consider all sites with base calling quality "-q [$>1$]", mapping quality "-m [$>1$] and read coverage "-c [$>4$]". Here, we consider filtering sites within homopolymer regions "-a [=Y]". The output (named here, "Cond1vsCond2Call2.out") consists of a read error profile where the format is a combination of BED6 with JACUSA2 call-2 specific columns and common info columns: info, filter, and ref. Check JACUSA2 manual for more details on JACUSA2 filter and output options \citep{JACUSA2manual}. The number of threads can be customized via the parameter "-p". All parameters related to the JACUSA2 method can be added under the field "jacusa\_params" in the config file by setting the name of the parameter followed by the corresponding value [key: value]. Be aware to set all parameters before running the pipeline. 
 
-	\item Extract m6A modification pattern: given the matrix of Sites$\times$Features, the next step is to learn a model representing the m6A modification pattern. To this end, the conventional non-negative matrix factorization (NMF) analysis is suggested \citep{lee1999learning}. Briefly, NMF factorizes a non-negative data matrix $X$ (here: $n$ sites and $m$ features) into two non-negative matrices as $X \approx WH$, such that $W$ is an $n\times k$ matrix containing basis vectors and $H$ is an $k \times m$ matrix containing coefficient vectors. The coefficient vectors and their combination can be viewed as a pattern for m6A modification. The rank of factorization $k$ is a critical parameter that affects the performance substantially. We suggest to select the rank $k$ according to the method of \cite{frigyesi2008non} by looking at silhouette \citep{rousseeuw1987silhouettes} and cophenetic correlation \citep{brunet2004metagenes} indices. Accordingly, the performance indices are computed for different choices of rank ($k<n,m$) and compared to the performance of a random permutation of the original data. Subsequently, the chosen rank corresponds to the value with the largest difference between slopes of the original and the randomized data. Here, the unsupervised pattern training is based on the consensus set of $1,905$ m6A sites reported in the three miCLIP-based studies mentioned earlier. Based on the silhouette and cophenetic correlation indices, we identified an optimal factorization rank of \textcolor{red}{6} (Figure \ref{fig:WT_KO}A). We then analyzed the identified patterns. According to the membership indicator of each site in matrix $W$, more than $80\%$ of m6A modification sites can be represented by five patterns \textcolor{red}{(Patterns 1,2,3,4,6)} (Figure \ref{fig:WT_KO}B). Interestingly, the linear combination \todo{in Figure 6C this is labeled sum} of these five patterns in Figure \ref{fig:WT_KO}C highlights the importance of position 3 and eventually the implication of all scores. 
-	
-	\textcolor{red}{Using the JACUSA2 pipeline, run rule "get\_pattern" to generate patterns and provide the set of modified sites as a ground truth under the field "modified\_sites" in the config file}. Here, the "miCLIP\_union.bed" file contains the m6A sites from the three miCLIP-based studies. A miCLIP annotation, reflecting the consensus sites, is added to each site. \textcolor{red}{A subset of modified sites can be used to generate patterns. Accordingly, the "internal\_pattern" field should refer to the annotation of selected sites from the "modified\_sites" file. Plus, multiple combinations of patterns can be defined and appended to the field "combined\_pattern" as new patterns. The corresponding outputs are under "patterns" folder. } 
-	
-	
+	\item Process JACUSA2 output with the \texttt{get\_features} rule:
+		\begin{spverbatim} 
+	$ snakemake --cores all get_features 	
+	\end{spverbatim}
+	 we select all sites within 5-mer of a central nucleotide 'A' flanked by 2 random nucleotides (NNANN) and we filter out sites of the homo-polymer regions. Then, we rebuild the tabular features such that the observations are only sites with a reference base 'A'. Each site is characterized by 15 features corresponding to the mismatch, insertion and deletion scores for the observed site and its two flanking positions from both sides. 
+	 The rule "get\_features" performs the preprocessing step. Use the parameter 'region' with a file containing target 5-mers to limit the analysis to specific sites. The output is an R object "features/features.rds", representing the matrix of Sites$\times$15 features. %Additional files generated from the intermediate preprocessing steps are in "tmp" folder.
+
+
+	\item Extract characteristic m6A modification patterns with the \texttt{get\_pattern} rule:
 	\begin{spverbatim} 
 	$ srun snakemake --cores all get_pattern 	
 	\end{spverbatim} 
-	\textcolor{red}{The produced patterns and their combinations can be visualized using "visualize\_pattern" rule. The corresponding outputs are under "pattern/viz" folder.}
+	 We learn a model representing the m6A modification patterns given the matrix of Sites$\times$Features. To this end, we employ non-negative matrix factorization (NMF)\citep{lee1999learning}. Briefly, NMF factorizes a non-negative data matrix $X$ (here: $n$ sites and $m$ features) into two non-negative matrices as $X \approx WH$, such that $W$ is an $n\times k$ matrix containing basis vectors and $H$ is an $k \times m$ matrix containing coefficient vectors. The coefficient vectors and their combination can be viewed as a pattern for m6A modification. The rank of factorization $k$ is a critical parameter that affects the performance substantially. We suggest to select the rank $k$ according to the method of \cite{frigyesi2008non} by looking at silhouette \citep{rousseeuw1987silhouettes} and cophenetic correlation \citep{brunet2004metagenes} indices. Accordingly, the performance indices are computed for different choices of rank ($k<n,m$) and compared to the performance of a random permutation of the original data. Subsequently, the chosen rank corresponds to the value with the largest difference between slopes of the original and the randomized data. Here, the unsupervised pattern training is based on the consensus set of $1,905$ m6A sites reported in the three miCLIP-based studies mentioned earlier. Based on the silhouette and cophenetic correlation indices, we identified an optimal factorization rank of 6 (Figure \ref{fig:WT_KO}A). We then analyzed the identified patterns. According to the membership indicator of each site in matrix $W$, more than $80\%$ of m6A modification sites can be represented by five patterns (Patterns 1,2,3,4,6) (Figure \ref{fig:WT_KO}B). Interestingly, the linear combination of these five patterns in Figure \ref{fig:WT_KO}C highlights the importance of position 3. 
+	
+%\textcolor{red}{Using the JACUSA2 pipeline, run rule "get\_pattern" to generate patterns and provide the set of modified sites as a ground truth under the field "modified\_sites" in the config file}. Here, the "miCLIP\_union.bed" file contains the m6A sites from the three miCLIP-based studies. A miCLIP annotation, reflecting the consensus sites, is added to each site. \textcolor{red}{A subset of modified sites can be used to generate patterns. Accordingly, the "internal\_pattern" field should refer to the annotation of selected sites from the "modified\_sites" file. Plus, multiple combinations of patterns can be defined and appended to the field "combined\_pattern" as new patterns. The corresponding outputs are under "patterns" folder. } 
+	
+	Multiple patterns and their combinations can be visualized using \texttt{visualize\_pattern} rule. The corresponding outputs are under "pattern/viz" folder.
 	\begin{spverbatim} 
 $ srun snakemake --cores all visualize_pattern 	
 \end{spverbatim} 
 	
-\item Predict m6A modifications: the additive linear combination of the coefficient vectors (patterns) with the 15 features can be used to predict m6A modification. We examine the ability of prediction on a subset of data of more than $1,52$ million sites with $17,021$ miCLIP m6A sites. We opt for the linear combination of the five most relevant patterns described in step 3. The empirical Cumulative Distribution Function (eCDF) of the inferred scores shows a significant difference between the different miCLIP m6A categories (miCLIP annotation) and the unmodified sites (Figure \ref{fig:WT_KO}D). As the number of negative samples is much larger than the number of positive samples, we particularly recommend investigating the Positive Predictive Value (PPV) of the predictions. Here, Figure \ref{fig:WT_KO}E shows a moderate PPV that increases with the cut-off.  
-
-\textcolor{red}{To perform the prediction based on the selected patterns using the JACUSA2 pipeline, run rule "predict\_modification". The patterns can be generated from a subset of the input data according to the field "internal\_pattern" or predefined patterns indicated in the "external\_pattern" field. The output is a BED file containing the estimated scores as well as the corresponding eCDF and PPV plots. The corresponding outputs are located under a new folder called "prediction". }
+\item Predict m6A modifications with the \texttt{predict\_modification} rule:
 
 	\begin{spverbatim} 
 	$ srun snakemake --cores all predict_modification 	
 	\end{spverbatim}
- 
+
+This rule uses patterns of 15 features to predict m6A modification. We examine the ability of prediction on a subset of data of more than $1.52$ million sites including $17,021$ miCLIP m6A sites. We opt for the linear combination of the five most relevant patterns described in step 3. The empirical Cumulative Distribution Function (eCDF) of the inferred scores shows a significant difference between the different miCLIP m6A categories (miCLIP annotation) and the unmodified sites (Figure \ref{fig:WT_KO}D). As the number of negative samples is much larger than the number of positive samples, we consider the Positive Predictive Value (PPV, TP/(TP+FP)) of our predictions. Here, Figure \ref{fig:WT_KO}E shows that PPV  increases with the score cut-off.  
+The final output is a BED file containing the estimated scores as well as the corresponding eCDF and PPV plots. The corresponding outputs are located under a new folder called "prediction". 
+
 	
 \end{enumerate}
 
@@ -352,7 +355,7 @@ $ srun snakemake --cores all get_pattern
 
 \newpage
 
-\section*{FIGURE CAPTIONS}
+\section*{FIGURES}
 
 \begin{figure}[h!]
     \includegraphics[width = 1\textwidth]{Figure1.pdf}
@@ -402,7 +405,7 @@ $ srun snakemake --cores all get_pattern
 	\label{fig:WT_IVT}
 \end{figure}
 \newpage
-\section*{TABLE CAPTIONS}
+
 \section*{TABLES}
 
 \begin{table}[]
@@ -428,7 +431,7 @@ $ srun snakemake --cores all get_pattern
 %R	4.0.5
 %PERL	5.28.1
 %bedtools	2.29.2
-snakemake	6.8.1
+%snakemake	6.8.1
 
 \begin{table}[]
 \label{tab:packages}

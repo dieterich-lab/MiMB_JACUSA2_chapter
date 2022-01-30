@@ -1,9 +1,9 @@
 configfile: "config.yaml"
 
 ##########################################################Global variables
-out_analysis = "{path_out}/analysis/{label}/".format(**config)
-out_jacusa = "{path_out}/jacusa/{label}/".format(**config)
-out_bam = "{path_out}/bam/{label}/".format(**config)
+out_analysis = "{path_out}/{label}/".format(**config)
+out_jacusa = "{path_out}/{label}/jacusa/".format(**config)
+out_bam = "{path_out}/{label}/bam/".format(**config)
 out = config['path_out']
 
 comb = config['pattern_params']
@@ -76,7 +76,7 @@ rule jacusa2_call2:
 # preprocess jacusa2 output
 rule get_features: 
     input:  out_jacusa+"Cond1vsCond2Call2.out"
-    #input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/bams/WT_vs_realIVT_v202_call2_result.out"
+    #input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/WT_vs_KO_RC22_call2_result.out"
     output: 
         out = out_analysis +"features/features.rds",
         
@@ -111,9 +111,9 @@ rule split_train_test:
 rule get_pattern: 
     input: out_analysis +"features/train_features.rds" 
     output: 
-        data=out_analysis +"pattern/NMF.rds",
-        rank1= out_analysis +"pattern/asses_NMF1.pdf" ,       
-        rank2= out_analysis +"pattern/asses_NMF2.pdf"
+        data=out_analysis +"patterns/NMF.rds",
+        rank1= out_analysis +"patterns/asses_NMF1.pdf" ,       
+        rank2= out_analysis +"patterns/asses_NMF2.pdf"
     params: 
         mod = ground_truth,
         ext_pat =comb['external_pattern']
@@ -128,9 +128,9 @@ rule get_pattern:
 # Visualize patterns        
 rule visualize_pattern: 
     input: 
-        nmf = out_analysis +"pattern/NMF.rds" 
+        nmf = out_analysis +"patterns/NMF.rds" 
     output: 
-        data=directory(out_analysis +"pattern/viz")
+        data=directory(out_analysis +"patterns/viz")
     params: 
         mod = ground_truth,
         pattern = comb['combined_patterns']
@@ -140,7 +140,7 @@ rule visualize_pattern:
 rule predict_modification: 
     input: 
         bigtable = out_analysis +"features/features.rds" ,
-        nmf = out_analysis +"pattern/NMF.rds" 
+        nmf = out_analysis +"patterns/NMF.rds" 
     output: 
         data=directory(out_analysis +"prediction")
     params: 

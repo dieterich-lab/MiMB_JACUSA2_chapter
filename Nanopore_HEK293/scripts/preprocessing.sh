@@ -22,4 +22,4 @@ else
     bedtools getfasta -fi $GRCh38_96 -bed $sites -s -tab > $path/checkMotif_reformat.txt
 fi
 #reformat
-cat $path/call2_SitesExt2.bed |perl get_features.pl > $path/data_reformat.txt
+cat $path/call2_SitesExt2.bed |perl scripts/get_features.pl > $path/data_reformat.txt

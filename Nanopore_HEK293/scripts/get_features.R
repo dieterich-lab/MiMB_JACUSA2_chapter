@@ -19,16 +19,14 @@ if (dir.exists(dirname(args[2]))== FALSE) {
 Call2=tapply(Exp1$call2.score,list(Exp1$ID,Exp1$Anchor),sum)
 Call2[is.na(Call2)]<-0
 colnames(Call2)<-paste0("Exp1Call2Score_",colnames(Call2))
-print(colnames(Call2))
+
 Deletion=tapply(Exp1$deletion.score,list(Exp1$ID,Exp1$Anchor),sum)
 Deletion[is.na(Deletion)]<-0
 colnames(Deletion)<-paste0("Exp1DeletionScore_",colnames(Deletion))
-print(colnames(Deletion))
 
 Insertion=tapply(Exp1$insertion.score,list(Exp1$ID,Exp1$Anchor),sum)
 Insertion[is.na(Insertion)]<-0
 colnames(Insertion)<-paste0("Exp1InsertionScore_",colnames(Insertion))
-print(colnames(Insertion))
 
 BigTable=merge(data.frame(ID=rownames(Call2),Call2),data.frame(ID=rownames(Deletion),Deletion),by.x=1,by.y=1)
 BigTable=merge(BigTable,data.frame(ID=rownames(Insertion),Insertion),by.x=1,by.y=1)

@@ -7,7 +7,6 @@ if (dir.exists(dirname(args[2]))== FALSE) {
 
 #load training data
 NMFtab = readRDS(args[1])
-print(colnames(NMFtab))
 nmfSeed('nndsvd')
 meth <- nmfAlgorithm(version='R')
 meth <- c(names(meth), meth)

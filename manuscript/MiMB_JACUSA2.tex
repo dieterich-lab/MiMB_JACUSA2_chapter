@@ -137,14 +137,14 @@ The workflow requires a multi-core processor system with minimal main memory of 
 and several GBs of free disk space (depending on data set size).
 
 \subsection*{Software dependencies and installation}
-Our analysis workflow has few requirements, which are detailed in Table \ref{tab:software}. Specifically, to execute our workflow, the following prerequisites are necessary: a BASH shell, a JAVA runtime environment, a working PERL and R installation. Additional i.e. non-standard software to process and map Nanopore reads (bedtools, samtools and Minimap2) are obligatory, while the installation of a Nanopore read simulator (NanoSim) is optional and depends on your use case. Table \ref{tab:packages} lists some additional R packages, which are required to run the R code. Detailed instructions on how to setup are found under \url{https://github.com/dieterich-lab/MiMB_JACUSA2_chapter} \todo{labeling of Tables in PDF doesn't seem to be correct}
+Our analysis workflow has few requirements, which are detailed in Table 1. Specifically, to execute our workflow, the following prerequisites are necessary: a BASH shell, a JAVA runtime environment, a working PERL and R installation. Additional i.e. non-standard software to process and map Nanopore reads (bedtools, samtools and Minimap2) are obligatory. Table 2 lists some additional R packages, which are required to run the R code. Detailed instructions on how to setup are found under \url{https://github.com/dieterich-lab/MiMB_JACUSA2_chapter}.
 
 \section*{METHODS}
 Our workflow is based on the pairwise comparison of samples with different modification status (Figure \ref{fig:graphicsummary}). The sample of interest (yellow) may be compared to different samples lacking certain modifications. If available, the wild type (WT) sample can be compared to a knock out (KO) sample lacking specific enzymatic activities (green), as outlined in Use Case 1. Alternatively, a sample lacking all modifications may be used for comparison (blue). This may be either a simulated sample (i.e. with NanoSim) or an \textit{in vitro} transcribed sample derived from cDNA. Such an analysis is detailed in Use Case 2. In any setting, JACUSA2 calculates scores for the Mismatch, Insertion and Deletion rates of the pairwise comparisons as outlined above (Figure \ref{fig:graphicsummary}, right).
 
-One feature of Nanopore sequencing is to read sequences as 5-mers, as always five nucleotides are occupied by the pore protein (Figure \ref{fig:5mer}). Because of this, a m6A modification may affect basecalling not only if the modified nucleotide is in the central position, but also at neighboring positions (-2 to +2). To account for this, JACUSA2 scores for Deletion, Mismatch and Insertion are calculated for the 5-mer context. Depending on the modification-specific signature, a Feature set can be selected to calculate the final JACUSA2 score (Figure \ref{fig:5mer}).
+One feature of Nanopore sequencing is to read sequences as 5-mers, as always five nucleotides are occupied by the pore protein (Figure \ref{fig:5mer}). Because of this, a m6A modification may affect basecalling not only if the modified nucleotide is in the central position, but also at neighboring positions (-2 to +2). To account for this, JACUSA2 scores for Deletion, Mismatch and Insertion are calculated for the entire 5-mer context. Depending on the modification-specific signature, a Feature set can be selected to calculate the final JACUSA2 score (Figure \ref{fig:5mer}).
 
-Our workflow can be divided into a wet-lab part (Figure \ref{fig:workflow}A) and a computational part (Figure \ref{fig:workflow}B). Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as live basecalling during sequencing or after the sequencing run from generated FAST5 files, resulting in FASTQ output files (Figure \ref{fig:workflow}A). FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as inpug for JACUSA2 analysis, which yields candidate m4A sites (Figure \ref{fig:workflow}B).
+Our workflow can be divided into a wet-lab part (Figure \ref{fig:workflow}A) and a computational part (Figure \ref{fig:workflow}B). Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as well as live basecalling during sequencing on the respective FAST5 files, which results in FASTQ output files (Figure \ref{fig:workflow}A). FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as input for JACUSA2 analysis, which yields candidate m6A sites with the presented workflow in this chapter (Figure \ref{fig:workflow}B).
 
 
 \subsection*{Nanopore direct RNA sequencing}
@@ -411,15 +411,22 @@ $ srun snakemake --cores all get_pattern
             \hline \hline
             \texttt{Minimap2} & \url{https://github.com/lh3/minimap2} v2.22 or later & \url{https://lh3.github.io/minimap2/} \\ \hline
             \texttt{samtools} & \url{https://github.com/samtools/samtools} v1.12 or later & \url{http://samtools.github.io/} \\ \hline
-	   \texttt{JAVA} & openjdk 11.0.12 2021-07-20 - JAVA 11 or later & OpenJDK Runtime Environment\\ \hline
+	   \texttt{JAVA} & \url{https://openjdk.java.net/} 11.0.12 2021-07-20 - JAVA 11 or later & OpenJDK Runtime Environment\\ \hline
 	   \texttt{R} &  \url{https://www.r-project.org/} version 3.5.1 or later & The R Project for Statistical Computing \\ \hline
 	   \texttt{PERL} &  \url{https://www.perl.org/} version 5.28.1 or later & Perl is a highly capable, feature-rich programming language \\ \hline
-	   \texttt{BASH, sed, awk} &  should be part of your Linux distribution & Misc.\\ \hline
 	   \texttt{bedtools} &  \url{https://github.com/arq5x/bedtools2} version 2.29.2 or later & Perl is a highly capable, feature-rich programming language \\ \hline	   
-	   \texttt{NanoSim} &  \url{https://github.com/bcgsc/NanoSim} version 3.0.2 or later (optional) & NanoSim is a fast and scalable read simulator that captures the technology-specific features of ONT data\\ \hline	   
+	   \texttt{snakemake} &  \url{https://snakemake.github.io/} version 6.8.1 or later & The Snakemake workflow management system\\ \hline	   
 \end{tabular}
-\caption{\textbf{Software dependencies}\label{tab:software} blubba}
+\caption{\textbf{Software dependencies}\label{tab:software}}
 \end{table}
+
+%Minimap2	2.22
+%samtools	1.12
+%openjdk	11.0.13
+%R	4.0.5
+%PERL	5.28.1
+%bedtools	2.29.2
+snakemake	6.8.1
 
 \begin{table}[]
 \label{tab:packages}
@@ -430,7 +437,7 @@ $ srun snakemake --cores all get_pattern
             \texttt{ggplot2} & \url{https://cran.r-project.org/web/packages/ggplot2/index.html} - ggplot2\_3.3.0 or later &  ggplot2 is a system for declaratively creating graphics, based on The Grammar of Graphics. \\ \hline
             \texttt{NMF} & \url{https://cran.r-project.org/web/packages/NMF/index.html} - NMF\_0.22.0 or later &  Provides a framework to perform Non-negative Matrix Factorization (NMF). \\ \hline
 \end{tabular}
-\caption{\textbf{R Package dependencies}\label{tab:software} blubba}
+\caption{\textbf{R Package dependencies}\label{tab:software}}
 \end{table}
 
 

@@ -284,24 +284,24 @@ The final output is a BED file containing the estimated scores as well as the co
 \end{enumerate}
 
 \subsection*{Use Case 2: Comparison of wild-type and IVT samples}
-An alternative way to detect RNA modifications is to compare a modified sample to an \emph{in-vitro} transcribed (IVT) control sample. Therefore, we benchmark JACUSA2 on a sample set of two replicates (2 and 3) from wild-type HEK293 cell lines (modified sample) \cite{pratanwanich2021identification} and a modification-free IVT sample from HEK293 cDNA (control sample) (see "Preparation of an \textit{in vitro} transcriptome sample").    
-The analysis steps are similar to case 1. We evaluate the analysis against miCLIP m6A sites (Figure \ref{fig:miclip_sites}).
+An alternative way to detect RNA modifications is to compare a modified sample to an \emph{in-vitro} transcribed (IVT) control sample. Therefore, we benchmark JACUSA2 on a sample set of two replicates from wild-type HEK293 cell lines (see Use Case 1m modified sample) \cite{pratanwanich2021identification} and a modification-free IVT sample from HEK293 cDNA (control sample) (see "Preparation of an \textit{in vitro} transcriptome sample").    
+All analysis steps are identical to use case 1. We evaluate the analysis against miCLIP m6A sites (Figure \ref{fig:miclip_sites}).
 \begin{enumerate}
-\item Identify read error profile: we use JACUSA2 call-2 with the same parameters as the previously described case. The input BAM files (HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam) and (HEK293T-IVT-rep1.bam, HEK293T-IVT-rep2.bam)\todo{The first IVT run hat rel. low coverage --> might this impact performance of UC2?} are associated to the wild-type and IVT replicate samples respectively.
+\item Identify read error profile: we use JACUSA2 call-2 with the same parameters as the previously described case. The input BAM files (HEK293T-WT-rep2.bam, HEK293T-WT-rep3.bam) and (HEK293T-IVT-rep1.bam, HEK293T-IVT-rep2.bam) are associated to the wild-type and IVT replicate samples respectively. All input files are available from \url{https://doi.org/10.5281/zenodo.5913452}
 	\begin{spverbatim}
 	$ srun snakemake --cores all jacusa2_call2 	
 	\end{spverbatim}
-\item Preprocess JACUSA2 output: we select all sites within the specific 5-mer (NNANN) and we consider the Y filter that excludes sites within homo-polymer regions. \textcolor{red}{Then, we extract 5-mer features such that the selected sites are represented by the Mismatch, Deletion and Insertion scores for the observed site and its two flanking positions from both sides.}
+\item Process JACUSA2 output: we consider all sites corresponding to a 5-mer (NNANN) with a central A residue. We employ the Y filter to excludes sites within homo-polymer regions. 
 	\begin{spverbatim} 
 $ srun snakemake --cores all get_features 	
 \end{spverbatim}
  
 
-\item Extract m6A modification pattern: using NMF factorization, we extract patterns from the $1,905$ sites reported as modified in the three miCLIP-based studies. Based on the silhouette and cophenetic correlation indices, we identified an optimal factorization rank of 6 (Figure \ref{fig:WT_IVT}A). We determined the predominant factors from matrix $W$. Accordingly, more than $80\%$ of m6A modification sites can be represented by four patterns (Patterns: 1,2,3,6) (Figure \ref{fig:WT_IVT}B). In agreement with Use Case 1, the linear combination of the four patterns confirms the importance of position 3 and the implication of all scores as shown in Figure \ref{fig:WT_IVT}C.
+\item Extract m6A modification pattern: Based on the silhouette and cophenetic correlation indices, we identified an optimal factorization rank of 6 (Figure \ref{fig:WT_IVT}A). We determined the predominant factors from matrix $W$. Accordingly, more than $80\%$ of m6A modification sites can be represented by four patterns (Patterns: 1,2,3,6) (Figure \ref{fig:WT_IVT}B). In agreement with Use Case 1, the linear combination of the four patterns confirms the importance of position 3 and the implication of all scores as shown in Figure \ref{fig:WT_IVT}C.
 	\begin{spverbatim} 
 $ srun snakemake --cores all get_pattern 	
 \end{spverbatim} 
-\item Predict m6A modifications: we evaluate the prediction ability of the detected patterns on a test set of almost $1,52$ million sites where $17,021$ are miCLIP-m6A modified. We consider the linear combination of the four most relevant patterns (1,2,3,6). Figure \ref{fig:WT_IVT}D shows the eCDF of the inferred scores. The difference between the cumulative distribution of non miCLIP sites and miCLIP sites can be nicely observed, while the PPV plot shows a lower performance as compared to Use Case 1 (Figure \ref{fig:WT_IVT}E). The decrease in performance is likely explained by the absence of all modifications and not exclusively m6A in the control condition, which may induce noise to the score estimation by JACUSA2 call-2 \todo{CD:to be confirmed}.
+\item Predict m6A modifications: we evaluate the prediction ability of the detected patterns on a test set of almost $1,52$ million sites where $17,021$ are miCLIP-m6A modified. We consider the linear combination of the four most relevant patterns (1,2,3,6). Figure \ref{fig:WT_IVT}D shows the eCDF of the inferred scores. The difference between the cumulative distribution of non miCLIP sites and miCLIP sites can be nicely observed, while the PPV plot shows a lower performance as compared to Use Case 1 (Figure \ref{fig:WT_IVT}E). The decrease in performance is likely explained by the absence of all modifications in the IVT samples. Additional adenosine modifications such as RNA editing may be counted as false positives.
 
 \begin{spverbatim} 
 	$ srun snakemake --cores all predict_modification 	
@@ -321,7 +321,7 @@ $ srun snakemake --cores all get_pattern
 
 \item During preparation of the \textit{in vitro} transcriptome sample, \textit{in vitro} transcription and clean up kits may be replaced by equivalent products. The protocol however has been tested only with the mentioned kits.
 
-\item Configuration of the pipeline should be handled via the config file. All parameters should be set before executing rules.
+\item Configuration of the pipeline should be handled via the config file: \texttt{config.yaml}. All parameters should be set before executing rules.
 
 \item Once the pipeline has run successfully you should expect the following folders with the corresponding outputs in the output directory: bam, jacusa, features, patterns, and prediction.
 
@@ -329,12 +329,12 @@ $ srun snakemake --cores all get_pattern
 
 \item In the snakemake pipeline, rules are linked so that the workflows are determined from top (e.g. predict\_modification) to bottom (e.g. sort\_bam) and executed accordingly from bottom to top (Figure \ref{fig:snakemake}). Therefore, running for example "predict\_modification" rule leads to executing all rules on its pipeline.
 
-\item Patterns could be generated from a subset of the input data that correspond to known modified sites. Alternatively, predefined patterns as a NMF R object could be used as a prediction model.
+\item This workflow uses a subset of the input data that correspond to known modified sites to derive characteristic read alignment profiles by NMF (patterns). Alternatively, predefined patterns could be used via a preloaded NMF R object to compute scores for modification site prediction.
 \end{enumerate}
 
 \section*{ACKNOWLEDGMENTS}
-  The authors would like to thank Harald Wilhemit for testing the snakemake pipeline.
-  This work was supported by Informatics for Life funded by the Klaus Tschira Foundation.\todo{CD: funding?}
+  The authors would like to thank Harald Wilhemi for testing the snakemake pipeline.
+  This work was supported by DFG SPP 1784 (DI1501/11-1) and DFG TRR 319 - RMaP.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                  The Bibliography                       %%
 %%                                                         %%
@@ -359,7 +359,7 @@ $ srun snakemake --cores all get_pattern
 
 \begin{figure}[h!]
     \includegraphics[width = 1\textwidth]{Figure1.pdf}
-  \caption{\textbf{General outline of RNA modification detection by JACUSA2.} A key feature of our approach is that multiple replicates can be compared as shown on the left. Samples of interests where all modifications are present could be compared with either KO samples where the modification of interest is missing or IVT/simulated samples where all modifications are absent. Read stacks (in blue) are compared head-to-head as shown on the right. }
+  \caption{\textbf{General outline of RNA modification detection by JACUSA2.} A key feature of our approach is that multiple replicates of the same condition can be considered simulatenously. Samples of interests where all modifications are present could be compared with either KO samples where the modification of interest is missing or IVT/simulated samples where all modifications are absent (left panel). Read stacks (in blue) are compared head-to-head as shown on the right. }
   \label{fig:graphicsummary}
       \end{figure}
 \newpage
@@ -373,7 +373,7 @@ $ srun snakemake --cores all get_pattern
 
 \begin{figure}[h!]
     \includegraphics[width = 1\textwidth]{Figure3.pdf}
-  \caption{\textbf{Experimental and computational workflow}. A) Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as live basecalling during sequencing or after the sequencing run from generated FAST5 files, resulting in FASTQ output files. B) FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as inpug for JACUSA2 analysis, which yields candidate m6A sites.}
+  \caption{\textbf{Experimental and computational workflow}. A) Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as live basecalling during sequencing or after the sequencing run from generated FAST5 files, resulting in FASTQ output files. B) FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as input for JACUSA2 analysis, which yields candidate m6A sites as described in Figure 4.}
   \label{fig:workflow}
       \end{figure}
 \newpage
@@ -394,21 +394,21 @@ $ srun snakemake --cores all get_pattern
 
 \begin{figure}[h!]
 	\includegraphics[width = 1\textwidth]{img/res_wt_ko.pdf}
-	\caption{\textbf{Case 1. WT  versus KO.}  \textbf{A}: NMF rank selection. \textcolor{red}{Barplots representing the difference of cophenetic correlation and silhouette indices between the NMF factorization of the original and the randomized data. Ranks with the largest value for both indices are determined, then the smallest rank is selected for the NMF decomposition}. \textbf{B}: NMF result represented by the basis matrix $W$ and the coefficient matrix $H$. The matrix $H$ induces the RNA modification pattern. \textbf{C}: Barplots representing the linear combination of the top 5 patterns (y-axis) by the number of position in the specific 5-mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 5 patterns (coefficient vectors: 1,2,3,4,6) are selected according to the predominant columns in matrix W.  \textbf{D}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{E}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
+	\caption{\textbf{Case 1. WT  versus KO.}  \textbf{A}: NMF rank selection. Barplots represent differences in cophenetic correlation and silhouette scores for NMF factorization of the original input and randomized data. Ranks with the largest differences are determined for both measures, then the smallest rank is selected for the NMF decomposition. \textbf{B}: NMF result represented by the basis matrix $W$ ("amplitude" matrix) and the coefficient matrix $H$ ("pattern" matrix). The matrix $H$ induces the RNA modification pattern. \textbf{C}: Barplot shows the sum of the top 5 patterns (y-axis) across the specific 5-mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 5 patterns (coefficient vectors: 1,2,3,4,6) are selected according to the predominant columns in matrix W.  \textbf{D}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{E}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
 	\label{fig:WT_KO}
 \end{figure}
 
 \newpage
 \begin{figure}[h!]
 	\includegraphics[width = 1\textwidth]{img/res_wt_ivt.pdf}
-	\caption{\textbf{Case 2. WT  versus IVT.}  \textbf{A}: NMF rank selection. \textcolor{red}{Barplots representing the difference of cophenetic correlation and silhouette indices between the NMF factorization of the original and the randomized data. Ranks with the largest value for both indices are determined, then the smallest rank is selected for the NMF decomposition.} \textbf{B}: NMF result represented by the basis matrix $W$ and the coefficient matrix $H$. The matrix $H$ induces the RNA modification pattern. \textbf{C}: Barplots representing the linear combination of the top 4 patterns (y-axis) by by the number of position in the specific 5-mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 4 patterns (coefficient vectors: 1,2,3,6) are selected according to the predominant columns in matrix W.  \textbf{D}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{E}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
+	\caption{\textbf{Case 2. WT  versus IVT.}  \textbf{A}: NMF rank selection. Barplots represent differences in cophenetic correlation and silhouette scores for NMF factorization of the original input and randomized data. Ranks with the largest value for both indices are determined, then the smallest rank is selected for the NMF decomposition.  \textbf{B}: NMF result represented by the basis matrix $W$ ("amplitude" matrix) and the coefficient matrix $H$ ("pattern" matrix). The matrix $H$ induces the RNA modification pattern. \textbf{C}: Barplots representing the linear combination of the top 4 patterns (y-axis) by by the number of position in the specific 5-mer context (x-axis) and the score type: mismatch, deletion and insertion (resp. black, orange and blue). The 4 patterns (coefficient vectors: 1,2,3,6) are selected according to the predominant columns in matrix W.  \textbf{D}: Score distribution inferred from the combined patterns, stratified by the different categories of miCLIP validated sites and non miCLIP sites.  \textbf{E}: Number of predicted m6A sites (green) and Positive Predictive Value (PPV) of predicted m6A sites that overlap with miCLIP sites (orange). }
 	\label{fig:WT_IVT}
 \end{figure}
 \newpage
 
 \section*{TABLES}
 
-\begin{table}[]
+\begin{table}[h!]
 \label{tab:software}
 \begin{tabular}{|p{1.5cm}|p{7cm}|p{6.5cm}|}
 \hline 
@@ -433,7 +433,7 @@ $ srun snakemake --cores all get_pattern
 %bedtools	2.29.2
 %snakemake	6.8.1
 
-\begin{table}[]
+\begin{table}[h!]
 \label{tab:packages}
 \begin{tabular}{|p{1.5cm}|p{7cm}|p{6.5cm}|}
 \hline 

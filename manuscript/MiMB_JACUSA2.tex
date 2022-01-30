@@ -145,7 +145,7 @@ Our workflow is based on the pairwise comparison of samples with different modif
 One feature of Nanopore sequencing is to read sequences as 5-mers, as always five nucleotides are occupied by the pore protein (Figure \ref{fig:5mer}). Because of this, a m6A modification may affect basecalling not only if the modified nucleotide is in the central position, but also at neighboring positions (-2 to +2). To account for this, JACUSA2 scores for Deletion, Mismatch and Insertion are calculated for the entire 5-mer context. Depending on the modification-specific signature, a Feature set can be selected to calculate the final JACUSA2 score (Figure \ref{fig:5mer}).
 
 Our workflow can be divided into a wet-lab part (Figure \ref{fig:workflow}A) and a computational part (Figure \ref{fig:workflow}B). Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as well as live basecalling during sequencing on the respective FAST5 files, which results in FASTQ output files (Figure \ref{fig:workflow}A). FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as input for JACUSA2 analysis, which yields candidate m6A sites with the presented workflow in this chapter (Figure \ref{fig:workflow}B).
-
+We will present all necessary experimental step for dRNA-seq in the next section.
 
 \subsection*{Nanopore direct RNA sequencing}
 \begin{enumerate}
@@ -182,7 +182,8 @@ Our workflow can be divided into a wet-lab part (Figure \ref{fig:workflow}A) and
 \end{enumerate}
 
 \subsection*{Preparation of an \emph{in vitro} transcriptome sample}
-The \emph{in vitro} transcriptome sample is prepared based on a protocol published by Zhang \emph{et al.}~\cite{zhang2021systematic} with some modifications.
+The \emph{in vitro} transcriptome sample is prepared based on a protocol published by \cite{zhang2021systematic} with some modifications a detailed below.
+An \emph{in vitro} transcriptome lacks any RNA modifications and is a perfect reference sample for RNA modification mining.
 
 \begin{enumerate}
 \item Adjust 100 ng polyA\textsuperscript{+} RNA to a total volume of 6 $\mu$l with nuclease-free water. Add 1 $\mu$l each of 10 $\mu$M oligo(dT)-VN RT primer and 10 mM dNTPs. Mix by pipetting and incubate in a thermocycler: 5 min at 75 $^{\circ}$C, 2 min at 42 $^{\circ}$C, cool to 4 $^{\circ}$C.
@@ -208,7 +209,7 @@ The \emph{in vitro} transcriptome sample is prepared based on a protocol publish
 		\begin{spverbatim}
 	$ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_file.cfg --cpu_threads_per_caller 14 --num_callers 1
 		\end{spverbatim}
-	Set the number of threads "cpu\_threads\_per\_caller" and the number of parallel basecallers "num\_caller" according to your resources. Additional details can be found in \cite{Guppymanual}.
+	Set the number of threads "cpu\_threads\_per\_caller" and the number of parallel basecallers "num\_caller" according to your resources. Additional details can be found at \url{https://nanoporetech.com/}.
 	\item  Align reads to the transcriptome using Minimap2 software. The output is a SAM file that has to be converted to a compressed form as BAM file using SAMtools command. The alignment requires a reference sequence. Here, we used GRCh38 Ensembl annotation and FASTA file release version 96. \textcolor{red}{To reduce the indexing time of the human genome, save the index with the option "-d" before the mapping and use the index instead of the reference file in the minimap2 command line. }
 	\begin{spverbatim}
 $ minimap2 -d reference.mmi reference.fa 
@@ -368,7 +369,7 @@ $ srun snakemake --cores all get_pattern
 
 \begin{figure}[h!]
     \includegraphics[width = 1\textwidth]{Figure3.pdf}
-  \caption{\textbf{Experimental and computational workflow}. A) Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as live basecalling during sequencing or after the sequencing run from generated FAST5 files, resulting in FASTQ output files. B) FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as inpug for JACUSA2 analysis, which yields candidate m4A sites.}
+  \caption{\textbf{Experimental and computational workflow}. A) Starting from total cellular RNA, polyA\textsuperscript{+} RNA is isolated and subjected to Nanopore direct RNA-sequencing. Guppy basecalling can be done as live basecalling during sequencing or after the sequencing run from generated FAST5 files, resulting in FASTQ output files. B) FASTQ files are aligned to a reference sequence with Minimap2. SAMtools is used to generate BAM files as inpug for JACUSA2 analysis, which yields candidate m6A sites.}
   \label{fig:workflow}
       \end{figure}
 \newpage

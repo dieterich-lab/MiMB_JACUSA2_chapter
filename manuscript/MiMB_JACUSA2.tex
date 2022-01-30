@@ -19,7 +19,7 @@
 \usepackage{hyperref}
 \renewcommand{\refname}{REFERENCES}
 \renewcommand\Authfont{\fontsize{10}{11}\selectfont}
-\renewcommand\Affilfont{\fontsize{9}{11}\selectfont}
+\renewcommand\Affilfont{\fontsize{9}{11}\emph{\selectfont}}
 \usepackage{spverbatim}
 \begin{document}
 
@@ -28,8 +28,8 @@
 \title{\Large Mapping of RNA modifications by direct Nanopore sequencing and JACUSA2}
 
 \date{}
-\author[1,2,3]{Christoph Dieterich\thanks{christoph.dieterich@uni-heidelberg.de}}
 \author[1,2]{Amina Lemsara}
+\author[1,2,3]{Christoph Dieterich\thanks{Correspondence to: christoph.dieterich@uni-heidelberg.de}}
 \author[1,2,3]{Isabel Naarmann-de Vries}
 
 
@@ -41,10 +41,10 @@
 \maketitle
 
 \begin{abstract} % abstract
-Cellular RNA is modified by different types of chemical modifications, which are now summarized as the "epitranscriptome". With the advent of high-throughput sequencing technologies much progress has been made in understanding the mechanisms of RNA modification biology and how these modifications can influence gene expression. The most widespread internal modification on mRNA is m6A, which has been implicated in physiological processes as well as disease pathogenesis. Here, we provide a workflow for the mapping of m6A sites in Nanopore direct RNA sequencing data, which employs pairwise comparison by JACUSA2. We describe two exemplary Use Cases in detail: a sample of interest ("wild type") may be either compared to a sample lacking a specific modification type ("knock out", Use Case 1) or to a sample lacking all modifications ("IVT", Use Case 2). We provide a detailed guidance for preprocessing of Nanopore reads and provide a snakemake pipeline to map m6A and validate the results against a consensus miCLIP-derived m6A site set. 
+RNA modifications exist in all kingdom of life. Several different types of base or ribose modifications are now summarized under the term the "epitranscriptome". With the advent of high-throughput sequencing technologies much progress has been made in understanding RNA modification biology and how these modifications can influence many aspects of RNA life. The most widespread internal modification on mRNA is m6A, which has been implicated in physiological processes as well as disease pathogenesis. Here, we provide a workflow for the mapping of m6A sites using Nanopore direct RNA sequencing data. Our strategy employs pairwise comparison of base calling error profiles with JACUSA2. We outline a general strategy for RNA modification detection on mRNA and describe two specific use cases on m6A detection in detail. \textbf{Use case 1:} a sample of interest with modifications (e.g. "wild type" sample) is compared to a sample lacking a specific modification type (e.g. "knock out" sample, here \emph{METTL3}-KO) or \textbf{Use case 2:} a sample of interest with modifications is compared to a sample lacking all modifications (e.g. \emph{in vitro} transcribed cDNA). We provide a detailed protocol on experimental and computational aspects. Extensive online material provides a snakemake pipeline to identify m6A positions in mRNA and to validate the results against  a miCLIP-derived m6A reference set. The general strategy is flexible and can be easily adapted by users in different application scenarios. 
 \end{abstract}
-
-\keywords{RNA modification, Nanopore sequencing, m6A}
+\clearpage
+%\keywords{Base calling, Nanopore, m6A}
 
 \section*{INTRODUCTION}
 Chemical modifications on DNA and histones, also known as epigenetics marks, strongly impact gene expression during cell differentiation and in several other biological programs. In the 1970s, it was recognized that RNA is also subjected to extensive covalent modification, and studies in the late 1980s revealed the widespread deamination of bases (termed RNA editing), which can lead to recoding if it occurs within coding sequences. Impressive development in the RNA modification field occurred during the past eight years, with the discovery of an extensive layer of base modifications in mRNAs. These can influence gene expression and have been already shown to be involved in primary cellular programs such as stem cell differentiation, response to stress, and the circadian clock. The study of RNA modifications and their effects is now referred to as epitranscriptomics, and it reveals striking similarities to what is known for epigenomics.
@@ -52,11 +52,12 @@ To date thirteen distinct modifications have been identified on mRNA transcripts
 
 In contrast to the m7G cap, the impact of internal modifications on gene regulation has been less studied apart from RNA editing, which is mediated by RNA deaminases (e.g. the ADAR family). The most widespread internal mRNA modification is N6-methyladenosine (m6A). By modulating the processing of mRNA, m6A can regulate a wide range of physiological processes and its alteration has been linked to several diseases \cite{Roignant2017,Zaccara2019,Shi2019}. The modification is catalyzed co-transcriptionally by a Mega-Dalton methyltransferase complex, which includes the heterodimer METTL3-METTL14 and other associated subunits \cite{GarciasMorales2021}. This modification is reversible since two proteins of the AlkB-family of demethylases can remove m6A from mRNA transcripts \citep{Jia2011,Zheng2013}. In mammals, m6A preferentially localizes within long internal exons and at the beginning of terminal exons at so-called DRACH motif (D = A/G/U, R = A/G, H = A/C/U) sites \citep{Dominissini2012,Meyer2012,Ke2015}. Once deposited, m6A is recognized by several reader proteins that can affect the fate of mRNA transcripts in nearly every step of the mRNA life cycle, including alternative splicing \citep{Adhikari2016,Roundtree2017}, mRNA translation \citep{wang2015n6} and decay \citep{wang2014n,du2016ythdf2,Roundtree2017}. The best-described readers are the YTH domain family of proteins that decode the signal and mediate m6A functions. By affecting RNA structure, m6A can also indirectly influence the association of additional RNA-binding proteins (RBPs) and the assembly of larger messenger ribonucleoprotein particles (mRNPs) \citep{patil2018reading}.
 
-Several approaches have been presented to map RNA modifications on RNA. Herein, we focus on mRNA modification site detection in general and on m6A in particular where antibody-based protocols (miCLIP), methylation-sensitive restriction enzyme assays (MazF) or transgenic approaches (TRIBE, DART) have been presented to map m6A sites. All of the aforementioned approaches rely on high-throughput short read sequencing on the Illumina platform. This typically involves cDNA synthesis by reverse transcription and PCR-based library amplification. One recent addition to the toolbox of RNA modification mapping is direct RNA single molecule long read sequencing on the Oxford Nanopore Technologies platform. While our software workflow is able to deal with Illumina and Nanopore-based approaches, the latter is the principal topic of this methods article.
+Several approaches have been presented to map RNA modifications on RNA. Herein, we focus on mRNA modification site detection in general and on m6A in particular where antibody-based protocols (miCLIP), methylation-sensitive restriction enzyme assays (MazF) or transgenic approaches (TRIBE, DART) have been presented to map m6A sites. All of the aforementioned approaches rely on high-throughput short read sequencing on the Illumina platform. This typically involves cDNA synthesis by reverse transcription and PCR-based library amplification. One recent addition to the toolbox of RNA modification mapping is direct RNA single molecule long read sequencing on the Oxford Nanopore Technologies platform (dRNA-seq). While our software is able to deal with Illumina and Nanopore-based approaches, the latter is the principal topic of this methods article.
 
 \section*{MATERIALS}
 
 \subsection*{ONT direct RNA sequencing}
+This section summarizes all necessary consumables for direct RNA sequencing of poly-adenylated RNA (i.e. mRNA) on the MinION or similar device.
 \begin{enumerate}
 \item 500 ng polyA\textsuperscript{+} RNA isolated from total RNA e.g. with Oligotex mRNA kit (Qiagen) or Dynabeads oligo dT\textsubscript{25} beads (Thermo Fisher Scientific) or \emph{in vitro} transcriptome sample. Store RNA at -80 $^{\circ}$C and the mRNA purification kit as recommended by the manufacturer.
 

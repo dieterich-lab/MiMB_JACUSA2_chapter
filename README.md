@@ -4,11 +4,10 @@ JACUSA2 - A framework for the mapping of RNA modifications
 We provide a Snakemake pipeline for RNA modification detection from nanopore Direct RNA-seq using multiple conditions and replicates.
 
 # General description
-- JACUSA2 can detect RNA modification rapidly.
+- The pipeline is based on JACUSA2 variant calling, where the output of JACUSA2 is analyzed to detect RNA modification patterns and predict modified sites.
 - JACUSA2 detects modification based on mapping characteristics, it requires BAM files as input.
 - JACUSA2 can be run in single-mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
-- JACUSA2 output can be used to predict RNA modifications.
-- Data can be found in  [Zenodo](https://doi.org/10.5281/zenodo.5924995)
+- All data used in our manuscript can be found at  [Zenodo](https://doi.org/10.5281/zenodo.5924995).
 
 # Installation
 We recommend installing software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).

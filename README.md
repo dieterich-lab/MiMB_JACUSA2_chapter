@@ -102,17 +102,17 @@ Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more
 
 - Run JACUSA2_call2 rule to call variants using paired conditions.
 ```  
-srun snakemake --cores all jacusa2_call2
+$ snakemake --cores all jacusa2_call2
 ```
 The output is a file called `Cond1vsCond2Call2.out` under `./output/{label}/jacusa` and filtered BAM files under `./output/{label}/bam`.
 - Run get_features rule to preprocess JACUSA2 call2 output and extract features.
 ```
-$ srun snakemake --cores all get_features
+$ snakemake --cores all get_features
 ```
 The output is an R object `features.rds` under `./output/{label}/features/`.
 - Run get_pattern rule to learn patterns representing m6A modification.
 ```
-$ srun snakemake --cores all get_pattern
+$ snakemake --cores all get_pattern
 ```
 The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. `train_features.rds`, `test_features.rds`) are created under `features' folder and, subsequently, used for the learning model.
 
@@ -120,7 +120,7 @@ For the testing example, `train_features.rds` is supposed to contain 1905 sites.
 
 - Run visualize_pattern rule to predict modified sites
 ```
-$ srun snakemake --cores all visualize_pattern
+$ snakemake --cores all visualize_pattern
 ```  
 The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under `./output/{label}/pattern/viz/`.
 
@@ -138,7 +138,7 @@ The combination of patterns representing more than 80% will look like this:
 
 - Run predict_modification rule to predict modified sites
 ```
-$ srun snakemake --cores all predict_modification
+$ snakemake --cores all predict_modification
 ```  
 The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under `./output/{label}/prediction/`. andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
 

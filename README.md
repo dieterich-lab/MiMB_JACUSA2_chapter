@@ -66,32 +66,31 @@ We provide a snakemake pipeline for JACUSA2 variant calling using call2 method a
 
 - Be aware to set all parameters before running the pipeline. 
 
-      * General
-            * label: 'HEK293_WT_KO' label of the analysis
-            * jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
-            * path_out: './output' # path to the output directory, if it doesn't exist it will be created 
-            * path_inp: './data' # path to the directory containing inputs - all input files are relative to this directory
-            * reference : 'GRCh38_96.fa' # path to reference squence 
-            * modified_sites: 'miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
-            * chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
-            * regions: "regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
-            * data: a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
-              * cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
-              * cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
-      * jacusa_params: a dictionary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
-            * P1: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the first condition sample.
-            * P2: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the second condition sample.
-            * m: 1  # filter reads by mapping quality
-            * q: 1  # filter reads by base calling quality
-            * c: 4  # filter reads by coverage
-            * a: 'Y'  # Mandatory parameters to filter sites within the holy-polymer regions.
-            * p: 16    # parameter to customize the number of threads
-            * D: ''  # Mandatory parameter to output deletion score.
-            * I: ''  # Mandatory parameter to output insertion score.
-      * pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
-            * internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "". 
-            * external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
-            * combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+      label: 'HEK293_WT_KO' label of the analysis
+      jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
+      path_out: './output' # path to the output directory, if it doesn't exist it will be created 
+      path_inp: './data' # path to the directory containing inputs - all input files are relative to this directory
+      reference : 'GRCh38_96.fa' # path to reference squence 
+      modified_sites: 'miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
+      chr_size: "hg38.genome"  #file contaning size of chromosomes (Chromosome     | size )
+      regions: "regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
+      data: # a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
+           cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
+           cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
+      jacusa_params: a dictionary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
+           P1: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the first condition sample.
+           P2: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the second condition sample.
+           m: 1  # filter reads by mapping quality
+           q: 1  # filter reads by base calling quality
+           c: 4  # filter reads by coverage
+           a: 'Y'  # Mandatory parameters to filter sites within the holy-polymer regions.
+           p: 16    # parameter to customize the number of threads
+           D: ''  # Mandatory parameter to output deletion score.
+           I: ''  # Mandatory parameter to output insertion score.
+      pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
+           internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "". 
+           external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
+           combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
                       pt1: [1,2,4,6]  
                       pt2: [1,2,3,4,6]
 

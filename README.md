@@ -101,17 +101,17 @@ Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more
 ```  
 srun snakemake --cores all jacusa2_call2
 ```
-The output is a file called `Cond1vsCond2Call2.out` under `./output/label[HEK293_WT_KO]/jacusa` and filtered BAM files under `./output/label[HEK293_WT_KO]/bam`.
+The output is a file called `Cond1vsCond2Call2.out` under `./output/{label}/jacusa` and filtered BAM files under `./output/{label}/bam`.
 - Run get_features rule to preprocess JACUSA2 call2 output and extract features.
 ```
 $ srun snakemake --cores all get_features
 ```
-The output is an R object `features.rds` under `./output/label[HEK293_WT_KO]/features/`.
+The output is an R object `features.rds` under `./output/{label}/features/`.
 - Run get_pattern rule to learn patterns representing m6A modification.
 ```
 $ srun snakemake --cores all get_pattern
 ```
-The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/label[HEK293_WT_KO]/pattern/`. Implicitly, training and test set files (resp. train_features.rds, test_features.rds) are created and, subsequently, used for the learning model.
+The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. train_features.rds, test_features.rds) are created and, subsequently, used for the learning model.
 
 For the testing example, the prediction.csv is supposed to contain 1905 sites.
 
@@ -119,7 +119,7 @@ For the testing example, the prediction.csv is supposed to contain 1905 sites.
 ```
 $ srun snakemake --cores all visualize_pattern
 ```  
-The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under `./output/label[HEK293_WT_KO]/pattern/viz/`.
+The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under `./output/{label}/pattern/viz/`.
 
 For the testing example, the scoring pattern will look like the following barplots.
 
@@ -137,7 +137,7 @@ The combination of patterns representing more than 80% will look like this:
 ```
 $ srun snakemake --cores all predict_modification
 ```  
-The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under `./output/label[HEK293_WT_KO]/prediction/`. andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
+The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under `./output/{label}/prediction/`. andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
 
 For the testing example, the eCDF will look like the following figure: 
 

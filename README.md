@@ -1,7 +1,7 @@
 # MiMB_JACUSA2_chapter
 JACUSA2 - A framework for the mapping of RNA modifications
 
-We provide a Snakemake pipeline for RNA modification detection from direct nanopore sequencing based on multiple conditions and replicates.
+We provide a Snakemake pipeline for RNA modification detection from nanopore Direct RNA-seq using multiple conditions and replicates.
 
 # General description
 - JACUSA2 can detect RNA modification rapidly.

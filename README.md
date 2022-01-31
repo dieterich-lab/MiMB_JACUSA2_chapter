@@ -40,7 +40,7 @@ Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.c
 # Usage
 The following protocol describes how to predict m6A modification from nanopore direct RNA-seq data. The benchmark is obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) and is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [following the use case 1 of the manuscript, We limited the analysis to the set of sites reported in 'data/selected_regions.bed' file]
 
-We present here after the main steps to produce the BAM files. However, for the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-rep2.bam","HEK293T-WT-rep3.bam") and knockout cells ("HEK293T-KO-rep2.bam","HEK293T-KO-rep3.bam")  from [Zenodo](https://doi.org/10.5281/zenodo.5924995) as our inputs. 
+We present hereafter the main steps to produce BAM files which would be the input of our pipeline.
 
 ## Preprocessing of Direct RNAseq
 1. Base call the ionic current signal stored in FAST5 file using Guppy basecaller.
@@ -67,7 +67,9 @@ The inputs are the FASTQ files `Reads.fastq.gz` and the reference sequence `refe
 We recommend outputting primary alignments `–secondary=no`. `–MD` parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
 
 ## Detect RNA modification
-We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and requires setting different parameters.
+For the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-rep2.bam","HEK293T-WT-rep3.bam") and knockout cells ("HEK293T-KO-rep2.bam","HEK293T-KO-rep3.bam") from [Zenodo](https://doi.org/10.5281/zenodo.5924995) as our inputs. 
+
+The pipeline is composed of many targets (rules) and requires setting different parameters.
 
 - Be aware to set all parameters before running the pipeline. Here is an example. Please put all required data in `data` folder.
 

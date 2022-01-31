@@ -112,8 +112,8 @@ rule get_pattern:
     input: out_analysis +"features/train_features.rds" 
     output: 
         data=out_analysis +"patterns/NMF.rds",
-        rank1= out_analysis +"patterns/asses_NMF1.pdf" ,       
-        rank2= out_analysis +"patterns/asses_NMF2.pdf"
+        rank1= out_analysis +"patterns/asses_NMF_1.pdf" ,       
+        rank2= out_analysis +"patterns/asses_NMF_2.pdf"
     params: 
         mod = ground_truth,
         ext_pat =comb['external_pattern']

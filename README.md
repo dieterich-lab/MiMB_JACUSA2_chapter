@@ -44,14 +44,14 @@ guppy_basecaller --compress_fastq -i path_to_fast5 -s path_to_output -c config_f
 ```
 
 The inputs are the path to FAST5 files, the output folder, and the config file or the flowcell/kit combination. The output is FASTQ files that can
-be compressed using the option ”–compress fastq”. Set the number of threads ”cpu threads per caller” and the number of parallel basecallers ”num caller” according to your resources. Additional details can be found [here](https://github.com/metagenomics/denbi-nanopore-training/blob/master/docs/basecalling/basecalling.rst).
+be compressed using the option `–compress fastq`. Set the number of threads `cpu threads per caller` and the number of parallel basecallers `num caller` according to your resources. Additional details can be found [here](https://github.com/metagenomics/denbi-nanopore-training/blob/master/docs/basecalling/basecalling.rst).
 
-2. Align reads to the transcriptome using the following Minimap2 command. To reduce the indexing time of the human genome, save the index with the option ”-d” before the mapping and use the index instead of the reference file in the minimap2 command line
+2. Align reads to the transcriptome using the following Minimap2 command. To reduce the indexing time of the human genome, save the index with the option `-d` before the mapping and use the index instead of the reference file in the minimap2 command line
 ```
 minimap2 -d reference.mmi reference.fa
 minimap2 -t 5 --MD -ax splice --junc-bonus 1 -k14 --secondary=no --junc-bed final_annotation_96.bed -ub reference.mmi Reads.fastq.gz |samtools view -bS > mapping.bam
 ```
-The inputs are the FASTQ files `Reads.fastq.gz` and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file `mapping.bam` using samtools command.  The setting is used for spliced alignments of the direct RNA sequencing :
+The inputs are the FASTQ files `Reads.fastq.gz` and the reference sequence `reference.fasta`. The output is a SAM file that is converted to BAM file `mapping.bam` using samtools command.  The setting is used for spliced alignments of the direct RNA sequencing :
   * `-ax splice --junc-bed annotation.bed --junc-bonus INT` where annotation.bed is the file containing the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
  ```
  paftools.js gff2bed annotation.gtf > annotation.bed

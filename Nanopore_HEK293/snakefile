@@ -70,7 +70,7 @@ rule jacusa2_call2:
         for i in input.bam2:
          input_str_bam2 = input_str_bam2+i+','
         input_str_bam2 = input_str_bam2[:-1]
-        if os.path.isfile(jarfile):
+        if os.path.isfile(jarfile) & jarfile != ""  :
             shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
         else:
             shell( "wget --no-check-certificate --content-disposition https://github.com/dieterich-lab/JACUSA2/releases/download/v2.0.1/JACUSA_v2.0.1.jar")

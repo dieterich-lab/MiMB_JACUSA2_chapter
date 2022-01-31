@@ -64,7 +64,7 @@ We recommend outputting primary alignments `–secondary=no`. `–MD` parameter 
 ## Detect RNA modification
 We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and requires setting different parameters.
 
-- Be aware to set all parameters before running the pipeline. 
+- Be aware to set all parameters before running the pipeline. Here is an example. Please put all required data in `data` folder.
 
       label: 'HEK293_WT_KO' label of the analysis
       jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 

@@ -163,14 +163,14 @@ Once the pipeline has run successfully you should expect the following files in 
     *   `NMF.rds` - NMF factorization (R object)
     *   `asses_NMF_1.pdf` - NMF rank survey
     *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
-    *   `viz/`:
-            *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
-            *  `pattern_scores.pdf` - barplot of the membership indicator of patterns based on basis matrix
-            *  `Pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix
+    *   **`viz/`:**
+        *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
+        *  `pattern_scores.pdf` - barplot of the membership indicator of patterns based on basis matrix
+        *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix
 *   **`prediction/`:**
-    *   `NMF.rds` - NMF factorization (R object)
-    *   `asses_NMF_1.pdf` - NMF rank survey
-    *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
+    *   `pattern_{pattern number}_prediction.bed` - prediction scores from selected patterns
+    *   `pattern_{pattern number}_ppv.pdf` - PPV plot
+    *   `pattern_{pattern number}_ecdf.pdf` - eCDF plot
     
 # Dependencies and versions
 Software | Version 

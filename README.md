@@ -133,13 +133,17 @@ For the testing example, the scoring pattern will look like the following barplo
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/pattern_scores.png?raw=true" width="300">
 </p>
-
+<p align="center"> 
+  <em>Figure 1: Membership score of resulted patterns</em>
+</p>
 The combination of patterns representing more than 80% will look like this:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/barplot_NMF.png?raw=true" width="300">
 </p>
-
+<p align="center"> 
+  <em>Figure 2: Combination of patterns representing 80% of training set</em>
+</p>
 - Run predict_modification rule to predict modified sites
 ```
 $ snakemake --cores all predict_modification
@@ -151,13 +155,18 @@ For the testing example, the eCDF will look like the following figure:
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/Pattern_ecdf.png?raw=true" width="500">
 </p>
-
+<p align="center"> 
+  <em>Figure 3: eCDF of estimated scores of sites from diffrent miCLIP categories and non miCLIP sites</em>
+</p>
 Note that rules are linked so that the workflow is determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
 executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules in its pipeline.
 
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/snakemake.png?raw=true" width="500">
+</p> 
+<p align="center"> 
+  <em>Figure 4: Snakemake JACUSA2-based pipeline</em>
 </p>
 
 # Output files

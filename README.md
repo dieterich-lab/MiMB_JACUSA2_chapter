@@ -101,7 +101,7 @@ Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more
 ```  
 srun snakemake --cores all jacusa2_call2
 ```
-The output is a file called `Cond1vsCond2Call2.out` under `./output/label[HEK293_WT_KO]/jacusa` and filtered bam file under `./output/label[HEK293_WT_KO]/bam`.
+The output is a file called `Cond1vsCond2Call2.out` under `./output/label[HEK293_WT_KO]/jacusa` and filtered BAM files under `./output/label[HEK293_WT_KO]/bam`.
 - Run get_features rule to preprocess JACUSA2 call2 output and extract features.
 ```
 $ srun snakemake --cores all get_features

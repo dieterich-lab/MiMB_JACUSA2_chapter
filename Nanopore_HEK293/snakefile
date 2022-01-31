@@ -1,5 +1,5 @@
 configfile: "config.yaml"
-
+import os.path
 ##########################################################Global variables
 out_analysis = "{path_out}/{label}/".format(**config)
 out_jacusa = "{path_out}/{label}/jacusa/".format(**config)
@@ -70,13 +70,16 @@ rule jacusa2_call2:
         for i in input.bam2:
          input_str_bam2 = input_str_bam2+i+','
         input_str_bam2 = input_str_bam2[:-1]
+        if os.path.isfile(jarfile):
+            shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
+        else:
+            shell( "wget --no-check-certificate --content-disposition https://github.com/dieterich-lab/JACUSA2/releases/download/v2.0.1/JACUSA_v2.0.1.jar")
+            shell( "java {javaparams} -jar JACUSA_v2.0.1.jar call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
         
-        shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
 
 # preprocess jacusa2 output
 rule get_features: 
     input:  out_jacusa+"Cond1vsCond2Call2.out"
-    #input: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/WT_vs_KO_RC22_call2_result.out"
     output: 
         out = out_analysis +"features/features.rds",
         

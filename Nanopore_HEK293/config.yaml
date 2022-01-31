@@ -2,19 +2,19 @@
 label: "HEK293_WT_KO"   # label of the analysis
              
 # INPUT & OUTPUT PATH
-path_out: "./output"     # path to the output directory, if it doesn't exist it will be created 
-path_inp: "./data"    # path to the directory containg inputs - all input files are relative to this directory
-reference : "./data/GRCh38_96.fa" # path to reference squence 
-modified_sites: "./data/miCLIP_union.bed"   # known modified sites
-chr_size: "./data/hg38.size" # file contaning size of chromosomes
-regions: "./data/selected_regions.bed"  # BED6 file contaning set of 5-mer (NNANN) to analyze on, if ="", all 5-mers (NNANN) will be considered    
+path_out: "output"     # path to the output directory, if it doesn't exist it will be created 
+path_inp: "data"    # path to the directory containg inputs - all input files are relative to this directory
+reference : "data/GRCh38_96.fa" # path to reference squence 
+modified_sites: "data/miCLIP_union.bed"   # known modified sites
+chr_size: "data/hg38.size" # file contaning size of chromosomes
+regions: "data/selected_regions.bed"  # BED6 file contaning set of 5-mer (NNANN) to analyze on, if ="", all 5-mers (NNANN) will be considered    
 # INPUTS PARAMS
 data:
     cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
     cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
 
 # JACUSA PARAMS
-jar : "JACUSA_v2.0.2-RC.jar"    # path to JACUISA2 JAR file 
+jar : "JACUSA_v2.0.1.jar"    # path to JACUISA2 JAR file 
 jacusa_params:                       #add any parameter as a name of the key and set its appropriate value as [key: value].
                                      # please use "" if no value is affected to the parameter.
              p: 16 

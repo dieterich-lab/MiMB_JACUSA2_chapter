@@ -1,7 +1,7 @@
 # MiMB_JACUSA2_chapter
 JACUSA2 - A framework for the mapping of RNA modifications
 
-We provide a Snakemake pipeline for RNA modification detection from direct nanopore sequencing based on multiple conditions and replicates.
+We provide a Snakemake pipeline for RNA modification detection from nanopore Direct RNA-seq using multiple conditions and replicates.
 
 # General description
 - JACUSA2 can detect RNA modification rapidly.
@@ -71,12 +71,12 @@ We provide a snakemake pipeline for JACUSA2 variant calling using call2 method a
 
       label: 'HEK293_WT_KO' label of the analysis
       jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
-      path_out: './output' # path to the output directory, if it doesn't exist it will be created 
-      path_inp: './data' # path to the directory containing inputs - all input files are relative to this directory
-      reference : './data/GRCh38_96.fa' # path to reference squence 
-      modified_sites: './data/miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
-      chr_size: "./data/hg38.size"  #file contaning size of chromosomes (Chromosome     | size )
-      regions: "./data/selected_regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
+      path_out: 'output' # path to the output directory, if it doesn't exist it will be created 
+      path_inp: 'data' # path to the directory containing inputs - all input files are relative to this directory
+      reference : 'data/GRCh38_96.fa' # path to reference squence 
+      modified_sites: 'data/miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
+      chr_size: "data/hg38.size"  #file contaning size of chromosomes (Chromosome     | size )
+      regions: "data/selected_regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
       data: # a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
            cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
            cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]

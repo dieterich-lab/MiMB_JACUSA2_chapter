@@ -17,6 +17,10 @@ Make sure you install the [Miniconda Python3 distribution](https://docs.conda.io
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
+In the Conda installer you will have to accept the license and select a installation directory.
+When asked also select to run 'conda init'. After the installer completed you can open a shell
+to get the basic Conda setup.
+
 For performance and compatibility reasons you should install `Mamba` via conda to install Snakemake. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
 ```
 conda install -c conda-forge mamba

@@ -38,7 +38,9 @@ conda activate JACUSA2pipeline_env
 Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file. In case the jar file is not set, "JACUSA_v2.0.1.jar" will be automatically downloaded and used.
 
 # Usage
-The following protocol describes how to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [We limited the analysis to the set of sites in the 'data/regions.bed' file]
+The following protocol describes how to predict m6A modification from nanopore direct RNA-seq data. The benchmark is obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) and is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [following the use case 1 of the manuscript, We limited the analysis to the set of sites reported in 'data/selected_regions.bed' file]
+
+We present here after the main steps to produce the BAM files. However, for the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-rep2.bam","HEK293T-WT-rep3.bam") and knockout cells ("HEK293T-KO-rep2.bam","HEK293T-KO-rep3.bam")  from [Zenodo](https://doi.org/10.5281/zenodo.5924995) as our inputs. 
 
 ## Preprocessing of Direct RNAseq
 1. Base call the ionic current signal stored in FAST5 file using Guppy basecaller.

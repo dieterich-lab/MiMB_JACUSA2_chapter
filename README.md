@@ -20,7 +20,6 @@ bash Miniconda3-latest-Linux-x86_64.sh
 In the Conda installer you will have to accept the license and select a installation directory.
 When asked also select to run 'conda init'. After the installer completed you can open a shell
 to get the basic Conda setup.
-
 For performance and compatibility reasons you should install `Mamba` via conda to install Snakemake. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
 ```
 conda install -c conda-forge mamba

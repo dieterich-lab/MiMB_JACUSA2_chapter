@@ -111,9 +111,9 @@ The output is an R object `features.rds` under `./output/{label}/features/`.
 ```
 $ srun snakemake --cores all get_pattern
 ```
-The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. train_features.rds, test_features.rds) are created and, subsequently, used for the learning model.
+The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. `train_features.rds`, `test_features.rds`) are created under `features' folder and, subsequently, used for the learning model.
 
-For the testing example, the prediction.csv is supposed to contain 1905 sites.
+For the testing example, `train_features.rds` is supposed to contain 1905 sites.
 
 - Run visualize_pattern rule to predict modified sites
 ```

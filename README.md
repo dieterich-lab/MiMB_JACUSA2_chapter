@@ -1,14 +1,14 @@
 # MiMB_JACUSA2_chapter
 JACUSA2 - A framework for the mapping of RNA modifications
 
-We provide a pipeline for RNA modification detection of direct nanopore sequencing based on multiple conditions and replicates.
+We provide a Snakemake pipeline for RNA modification detection from direct nanopore sequencing based on multiple conditions and replicates.
 
 # General description
 - JACUSA2 can detect RNA modification rapidly.
 - JACUSA2 detects modification based on mapping characteristics, it requires BAM files as input.
 - JACUSA2 can be run in single-mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
 - JACUSA2 output can be used to predict RNA modifications.
-- Data (BAM files and JACUSA2 output) can be found in  [Zenodo](https://doi.org/10.5281/zenodo.5924995)
+- Data can be found in  [Zenodo](https://doi.org/10.5281/zenodo.5924995)
 
 # Installation
 We recommend installing software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
@@ -35,7 +35,7 @@ conda activate JACUSA2pipeline_env
 Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file.
 
 # Usage
-The following pipeline is used to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [We limited the analysis to the set of sites in the 'data/regions.bed' file]
+The following protocol describes how to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [We limited the analysis to the set of sites in the 'data/regions.bed' file]
 
 ## Preprocessing of Direct RNAseq
 1. Base call the ionic current signal stored in FAST5 file using Guppy basecaller.

@@ -28,7 +28,7 @@ for (pt in snakemake@params[[2]]){
 # barplots of patterns
 for(k in 1:nrow(h))
     {
-    pdf(paste0(snakemake@output[[1]],"/Pattern_",k,"_barplot_NMF.pdf"),width=7,height=7)
+    pdf(paste0(snakemake@output[[1]],"/pattern_",k,"_barplot_NMF.pdf"),width=7,height=7)
     rep1=matrix(h[k,],ncol=5,byrow=T)[1:3,]
     rownames(rep1)=c("Mismatch","Deletion","Insertion")
     colnames(rep1)=c("Pos1","Pos2","Pos3","Pos4","Pos5")

@@ -16,25 +16,26 @@ Make sure you install the [Miniconda Python3 distribution](https://docs.conda.io
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
-In the Conda installer you will have to accept the license and select a installation directory.
+In the Conda installer you will have to accept the license and select an installation directory.
 When asked also select to run 'conda init'. After the installer completed you can open a shell
 to get the basic Conda setup.
+
 For performance and compatibility reasons you should install `Mamba` via conda to install Snakemake. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
 ```
 conda install -c conda-forge mamba
 ```
-Once you have installed Conda and Mamba, you can download the Snakemake pipeline and the example datasets.
+Once you have installed Conda and Mamba, you can download the Snakemake pipeline.
 ```
 git clone https://github.com/dieterich-lab/MiMB_JACUSA2_chapter.git
 cd MiMB_JACUSA2_chapter/Nanopore_HEK293
 ```
 
-Then, you install the required packages after creating an environment with Snakemake installed `environment.yml` file.
+Then, install the required packages after creating an environment with downloaded `environment.yml` file.
 ```
 mamba env create -f environment.yaml
 conda activate JACUSA2pipeline_env
 ```
-Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file.
+Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file. In case, the jar file is not set, "JACUSA_v2.0.1.jar" will be automatically downloaded and used.
 
 # Usage
 The following protocol describes how to predict m6A modification from nanopore RNA direct sequencing data. The benchmark obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [We limited the analysis to the set of sites in the 'data/regions.bed' file]

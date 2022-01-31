@@ -8,7 +8,7 @@ We provide a pipeline for RNA modification detection of direct nanopore sequenci
 - JACUSA2 detects modification based on mapping characteristics, it requires BAM files as input.
 - JACUSA2 can be run in single-mode (call-1) or paired mode (call-2). For sensitivity, we adopt paired mode.
 - JACUSA2 output can be used to predict RNA modifications.
-- Data (BAM files and JACUSA2 output) can be found in  [Zenodo](https://doi.org/10.5281/zenodo.5913452)
+- Data (BAM files and JACUSA2 output) can be found in  [Zenodo](https://doi.org/10.5281/zenodo.5924995)
 
 # Installation
 We recommend installing software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
@@ -152,6 +152,9 @@ executed accordingly from bottom to top. Therefore, running ”predict_modificat
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/amina/img/snakemake.png" width="500">
 </p>
+
+# Output files
+Once the pipeline has run successfully you should expect the following files in the output directory:
 
 # Dependencies and versions
 Software | Version 

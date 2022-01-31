@@ -51,15 +51,15 @@ be compressed using the option ”–compress fastq”. Set the number of thread
 minimap2 -d reference.mmi reference.fa
 minimap2 -t 5 --MD -ax splice --junc-bonus 1 -k14 --secondary=no --junc-bed final_annotation_96.bed -ub reference.mmi Reads.fastq.gz |samtools view -bS > mapping.bam
 ```
-The inputs are the FASTQ files "Reads.fastq.gz" and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file "mapping.bam" using samtools command.  The setting is used for spliced alignments of the direct RNA sequencing :
-  * "-ax splice --junc-bed annotation.bed --junc-bonus INT" where annotation.bed is the file containing the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
+The inputs are the FASTQ files `Reads.fastq.gz` and the reference sequence "reference.fasta". The output is a SAM file that is converted to BAM file `mapping.bam` using samtools command.  The setting is used for spliced alignments of the direct RNA sequencing :
+  * `-ax splice --junc-bed annotation.bed --junc-bonus INT` where annotation.bed is the file containing the splice junctions and INT is the bonus score. The BED file can be generated using the following command: 
  ```
  paftools.js gff2bed annotation.gtf > annotation.bed
   ```
-  * ”-ub” to align reads to both strands of the reference, 
-  * small k-mer size ”-k [=14]” to enhance sensitivity.
+  * `-ub` to align reads to both strands of the reference, 
+  * small k-mer size `-k [=14]` to enhance sensitivity.
 
-We recommend outputting primary alignments ”–secondary=no”. ’–MD’ parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
+We recommend outputting primary alignments `–secondary=no`. `–MD` parameter is used to add the reference sequence information to the alignment; this is recommended for the downstream analysis. Check Minimap2 [manual](https://github.com/lh3/minimap2) for further details.
 
 ## Detect RNA modification
 We provide a snakemake pipeline for JACUSA2 variant calling using call2 method and downstream analysis for the detection of modification patterns and predict modified sites. The pipeline is composed of many rules and requires setting different parameters.
@@ -102,17 +102,17 @@ Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more
 ```  
 srun snakemake --cores all jacusa2_call2
 ```
-The output is a file called "Cond1vsCond2Call2.out" under "./output/label[HEK293_WT_KO]/jacusa" and filtered bam file under "./output/label[HEK293_WT_KO]/bam".
+The output is a file called `Cond1vsCond2Call2.out` under `./output/label[HEK293_WT_KO]/jacusa` and filtered bam file under `./output/label[HEK293_WT_KO]/bam`.
 - Run get_features rule to preprocess JACUSA2 call2 output and extract features.
 ```
 $ srun snakemake --cores all get_features
 ```
-The output is an R object "features.rds" under "./output/label[HEK293_WT_KO]/features/".
+The output is an R object `features.rds` under `./output/label[HEK293_WT_KO]/features/`.
 - Run get_pattern rule to learn patterns representing m6A modification.
 ```
 $ srun snakemake --cores all get_pattern
 ```
-The output is an R object "NMF.rds" containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under "./output/label[HEK293_WT_KO]/pattern/". Implicitly, training and test set files (resp. train_features.rds, test_features.rds"  under are created and, subsequently, used for the learning model.
+The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/label[HEK293_WT_KO]/pattern/`. Implicitly, training and test set files (resp. train_features.rds, test_features.rds) are created and, subsequently, used for the learning model.
 
 For the testing example, the prediction.csv is supposed to contain 1905 sites.
 
@@ -120,7 +120,7 @@ For the testing example, the prediction.csv is supposed to contain 1905 sites.
 ```
 $ srun snakemake --cores all visualize_pattern
 ```  
-The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under "./output/label[HEK293_WT_KO]/pattern/viz/".
+The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under `./output/label[HEK293_WT_KO]/pattern/viz/`.
 
 For the testing example, the scoring pattern will look like the following barplots.
 
@@ -138,7 +138,7 @@ The combination of patterns representing more than 80% will look like this:
 ```
 $ srun snakemake --cores all predict_modification
 ```  
-The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under "./output/label[HEK293_WT_KO]/prediction/". andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
+The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under `./output/label[HEK293_WT_KO]/prediction/`. andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
 
 For the testing example, the eCDF will look like the following figure: 
 

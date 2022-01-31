@@ -155,7 +155,23 @@ executed accordingly from bottom to top. Therefore, running ”predict_modificat
 
 # Output files
 Once the pipeline has run successfully you should expect the following files in the output directory:
-
+*   **`features/`:**
+    *   `features.rds` - tabular features (target sites (here, 'A') x 15 features)
+    *   `train_features.rds` - traning set to extract Rna modification pattern
+    *   `test_features.rds`- test set
+*   **`patterns/`:**
+    *   `NMF.rds` - NMF factorization (R object)
+    *   `asses_NMF_1.pdf` - NMF rank survey
+    *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
+    *   `viz/`:
+            *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
+            *  `pattern_scores.pdf` - barplot of the membership indicator of patterns based on basis matrix
+            *  `Pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix
+*   **`prediction/`:**
+    *   `NMF.rds` - NMF factorization (R object)
+    *   `asses_NMF_1.pdf` - NMF rank survey
+    *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
+    
 # Dependencies and versions
 Software | Version 
 --- | ---

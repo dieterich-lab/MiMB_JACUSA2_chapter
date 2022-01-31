@@ -30,7 +30,7 @@ git clone https://github.com/dieterich-lab/MiMB_JACUSA2_chapter.git
 cd MiMB_JACUSA2_chapter/Nanopore_HEK293
 ```
 
-Then, install the required packages after creating an environment with downloaded `environment.yml` file.
+Then, install the required packages after creating an environment with the downloaded `environment.yml` file.
 ```
 mamba env create -f environment.yaml
 conda activate JACUSA2pipeline_env
@@ -69,9 +69,9 @@ We recommend outputting primary alignments `–secondary=no`. `–MD` parameter 
 ## Detect RNA modification
 For the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-rep2.bam","HEK293T-WT-rep3.bam") and knockout cells ("HEK293T-KO-rep2.bam","HEK293T-KO-rep3.bam") from [Zenodo](https://doi.org/10.5281/zenodo.5924995) as our inputs. 
 
-The pipeline is composed of many targets (rules) and requires setting different parameters.
+The pipeline is composed of many targets (rules) (fig. 4) and requires setting different parameters.
 
-- Be aware to set all parameters before running the pipeline. Here is an example. Please put all required data in `data` folder.
+- Be aware to set all parameters before running the pipeline. Please put all required data in `data` folder.
 
       label: 'HEK293_WT_KO' label of the analysis
       jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
@@ -102,33 +102,35 @@ The pipeline is composed of many targets (rules) and requires setting different 
                       pt2: [1,2,3,4,6]
 
 
-Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use parameters.
+Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use JACUSA2 parameters.
 
-- Run JACUSA2_call2 rule to call variants using paired conditions.
+- Run `JACUSA2_call2` rule to call variants using paired conditions.
 ```  
 $ snakemake --cores all jacusa2_call2
 ```
 The output is a file called `Cond1vsCond2Call2.out` under `./output/{label}/jacusa` and filtered BAM files under `./output/{label}/bam`.
-- Run get_features rule to preprocess JACUSA2 call2 output and extract features.
+
+- Run `get_features` rule to preprocess JACUSA2 call2 output and extract features.
 ```
 $ snakemake --cores all get_features
 ```
 The output is an R object `features.rds` under `./output/{label}/features/`.
-- Run get_pattern rule to learn patterns representing m6A modification.
+
+- Run `get_pattern` rule to learn patterns representing m6A modification.
 ```
 $ snakemake --cores all get_pattern
 ```
-The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. `train_features.rds`, `test_features.rds`) are created under `features' folder and, subsequently, used for the learning model.
+The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. `train_features.rds`, `test_features.rds`) are created under `features` folder and, subsequently, used for the learning model.
 
 For the testing example, `train_features.rds` is supposed to contain 1905 sites.
 
-- Run visualize_pattern rule to predict modified sites
+- Run `visualize_pattern` rule to predict modified sites
 ```
 $ snakemake --cores all visualize_pattern
 ```  
-The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplots and heatmap of NMF resulting matrices, The output can be found under `./output/{label}/pattern/viz/`.
+The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplot and heatmap of NMF resulting matrices. The outputs can be found under `./output/{label}/pattern/viz/`.
 
-For the testing example, the scoring pattern will look like the following barplots.
+For the testing example, the scoring of patterns will look like the following barplot.
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/pattern_scores.png?raw=true" width="300">
@@ -136,7 +138,7 @@ For the testing example, the scoring pattern will look like the following barplo
 <p align="center"> 
   <em>Figure 1: Membership score of resulted patterns</em>
 </p>
-The combination of patterns representing more than 80% will look like this:
+The combination of patterns representing more than 80% will look as follow:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/barplot_NMF.png?raw=true" width="300">
@@ -145,11 +147,11 @@ The combination of patterns representing more than 80% will look like this:
   <em>Figure 2: Combination of patterns representing 80% of training set</em>
 </p>
 
-- Run predict_modification rule to predict modified sites
+- Run `predict_modification` rule to predict modified sites
 ```
 $ snakemake --cores all predict_modification
 ```  
-The output is a BED6 file(s) contaning score of the selected pattern(s) for the test set under `./output/{label}/prediction/`. andthe corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
+The output is a BED6 file(s) contaning scores of the selected pattern(s) for the test set under `./output/{label}/prediction/` and the corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
 
 For the testing example, the eCDF will look like the following figure: 
 

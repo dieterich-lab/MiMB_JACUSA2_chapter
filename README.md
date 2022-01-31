@@ -155,6 +155,12 @@ executed accordingly from bottom to top. Therefore, running ”predict_modificat
 
 # Output files
 Once the pipeline has run successfully you should expect the following files in the output directory:
+*   **`bam/`:**  # This will be skipped if you start from a JACUSA2 output
+    *   `{mapping BAM file name}.sorted.bam` - sorted BAM file
+    *   `{mapping BAM file name}.filtered.bam` - filtered BAM file
+    *   `{mapping BAM file name}.filtered.bam.bai` - index of the filtered BAM file
+*   **`jacusa/`:**
+    *   `Cond1vsCond2Call2.out` - JACUSA2 call-2 output
 *   **`features/`:**
     *   `features.rds` - tabular features (target sites (here, 'A') x 15 features)
     *   `train_features.rds` - traning set to extract Rna modification pattern
@@ -168,9 +174,9 @@ Once the pipeline has run successfully you should expect the following files in 
         *  `pattern_scores.pdf` - barplot of the membership indicator of patterns based on basis matrix
         *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix
 *   **`prediction/`:**
-    *   `pattern_{pattern number}_prediction.bed` - prediction scores from selected patterns
-    *   `pattern_{pattern number}_ppv.pdf` - PPV plot
-    *   `pattern_{pattern number}_ecdf.pdf` - eCDF plot
+    *   `pattern{pattern number}_prediction.bed` - prediction scores from selected patterns
+    *   `pattern{pattern number}_ppv.pdf` - PPV plot
+    *   `pattern{pattern number}_ecdf.pdf` - eCDF plot
     
 # Dependencies and versions
 Software | Version 

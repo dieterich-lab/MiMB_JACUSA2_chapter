@@ -144,6 +144,7 @@ The combination of patterns representing more than 80% will look like this:
 <p align="center"> 
   <em>Figure 2: Combination of patterns representing 80% of training set</em>
 </p>
+
 - Run predict_modification rule to predict modified sites
 ```
 $ snakemake --cores all predict_modification

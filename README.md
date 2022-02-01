@@ -173,7 +173,7 @@ executed accordingly from bottom to top. Therefore, running ”predict_modificat
 
 # Output files
 Once the pipeline has run successfully you should expect the following files in the output directory:
-*   **`bam/`:**  # This will be skipped if you start from a JACUSA2 output
+*   **`bam/`:**  # This will be skipped if you start from JACUSA2 output
     *   `{mapping BAM file name}.sorted.bam` - sorted BAM file
     *   `{mapping BAM file name}.filtered.bam` - filtered BAM file
     *   `{mapping BAM file name}.filtered.bam.bai` - index of the filtered BAM file
@@ -181,14 +181,14 @@ Once the pipeline has run successfully you should expect the following files in 
     *   `Cond1vsCond2Call2.out` - JACUSA2 call-2 output
 *   **`features/`:**
     *   `features.rds` - tabular features (target sites (here, 'A') x 15 features)
-    *   `train_features.rds` - traning set to extract Rna modification pattern
+    *   `train_features.rds` - training set to extract RNA modification patterns
     *   `test_features.rds`- test set
 *   **`patterns/`:**
     *   `NMF.rds` - NMF factorization (R object)
     *   `asses_NMF_1.pdf` - NMF rank survey
     *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
     *  `pattern_scores.pdf` - barplot of the membership score of patterns based on basis matrix
-    *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix   
+    *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns (by position and score type) from coefficient matrix   
     *   **`viz/`:**
         *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
 *   **`prediction/`:**

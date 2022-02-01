@@ -138,7 +138,7 @@ For the testing example, the scoring of patterns will look like the following ba
 <p align="center"> 
   <em>Figure 1: Membership score of resulted patterns</em>
 </p>
-The combination of patterns representing more than 80% will look as follow:
+The combination of patterns representing more than 80% will look like the following:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/barplot_NMF.png?raw=true" width="300">

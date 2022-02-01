@@ -73,31 +73,31 @@ The pipeline is composed of many targets (rules) (fig. 4) and requires setting d
 
 - Be aware to set all parameters before running the pipeline. Please put all required data in `data` folder.
 
-      label: 'HEK293_WT_KO' label of the analysis
+      label: 'HEK293_WT_KO' #label of the analysis
       jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUISA2 JAR file 
       path_out: 'output' # path to the output directory, if it doesn't exist it will be created 
       path_inp: 'data' # path to the directory containing inputs - all input files are relative to this directory
       reference : 'data/GRCh38_96.fa' # path to reference squence 
-      modified_sites: 'data/miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. useful for learning patterns (training and test set).
+      modified_sites: 'data/miCLIP_union.bed' #BED6 file containing known modified sites where 'name' refers to the annotation of the position. Useful for learning patterns (training and test set).
       chr_size: "data/hg38.size"  #file contaning size of chromosomes (Chromosome     | size )
       regions: "data/selected_regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
       data: # a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
            cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
            cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
-      jacusa_params: a dictionary where keys refer to parameters (e.g. p: 16 to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
-           P1: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the first condition sample.
-           P2: 'FR-SECONDSTRAND'  # Mandatory parameters referring to the library of the second condition sample.
+      jacusa_params: # dictionary where keys refer to parameters (e.g. [p: 16] to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
+           P1: 'FR-SECONDSTRAND'  # mandatory parameter referring to the library of the first condition sample.
+           P2: 'FR-SECONDSTRAND'  # mandatory parameter referring to the library of the second condition sample.
            m: 1  # filter reads by mapping quality
            q: 1  # filter reads by base calling quality
            c: 4  # filter reads by coverage
-           a: 'Y'  # Mandatory parameters to filter sites within the holy-polymer regions.
+           a: 'Y'  # recommended parameters to filter sites within the holy-polymer regions.
            p: 16    # parameter to customize the number of threads
-           D: ''  # Mandatory parameter to output deletion score.
-           I: ''  # Mandatory parameter to output insertion score.
+           D: ''  # mandatory parameter to output deletion score.
+           I: ''  # mandatory parameter to output insertion score.
       pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
            internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "". 
            external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
-           combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+           combined_patterns: # patterns to combine, add as many combinations as you want as a [key(any name): value (pattern numbers)] combination.
                       pt1: [1,2,4,6]  
                       pt2: [1,2,3,4,6]
 
@@ -120,17 +120,9 @@ The output is an R object `features.rds` under `./output/{label}/features/`.
 ```
 $ snakemake --cores all get_pattern
 ```
-The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. `train_features.rds`, `test_features.rds`) are created under `features` folder and, subsequently, used for the learning model.
+The output is an R object `NMF.rds` containing the factorization result, including basis and coefficient matrices, plus, plots showing the rank selection result, pattern scoring barplot and heatmap of NMF resulting matrices. The output is under `./output/{label}/pattern/`. Implicitly, training and test set files (resp. `train_features.rds`, `test_features.rds`) are created under `features` folder and, subsequently, used for the learning model.
 
-For the testing example, `train_features.rds` is supposed to contain 1905 sites.
-
-- Run `visualize_pattern` rule to predict modified sites
-```
-$ snakemake --cores all visualize_pattern
-```  
-The output is a set of figures representing barplots for the produced patterns, in addition to the pattern scoring barplot and heatmap of NMF resulting matrices. The outputs can be found under `./output/{label}/pattern/viz/`.
-
-For the testing example, the scoring of patterns will look like the following barplot.
+For the testing example, `train_features.rds` is supposed to contain 1905 sites. The scoring of patterns will look like the following barplot.
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/pattern_scores.png?raw=true" width="300">
@@ -138,7 +130,14 @@ For the testing example, the scoring of patterns will look like the following ba
 <p align="center"> 
   <em>Figure 1: Membership score of resulted patterns</em>
 </p>
-The combination of patterns representing more than 80% will look like the following:
+
+- Run `visualize_pattern` rule to visualize patterns and their combinations.
+```
+$ snakemake --cores all visualize_pattern
+```  
+The output is a set of figures representing barplots for the produced patterns. The outputs can be found under `./output/{label}/pattern/viz/`.
+
+For the testing example, the combination of patterns representing more than 80% will look like the following:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/barplot_NMF.png?raw=true" width="300">
@@ -151,7 +150,7 @@ The combination of patterns representing more than 80% will look like the follow
 ```
 $ snakemake --cores all predict_modification
 ```  
-The output is a BED6 file(s) contaning scores of the selected pattern(s) for the test set under `./output/{label}/prediction/` and the corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
+The output is a BED6 file(s) containing scores of the selected pattern(s) for the test set under `./output/{label}/prediction/` and the corresponding eCDF (empirical cumulative distribution) and PPV (positive predictive values) plots.
 
 For the testing example, the eCDF will look like the following figure: 
 
@@ -188,10 +187,10 @@ Once the pipeline has run successfully you should expect the following files in 
     *   `NMF.rds` - NMF factorization (R object)
     *   `asses_NMF_1.pdf` - NMF rank survey
     *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
+    *  `pattern_scores.pdf` - barplot of the membership indicator of patterns based on basis matrix
+    *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix   
     *   **`viz/`:**
         *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
-        *  `pattern_scores.pdf` - barplot of the membership indicator of patterns based on basis matrix
-        *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns from coefficient matrix
 *   **`prediction/`:**
     *   `pattern{pattern number}_prediction.bed` - prediction scores from selected patterns
     *   `pattern{pattern number}_ppv.pdf` - PPV plot

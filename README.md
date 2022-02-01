@@ -188,9 +188,11 @@ Once the pipeline has run successfully you should expect the following files in 
     *   `asses_NMF_1.pdf` - NMF rank survey
     *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
     *  `pattern_scores.pdf` - barplot of the membership score of patterns based on basis matrix
-    *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns (by position and score type) from coefficient matrix   
+    *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns (by position and score type) from coefficient matrix 
+    *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
+ 
     *   **`viz/`:**
-        *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
+        *  `pattern_{pattern number}_barplot_NMF.pdf` - barplot of patterns (by position and score type) from coefficient matrix   
 *   **`prediction/`:**
     *   `pattern{pattern number}_prediction.bed` - prediction scores from selected patterns
     *   `pattern{pattern number}_ppv.pdf` - PPV plot

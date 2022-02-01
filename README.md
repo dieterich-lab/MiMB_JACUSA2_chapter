@@ -173,7 +173,7 @@ executed accordingly from bottom to top. Therefore, running ”predict_modificat
 
 # Output files
 Once the pipeline has run successfully you should expect the following files in the output directory:
-*   **`bam/`:**  # This will be skipped if you start from JACUSA2 output
+*   **`bam/`:**  This will be skipped if you start from JACUSA2 output
     *   `{mapping BAM file name}.sorted.bam` - sorted BAM file
     *   `{mapping BAM file name}.filtered.bam` - filtered BAM file
     *   `{mapping BAM file name}.filtered.bam.bai` - index of the filtered BAM file

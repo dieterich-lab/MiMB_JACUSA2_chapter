@@ -2,11 +2,11 @@
 label: "HEK293_WT_KO"   # label of the analysis
              
 # INPUT & OUTPUT PATH
-path_out: "../../output"     # path to the output directory, if it doesn't exist it will be created 
-path_inp: "../../data"    # path to the directory containg inputs - all input files are relative to this directory
-reference : "/biodb/genomes/homo_sapiens/GRCh38_96/GRCh38_96.fa" # reference squence 
+path_out: "output"     # path to the output directory, if it doesn't exist it will be created 
+path_inp: "data"    # path to the directory containg inputs - all input files are relative to this directory
+reference : "data/GRCh38_96.fa" # reference squence 
 modified_sites: "data/miCLIP_union.bed"   # known modified sites
-chr_size: "/prj/MiMB_book_chapter_Amina_Isabel/Nanopore/HEK293/JACUSA2/hg38.genome" # size of chromosomes
+chr_size: "data/hg38.size" # size of chromosomes
 regions: "data/selected_regions.bed"  # set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered    
 # INPUTS PARAMS
 data:
@@ -26,7 +26,6 @@ jacusa_params:               # add any parameter as the key and set its appropri
              q: 1 
              c: 4
              a: 'D,Y'
-             b: "data/contigous_regions.bed"
 java_params:
              Xmx20g: ''
              XX:ParallelGCThreads=10: ''
@@ -34,7 +33,7 @@ java_params:
 # COMBINATION OF PATTERNS           
 pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
         internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modified sites to be used for the training 
-        external_pattern: "../../output/HEK293_WT_KO2/patterns/NMF.rds"  # path to an external pattern in case you don't use internal_pattern, else put ""
+        external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
         combined_patterns: # patterns to combine, add as many combinations as you want as a [key(any name): value (pattern numbers)] combination.
                     pt1: [1,2,4,6]  
                     pt2: [1,2,3,4,6]

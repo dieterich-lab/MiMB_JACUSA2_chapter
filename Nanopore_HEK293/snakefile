@@ -1,5 +1,6 @@
 configfile: "config.yaml"
 import os.path
+
 ##########################################################Global variables
 out_analysis = "{path_out}/{label}/".format(**config)
 out_jacusa = "{path_out}/{label}/jacusa/".format(**config)
@@ -25,10 +26,6 @@ for key in java_params:
 parameters= config["jacusa_params"]
 allparams = ''
 for key in parameters:
-    if key == 'b':
-        merged = touch(parameters[key]+".contigous_regions.bed")
-        allparams = allparams + "-"+key+ " " +merged+ " "
-    else: 
         allparams = allparams + "-"+key+ " " +str(parameters[key])+ " "
         
 ####################################################Rules
@@ -70,7 +67,7 @@ rule jacusa2_call2:
         for i in input.bam2:
          input_str_bam2 = input_str_bam2+i+','
         input_str_bam2 = input_str_bam2[:-1]
-        if os.path.isfile(jarfile) & jarfile != ""  :
+        if os.path.isfile(jarfile) & (jarfile != "")  :
             shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
         else:
             shell( "wget --no-check-certificate --content-disposition https://github.com/dieterich-lab/JACUSA2/releases/download/v2.0.1/JACUSA_v2.0.1.jar")
@@ -95,6 +92,7 @@ rule get_features:
         bash scripts/preprocessing.sh {input} {params.chr_size} {params.ref} {params.inter} {params.sites}
         Rscript scripts/get_features.R {params.inter} {output.out}
         """
+        
 # split data into test set and traning set  for internal pattern use case      
 rule split_train_test:
     input: out_analysis +"features/features.rds"
@@ -110,25 +108,32 @@ rule split_train_test:
         else:
             shell("Rscript scripts/split.R {input} {ground_truth} {output.train} {output.test} {params.int_pt}")
         
-# Extract pattern or use an exernal pattern        
+        
+# extract pattern or use an exernal pattern        
 rule get_pattern: 
     input: out_analysis +"features/train_features.rds" 
     output: 
         data=out_analysis +"patterns/NMF.rds",
         rank1= out_analysis +"patterns/asses_NMF_1.pdf" ,       
-        rank2= out_analysis +"patterns/asses_NMF_2.pdf"
+        rank2= out_analysis +"patterns/asses_NMF_2.pdf",
+        fct_res= out_analysis +"patterns/NMF_matrices.pdf",
+        ptrn_sco= out_analysis +"patterns/pattern_scores.pdf"
+        
     params: 
         mod = ground_truth,
         ext_pat =comb['external_pattern']
     run:
-        if comb['external_pattern']!= "":
+        if params.ext_pat != "":
+            shell(" mkdir -p $(dirname {output.data})")
             shell(" cp {params.ext_pat} {output.data}")
             shell(" touch {output.rank1} {output.rank2}")
-
+            shell("Rscript scripts/viz_NMF.R {params.ext_pat} {output.fct_res} {output.ptrn_sco}")
         else:
             shell("Rscript scripts/get_pattern.R {input} {output.data} {output.rank1} {output.rank2}")
+            shell("Rscript scripts/viz_NMF.R {output.data} {output.fct_res} {output.ptrn_sco}")
             
-# Visualize patterns        
+            
+# visualize patterns  
 rule visualize_pattern: 
     input: 
         nmf = out_analysis +"patterns/NMF.rds" 
@@ -137,9 +142,9 @@ rule visualize_pattern:
     params: 
         mod = ground_truth,
         pattern = comb['combined_patterns']
-    script: "scripts/pattern_viz.R"
+    script: "scripts/viz_pattern.R"
 
-# Perform prediction on test set
+# perform prediction on test set
 rule predict_modification: 
     input: 
         bigtable = out_analysis +"features/features.rds" ,

@@ -5,7 +5,7 @@
 #SBATCH --mem=150G
 #SBATCH -c 10
 #SBATCH --job-name="JACUSA_test"
-#SBATCH --output=Snakejob4.txt
+#SBATCH --output=Snakejob1.txt
 #SBATCH --mail-user=amina.lemsara@uni-heidelberg.de
 #SBATCH --partition=general
 
@@ -17,6 +17,6 @@ module load bedtools
 module load R
 srun snakemake --cores --unlock
 
-srun snakemake --cores all predict_modification --rerun-incomplete
-# srun snakemake --cores all visualize_pattern --rerun-incomplete
+# srun snakemake --cores all predict_modification --rerun-incomplete
+srun snakemake --cores all visualize_pattern --rerun-incomplete
 # snakemake --dag predict_modification | dot -Tsvg > dag.svg

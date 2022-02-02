@@ -35,10 +35,10 @@ Then, install the required packages after creating an environment with the downl
 mamba env create -f environment.yaml
 conda activate JACUSA2pipeline_env
 ```
-Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file. In case the jar file is not set, "JACUSA_v2.0.1.jar" will be automatically downloaded and used.
+Before executing the Snakemake workflow, we recommend downloading JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file. In case the jar file is not set, "JACUSA_v2.0.1.jar" will be automatically downloaded and used.
 
 # Usage
-The following protocol describes how to predict m6A modification from nanopore direct RNA-seq data. The benchmark is obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) and is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [following the use case 1 of the manuscript, We limited the analysis to the set of sites reported in 'data/selected_regions.bed' file]
+The following protocol describes how to predict m6A modification from nanopore direct RNA-seq data. The benchmark is obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) and is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [Following the use case 1 of the manuscript, we limited the analysis to the set of sites reported in 'data/selected_regions.bed' file]
 
 We present hereafter the main steps to produce BAM files which would be the input of our pipeline.
 
@@ -69,7 +69,7 @@ We recommend outputting primary alignments `–secondary=no`. `–MD` parameter 
 ## Detect RNA modification
 For the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-rep2.bam","HEK293T-WT-rep3.bam") and knockout cells ("HEK293T-KO-rep2.bam","HEK293T-KO-rep3.bam") from [Zenodo](https://doi.org/10.5281/zenodo.5924995) as our inputs. 
 
-The pipeline is composed of many targets (rules) (fig. 4) and requires setting different parameters.
+The pipeline is composed of many target rules (fig. 4) and requires setting different parameters.
 
 - Be aware to set all parameters before running the pipeline. Please put all required data in `data` folder.
 
@@ -104,19 +104,19 @@ The pipeline is composed of many targets (rules) (fig. 4) and requires setting d
 
 Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use JACUSA2 parameters.
 
-- Run `JACUSA2_call2` rule to call variants using paired conditions.
+- Run `JACUSA2_call2` target to call variants using paired conditions.
 ```  
 $ snakemake --cores all jacusa2_call2
 ```
 The output is a file called `Cond1vsCond2Call2.out` under `./output/{label}/jacusa` and filtered BAM files under `./output/{label}/bam`.
 
-- Run `get_features` rule to preprocess JACUSA2 call2 output and extract features.
+- Run `get_features` target to preprocess JACUSA2 call2 output and extract features.
 ```
 $ snakemake --cores all get_features
 ```
 The output is an R object `features.rds` under `./output/{label}/features/`.
 
-- Run `get_pattern` rule to learn patterns representing m6A modification.
+- Run `get_pattern` target to learn patterns representing m6A modification.
 ```
 $ snakemake --cores all get_pattern
 ```
@@ -131,22 +131,22 @@ For the testing example, `train_features.rds` is supposed to contain 1905 sites.
   <em>Figure 1: Membership score of resulted patterns</em>
 </p>
 
-- Run `visualize_pattern` rule to visualize patterns and their combinations.
+- Run `visualize_pattern` target to visualize patterns and their combinations.
 ```
 $ snakemake --cores all visualize_pattern
 ```  
 The output is a set of figures representing barplots for the produced patterns. The outputs can be found under `./output/{label}/pattern/viz/`.
 
-For the testing example, the combination of patterns representing more than 80% will look like the following:
+For the testing example, the combination of patterns representing more than 80% of the training set will look like the following barplot:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/barplot_NMF.png?raw=true" width="300">
 </p>
 <p align="center"> 
-  <em>Figure 2: Combination of patterns representing 80% of training set</em>
+  <em>Figure 2: Combination of patterns representing 80% of the training set</em>
 </p>
 
-- Run `predict_modification` rule to predict modified sites
+- Run `predict_modification` target to predict modified sites
 ```
 $ snakemake --cores all predict_modification
 ```  
@@ -160,8 +160,9 @@ For the testing example, the eCDF will look like the following figure:
 <p align="center"> 
   <em>Figure 3: eCDF of estimated scores of sites from diffrent miCLIP categories and non miCLIP sites</em>
 </p>
+
 Note that rules are linked so that the workflow is determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
-executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules in its pipeline.
+executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules on its pipeline. Check [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/) for further details.
 
 
 <p align="center">
@@ -186,7 +187,7 @@ Once the pipeline has run successfully you should expect the following files in 
 *   **`patterns/`:**
     *   `NMF.rds` - NMF factorization (R object)
     *   `asses_NMF_1.pdf` - NMF rank survey
-    *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
+    *   `asses_NMF_2.pdf` - silhouette + cophenetic correlation result
     *  `pattern_scores.pdf` - barplot of the membership score of patterns based on basis matrix
     *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
  
@@ -198,6 +199,9 @@ Once the pipeline has run successfully you should expect the following files in 
     *   `pattern{pattern number}_ecdf.pdf` - eCDF plot
     
 # Dependencies and versions
+
+All dependencies and packages are added to the `environment.yaml` file.
+
 Software | Version 
 --- | ---
 Minimap2 | 2.22

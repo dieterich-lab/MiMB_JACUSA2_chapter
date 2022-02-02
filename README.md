@@ -35,10 +35,10 @@ Then, install the required packages after creating an environment with the downl
 mamba env create -f environment.yaml
 conda activate JACUSA2pipeline_env
 ```
-Before executing the Snakemake workflow, download JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file. In case the jar file is not set, "JACUSA_v2.0.1.jar" will be automatically downloaded and used.
+Before executing the Snakemake workflow, we recommend downloading JACUSA2 [jar](https://github.com/dieterich-lab/JACUSA2) file and make sure that you set the path `jar` in the config file. In case the jar file is not set, "JACUSA_v2.0.1.jar" will be automatically downloaded and used.
 
 # Usage
-The following protocol describes how to predict m6A modification from nanopore direct RNA-seq data. The benchmark is obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) and is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [following the use case 1 of the manuscript, We limited the analysis to the set of sites reported in 'data/selected_regions.bed' file]
+The following protocol describes how to predict m6A modification from nanopore direct RNA-seq data. The benchmark is obtained from [PRJEB40872](https://www.ebi.ac.uk/ena/browser/view/PRJEB40872?show=reads) and is composed of two samples from two conditions: wild-type cells (modified RNAs) and Mettl3 knockout cells (unmodified RNAs) with two replicates (2 and 3). The analysis is validated against reported m6A sites in the three miCLIP-based studies Bouliaset al. [2019], Koh et al. [2019], Körtel et al. [2021]. [Following the use case 1 of the manuscript, we limited the analysis to the set of sites reported in 'data/selected_regions.bed' file]
 
 We present hereafter the main steps to produce BAM files which would be the input of our pipeline.
 

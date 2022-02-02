@@ -69,7 +69,7 @@ We recommend outputting primary alignments `–secondary=no`. `–MD` parameter 
 ## Detect RNA modification
 For the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-rep2.bam","HEK293T-WT-rep3.bam") and knockout cells ("HEK293T-KO-rep2.bam","HEK293T-KO-rep3.bam") from [Zenodo](https://doi.org/10.5281/zenodo.5924995) as our inputs. 
 
-The pipeline is composed of many targets (rules) (fig. 4) and requires setting different parameters.
+The pipeline is composed of many target rules (fig. 4) and requires setting different parameters.
 
 - Be aware to set all parameters before running the pipeline. Please put all required data in `data` folder.
 
@@ -104,19 +104,19 @@ The pipeline is composed of many targets (rules) (fig. 4) and requires setting d
 
 Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use JACUSA2 parameters.
 
-- Run `JACUSA2_call2` rule to call variants using paired conditions.
+- Run `JACUSA2_call2` target to call variants using paired conditions.
 ```  
 $ snakemake --cores all jacusa2_call2
 ```
 The output is a file called `Cond1vsCond2Call2.out` under `./output/{label}/jacusa` and filtered BAM files under `./output/{label}/bam`.
 
-- Run `get_features` rule to preprocess JACUSA2 call2 output and extract features.
+- Run `get_features` target to preprocess JACUSA2 call2 output and extract features.
 ```
 $ snakemake --cores all get_features
 ```
 The output is an R object `features.rds` under `./output/{label}/features/`.
 
-- Run `get_pattern` rule to learn patterns representing m6A modification.
+- Run `get_pattern` target to learn patterns representing m6A modification.
 ```
 $ snakemake --cores all get_pattern
 ```
@@ -131,7 +131,7 @@ For the testing example, `train_features.rds` is supposed to contain 1905 sites.
   <em>Figure 1: Membership score of resulted patterns</em>
 </p>
 
-- Run `visualize_pattern` rule to visualize patterns and their combinations.
+- Run `visualize_pattern` target to visualize patterns and their combinations.
 ```
 $ snakemake --cores all visualize_pattern
 ```  
@@ -146,7 +146,7 @@ For the testing example, the combination of patterns representing more than 80% 
   <em>Figure 2: Combination of patterns representing 80% of training set</em>
 </p>
 
-- Run `predict_modification` rule to predict modified sites
+- Run `predict_modification` target to predict modified sites
 ```
 $ snakemake --cores all predict_modification
 ```  
@@ -161,7 +161,7 @@ For the testing example, the eCDF will look like the following figure:
   <em>Figure 3: eCDF of estimated scores of sites from diffrent miCLIP categories and non miCLIP sites</em>
 </p>
 Note that rules are linked so that the workflow is determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
-executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules in its pipeline.
+executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules in its pipeline. Check [Snakemake](https://snakemake.readthedocs.io/en/stable/) for further details.
 
 
 <p align="center">

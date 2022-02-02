@@ -140,7 +140,6 @@ rule visualize_pattern:
     output: 
         data=directory(out_analysis +"patterns/viz")
     params: 
-        mod = ground_truth,
         pattern = comb['combined_patterns']
     script: "scripts/viz_pattern.R"
 

@@ -137,13 +137,13 @@ $ snakemake --cores all visualize_pattern
 ```  
 The output is a set of figures representing barplots for the produced patterns. The outputs can be found under `./output/{label}/pattern/viz/`.
 
-For the testing example, the combination of patterns representing more than 80% will look like the following:
+For the testing example, the combination of patterns representing more than 80% of the training set will look like the following barplot:
 
 <p align="center">
   <img src="https://github.com/dieterich-lab/MiMB_JACUSA2_chapter/blob/main/img/barplot_NMF.png?raw=true" width="300">
 </p>
 <p align="center"> 
-  <em>Figure 2: Combination of patterns representing 80% of training set</em>
+  <em>Figure 2: Combination of patterns representing 80% of the training set</em>
 </p>
 
 - Run `predict_modification` target to predict modified sites
@@ -187,7 +187,7 @@ Once the pipeline has run successfully you should expect the following files in 
 *   **`patterns/`:**
     *   `NMF.rds` - NMF factorization (R object)
     *   `asses_NMF_1.pdf` - NMF rank survey
-    *   `asses_NMF_2.pdf` - Silhouette + cophenetic correlation result
+    *   `asses_NMF_2.pdf` - silhouette + cophenetic correlation result
     *  `pattern_scores.pdf` - barplot of the membership score of patterns based on basis matrix
     *  `NMF_matrices.pdf` - heatmaps for basis and coefficient matrices of the NMF result
  

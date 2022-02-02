@@ -199,6 +199,9 @@ Once the pipeline has run successfully you should expect the following files in 
     *   `pattern{pattern number}_ecdf.pdf` - eCDF plot
     
 # Dependencies and versions
+
+All dependencies and packages are added to the `environment.yaml` file.
+
 Software | Version 
 --- | ---
 Minimap2 | 2.22

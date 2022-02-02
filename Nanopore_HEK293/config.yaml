@@ -1,5 +1,5 @@
 # INFOS PARAMS
-label: "HEK293_WT_IVT"   # label of the analysis
+label: "HEK293_WT_KO"   # label of the analysis
              
 # INPUT & OUTPUT PATH
 path_out: "output"     # path to the output directory, if it doesn't exist it will be created 

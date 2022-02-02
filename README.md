@@ -160,8 +160,9 @@ For the testing example, the eCDF will look like the following figure:
 <p align="center"> 
   <em>Figure 3: eCDF of estimated scores of sites from diffrent miCLIP categories and non miCLIP sites</em>
 </p>
+
 Note that rules are linked so that the workflow is determined from top (e.g. predict modification) to bottom (e.g. sort bam) and
-executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules in its pipeline. Check [Snakemake](https://snakemake.readthedocs.io/en/stable/) for further details.
+executed accordingly from bottom to top. Therefore, running ”predict_modification” rule leads to executing all rules on its pipeline. Check [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/) for further details.
 
 
 <p align="center">

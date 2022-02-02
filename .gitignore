@@ -4,3 +4,4 @@ data
 output
 job.sh
 .ipynb_checkpoints
+*job*.txt

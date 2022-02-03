@@ -117,7 +117,9 @@ The pipeline is composed of many target rules (fig. 4) and requires setting diff
         D: null
         # mandatory parameter to output insertion score.
         I: null
-        # specify patterns and their combinations to be used, please set to "null" if no value is affected to the field.
+      # dictionary where you can add java specific parameters e.g. Xmx20g
+      java_params: null 
+      # specify patterns and their combinations to be used, please set to "null" if no value is affected to the field.
       pattern_params:
         # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "null".
         internal_pattern: "Boulias,Koertel,Koh"

@@ -9,7 +9,7 @@ echo "Preprocessing JACUSA2 output ..."
 
 mkdir -p $path
 
-if [[ $sites = "" ]]
+if [[ $sites = "None" ]]
 then
     sort -k5,5gr  $jacusa_out |awk '($13=="A" && $12!~/Y/)' > $path/jacusa_out.txt
     cut -f 1-6 $path/jacusa_out.txt | awk '{print $1"\t"$2"\t"$3"\tCand\t0\t"$6;}' |sort -u > $path/allSites.bed

@@ -1,7 +1,8 @@
 .snakemake
 *.jar
-data
+*data
 output
-job.sh
+*job.sh
 .ipynb_checkpoints
 *job*.txt
+*config.yaml

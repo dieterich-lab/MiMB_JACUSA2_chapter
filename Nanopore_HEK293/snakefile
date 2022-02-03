@@ -20,13 +20,19 @@ jarfile= config["jar"]
 java_params= config["java_params"]
 javaparams = ""
 for key in java_params:
-      javaparams = javaparams + "-"+key+ " " +str(java_params[key])+ " "
+      strg = ""
+      if  java_params[key] != None:
+          strg = str(java_params[key])
+      javaparams = javaparams + "-"+key+ " " +strg+ " "
 
 #Combine all jacusa params in one string    
 parameters= config["jacusa_params"]
 allparams = ''
 for key in parameters:
-        allparams = allparams + "-"+key+ " " +str(parameters[key])+ " "
+      strg = ""
+      if  parameters[key] != None:
+          strg = str(parameters[key])
+      allparams = allparams + "-"+key+ " " +strg+ " "
         
 ####################################################Rules
 
@@ -67,7 +73,7 @@ rule jacusa2_call2:
         for i in input.bam2:
          input_str_bam2 = input_str_bam2+i+','
         input_str_bam2 = input_str_bam2[:-1]
-        if os.path.isfile(jarfile) & (jarfile != "")  :
+        if os.path.isfile(jarfile) & (jarfile != None)  :
             shell( "java {javaparams} -jar {jarfile} call-2 {allparams} -r {output} {input_str_bam1} {input_str_bam2}")
         else:
             shell( "wget --no-check-certificate --content-disposition https://github.com/dieterich-lab/JACUSA2/releases/download/v2.0.1/JACUSA_v2.0.1.jar")
@@ -79,18 +85,18 @@ rule get_features:
     input:  out_jacusa+"Cond1vsCond2Call2.out"
     output: 
         out = out_analysis +"features/features.rds",
+        inter = temp(directory(out_analysis +"tmp")), 
         
     params: 
         mod = ground_truth,
         ref = config['reference'],
         chr_size = config['chr_size'],
-        inter = out_analysis +"tmp", 
         sites = config['regions']
         
     shell: 
         """
-        bash scripts/preprocessing.sh {input} {params.chr_size} {params.ref} {params.inter} {params.sites}
-        Rscript scripts/get_features.R {params.inter} {output.out}
+        bash scripts/preprocessing.sh {input} {params.chr_size} {params.ref} {output.inter} {params.sites}
+        Rscript scripts/get_features.R {output.inter} {output.out}
         """
         
 # split data into test set and traning set  for internal pattern use case      
@@ -102,7 +108,7 @@ rule split_train_test:
     params: 
         int_pt = comb['internal_pattern']
     run:
-        if comb['external_pattern'] != "":
+        if comb['external_pattern'] != None:
             shell(" cp {input} {output.test}")
             shell("touch {output.train}")
         else:
@@ -123,7 +129,7 @@ rule get_pattern:
         mod = ground_truth,
         ext_pat =comb['external_pattern']
     run:
-        if params.ext_pat != "":
+        if params.ext_pat != None:
             shell(" mkdir -p $(dirname {output.data})")
             shell(" cp {params.ext_pat} {output.data}")
             shell(" touch {output.rank1} {output.rank2}")

@@ -1,8 +1,8 @@
 .snakemake
 *.jar
-*data
+Nanopore_HEK293/data
 output
-*job.sh
+Nanopore_HEK293/job.sh
 .ipynb_checkpoints
-*job*.txt
-*config.yaml
+Nanopore_HEK293/*job*.txt
+Nanopore_HEK293/config.yaml

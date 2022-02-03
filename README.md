@@ -71,36 +71,62 @@ For the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-r
 
 The pipeline is composed of many target rules (fig. 4) and requires setting different parameters.
 
-- Be aware to set all parameters before running the pipeline. Please put all required data in a folder with the name `data` in the working directory.
+- Be aware to set all parameters before running the pipeline. Please put all required data in a folder with the name `data` in the working directory. Here is the bconfig file of the testing example.
 
-      label: 'HEK293_WT_KO' #label of the analysis
-      jar : 'JACUSA_v2.0.2-RC.jar'  #path to JACUSA2 JAR file 
-      path_out: 'output' # path to the output directory, if it doesn't exist it will be created 
-      path_inp: 'data' # path to the directory containing inputs - all input files are relative to this directory
-      reference : 'data/GRCh38_96.fa' # path to reference squence 
-      modified_sites: 'data/miCLIP_union.bed' # BED6 file containing known modified sites where 'name' refers to the annotation of the position. Useful for learning patterns (training and test set splitting).
-      chr_size: "data/hg38.size"  # file contaning size of chromosomes (Chromosome     | size )
-      regions: "data/selected_regions.bed" # BED6 file contaning set of 5-mer (NNANN) to analyze, if ="", all 5-mers (NNANN) will be considered.
-      data: # a dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
-           cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]
-           cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]
-      jacusa_params: # dictionary where keys refer to parameters (e.g. [p: 16] to set the number of threads to 16). Please use "" if no value is affected to the parameter. We use the following parameters:
-           P1: 'FR-SECONDSTRAND'  # mandatory parameter referring to the library of the first condition sample.
-           P2: 'FR-SECONDSTRAND'  # mandatory parameter referring to the library of the second condition sample.
-           m: 1  # filter reads by mapping quality
-           q: 1  # filter reads by basecalling quality
-           c: 4  # filter reads by coverage
-           a: 'Y'  # recommended parameter to filter sites within the holy-polymer regions.
-           p: 16    # parameter to customize the number of threads
-           D: ''  # mandatory parameter to output deletion score.
-           I: ''  # mandatory parameter to output insertion score.
-      pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
-           internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "". 
-           external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
-           combined_patterns: # patterns to combine, add as many combinations as you want as a [key(any name): value (pattern numbers)] combination.
-                      pt1: [1,2,4,6]  
-                      pt2: [1,2,3,4,6]
-
+      #label of the analysis
+      label: "HEK293_WT_KO"
+      #path to JACUSA2 JAR file
+      jar: "JACUSA_v2.0.1-RC.jar"
+      # path to the output directory, if it doesn't exist it will be created
+      path_out: "output"
+      # path to the directory containing inputs - all input files are relative to this directory
+      path_inp: "data"
+      # path to the reference squence
+      reference: "data/GRCh38_96.fa"
+      # path to the BED6 file containing known modified sites where 'name' refers to the annotation of the position. Useful for learning patterns (training and test set splitting).
+      modified_sites: "data/miCLIP_union.bed"
+      # path to the file containing size of chromosomes (Chromosome     | size )
+      chr_size: "data/hg38.size"
+      # BED6 file containing set of 5-mer (NNANN) to analyze, if = null, all 5-mers (NNANN) will be considered.
+      regions: "data/selected_regions.bed"
+      # dictionary of two keys (cond1, cond2) referring to the paired conditions inputs. The value is the list of replicates names without ".bam" extension.
+      data:
+        cond1: 
+          - HEK293T-WT-rep2
+          - HEK293T-WT-rep3        
+        cond2: 
+          - HEK293T-KO-rep2
+          - HEK293T-KO-rep3                
+      # dictionary where keys refer to parameters (e.g. [p: 16] to set the number of threads to 16). Please put "null" if no value is assigned to the parameter. We use the following parameters:
+      jacusa_params:
+        # mandatory parameter referring to the library of the first condition sample.
+        P1: "FR-SECONDSTRAND"
+        # mandatory parameter referring to the library of the second condition sample.
+        P2: "FR-SECONDSTRAND"
+        # filter reads by mapping quality
+        m: 1
+        # filter reads by basecalling quality
+        q: 1
+        # filter reads by coverage
+        c: 4
+        # recommended parameter to filter sites within the holy-polymer regions.
+        a: "Y"
+        # customize the number of threads
+        p: 16
+        # mandatory parameter to output deletion score.
+        D: null
+        # mandatory parameter to output insertion score.
+        I: null
+        # specify patterns and their combinations to be used, please set to "null" if no value is affected to the field.
+      pattern_params:
+        # specify the annotation of the set of modified sites to be used as a training set. in case you use an external pattern put "null".
+        internal_pattern: "Boulias,Koertel,Koh"
+        # path to an external pattern in case you don't use internal_pattern, else put "null"
+        external_pattern: null
+        # patterns to combine, add as many combinations as you want as a [key(any name): value (pattern numbers)] combination.
+        combined_patterns:
+          pt1: [1, 2, 4, 6]
+          pt2: [1, 2, 3, 4, 6]
 
 Please check JACUSA2 [manual](https://github.com/dieterich-lab/JACUSA2) for more details on how to use JACUSA2 parameters.
 

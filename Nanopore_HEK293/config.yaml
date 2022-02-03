@@ -1,39 +1,38 @@
-# INFOS PARAMS
-label: "HEK293_WT_KO"   # label of the analysis
-             
-# INPUT & OUTPUT PATH
-path_out: "output"     # path to the output directory, if it doesn't exist it will be created 
-path_inp: "data"    # path to the directory containg inputs - all input files are relative to this directory
-reference : "data/GRCh38_96.fa" # path to reference squence 
-modified_sites: "data/miCLIP_union.bed"   # known modified sites
-chr_size: "data/hg38.size" # file contaning size of chromosomes
-regions: "data/selected_regions.bed"  # BED6 file contaning set of 5-mer (NNANN) to analyze on, if ="", all 5-mers (NNANN) will be considered    
-# INPUTS PARAMS
+label:                            # label of the analysis
+
+# INPUT & OUTPUT PARAMS
+path_out:                         # path to the output directory, if it doesn't exist it will be created 
+path_inp:                         # path to the directory containing inputs - all input files are relative to this directory
+reference:                        # path to the reference sequence 
+modified_sites:                   # path to file containing known modified sites
+chr_size:                         # path to file containing the size of chromosomes
+regions:                          # path to BED6 file containing a set of 5-mer (NNANN) to analyze on, if =null, all 5-mers (NNANN) will be considered    
 data:
-    cond1: ["HEK293T-WT-rep2","HEK293T-WT-rep3"]    # list of all replicates bam file without the extension .bam for condition1
-    cond2: ["HEK293T-KO-rep2","HEK293T-KO-rep3"]   # list of all replicates bam file without the extension .bam for condition2
+    cond1:                        # list of bam file names of all replicates without the extension .bam for condition1
+    cond2:                        # list of bam file names of all replicates without the extension .bam for condition2
 
 # JACUSA PARAMS
-jar : "JACUSA_v2.0.1.jar"    # path to JACUISA2 JAR file 
-jacusa_params:                       #add any parameter as a name of the key and set its appropriate value as [key: value].
-                                     # please use "" if no value is affected to the parameter.
-             p: 16 
-             D: ''
-             I: ''
-             P1: 'FR-SECONDSTRAND' 
-             P2: 'FR-SECONDSTRAND'             
-             m: 1 
-             q: 1 
-             c: 4
-             a: 'D,Y'
-java_params:
-             Xmx20g: ''
-             XX:ParallelGCThreads=10: ''
+jar:                              # path to JACUSA2 JAR file 
+jacusa_params:                    # add any parameter as a name of the key and set its appropriate value as [key: value]. Please put "null" if no value is assigned to the parameter.
+    p: 
+    D: null
+    I: null
+    P1: 
+    P2: 
+    m: 
+    q: 
+    c: 
+    a: 'Y'
 
-# COMBINATION OF PATTERNS           
-pattern_params:       # specify patterns and their combinations to be used, please use "" if no value is affected to the field.
-        internal_pattern: "Boulias,Koertel,Koh" # specify the annotation of the set of modied sites to be used as a training set 
-        external_pattern: ""  # path to an external pattern in case you don't use internal_pattern, else put ""
-        combined_patterns: #patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
-                    pt1: [1,2,4,6]  
-                    pt2: [1,2,3,4,6]
+# JAVA PARAMS
+java_params:
+    Xmx20g: null
+    'XX:ParallelGCThreads=10': null
+    
+# COMBINATION OF PATTERNS               
+pattern_params:                    # specify patterns and their combinations to be used, please put "null" if no value is affected to the field.
+    internal_pattern:              # specify the annotation of the set of modified sites to be used as a training set 
+    external_pattern:              # path to an external pattern in case you don't use internal_pattern, else put "null"
+    combined_patterns:             # patterns to combine, add as many combinations as you want as a [key(any name): value (pattern number)] combination.
+        pt1: []
+        pt2: []

@@ -71,7 +71,7 @@ For the testing example, we consider BAM files of wild-type cells ("HEK293T-WT-r
 
 The pipeline is composed of many target rules (fig. 4) and requires setting different parameters.
 
-- Be aware to set all parameters before running the pipeline. Please put all required data in a folder with the name `data` in the working directory. Here is the bconfig file of the testing example.
+- Be aware to set all parameters before running the pipeline. Please put all required data in a folder with the name `data` in the working directory. Here is the config file of the testing example.
 
       #label of the analysis
       label: "HEK293_WT_KO"

@@ -15,8 +15,8 @@ data:
 jar:                              # path to JACUSA2 JAR file 
 jacusa_params:                    # add any parameter as a name of the key and set its appropriate value as [key: value]. Please put "null" if no value is assigned to the parameter.
     p: 
-    D: ''
-    I: ''
+    D: null
+    I: null
     P1: 
     P2: 
     m: 
@@ -26,8 +26,8 @@ jacusa_params:                    # add any parameter as a name of the key and s
 
 # JAVA PARAMS
 java_params:
-    Xmx20g: ''
-    'XX:ParallelGCThreads=10': ''
+    Xmx20g: null
+    'XX:ParallelGCThreads=10': null
     
 # COMBINATION OF PATTERNS               
 pattern_params:                    # specify patterns and their combinations to be used, please put "null" if no value is affected to the field.

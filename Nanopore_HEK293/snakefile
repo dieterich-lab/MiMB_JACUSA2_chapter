@@ -19,11 +19,12 @@ ground_truth = config['modified_sites']
 jarfile= config["jar"]    
 java_params= config["java_params"]
 javaparams = ""
-for key in java_params:
-      strg = ""
-      if  java_params[key] != None:
-          strg = str(java_params[key])
-      javaparams = javaparams + "-"+key+ " " +strg+ " "
+if java_params != None:
+    for key in java_params:
+          strg = ""
+          if  java_params[key] != None:
+              strg = str(java_params[key])
+          javaparams = javaparams + "-"+key+ " " +strg+ " "
 
 #Combine all jacusa params in one string    
 parameters= config["jacusa_params"]

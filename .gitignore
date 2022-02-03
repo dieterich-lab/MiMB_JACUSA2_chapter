@@ -5,4 +5,5 @@ output
 Nanopore_HEK293/job.sh
 .ipynb_checkpoints
 Nanopore_HEK293/*job*.txt
-Nanopore_HEK293/config.yaml
+Nanopore_HEK293/samtools.*.bam
+

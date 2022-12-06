@@ -9,7 +9,8 @@ dependencies:
   - Minimap2=2.22
   - r-base=4.0.5
   - bedtools=2.29.2
-  - r-NMF
-  - r-ggplot2
-  - r-pROC
-  - r-stringr
+  - r-NMF=0.24.0 
+  - r-ggplot2=3.3.6
+  - r-pROC=_1.4.0
+  - r-stringr=1.4.0
+
